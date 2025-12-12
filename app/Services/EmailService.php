@@ -21,10 +21,13 @@ class EmailService
             return false;
         }
 
+        $senderEmail = getenv('BREVO_SENDER_EMAIL') ?: 'noreply@tradepro.com';
+        $senderName = getenv('BREVO_SENDER_NAME') ?: 'TradePro';
+        
         $data = [
             'sender' => [
-                'name' => 'TradePro',
-                'email' => 'noreply@tradepro.com'
+                'name' => $senderName,
+                'email' => $senderEmail
             ],
             'to' => [
                 [
