@@ -1,0 +1,185 @@
+Professional system blueprint (PHP only)
+1) User system
+
+Register / Login / Forgot password
+
+KYC fields (optional) + account status (active / suspended)
+
+2FA (recommended) + login logs
+
+2) Wallet system (manual approvals like you described)
+
+Deposit request (user uploads proof + txid)
+
+Admin approves → user balance updates
+
+Withdrawal request (user enters address + amount)
+
+Admin approves → admin marks “paid” (manual send outside)
+
+3) Trading system (professional features)
+
+Markets list: Forex + Crypto
+
+Real-time-ish prices (from a price API)
+
+Order types:
+
+Market order
+
+Limit order
+
+Stop loss
+
+Take profit
+
+Leverage + margin rules
+
+Positions table (open/closed)
+
+PnL calculation (profit/loss)
+
+Liquidation rules (if margin too low)
+
+4) Admin panel (full control)
+
+Users management
+
+Deposit approvals + withdrawal approvals
+
+Edit user balances (with audit)
+
+Market settings (spread, leverage limits, min trade)
+
+Referral rules + commission settings
+
+Risk controls: max leverage, max position size, freeze trading, suspend user
+
+Full logs: every action recorded
+
+5) Professional “trust” features
+
+Audit logs for everything
+
+Anti-fraud: duplicate txid check, withdrawal cooldown, device/session log
+
+Rate limits on login
+
+Password hashing + secure sessions
+
+Roles: superadmin / finance admin / support admin
+
+Important: If you will handle real money publicly, you may need legal/regulatory compliance in your country. The platform can be built, but don’t launch without checking rules.
+
+Recommended tech stack (still “PHP only”)
+
+PHP 8.2+ (Composer allowed)
+
+MySQL/MariaDB
+
+MVC structure (clean code)
+
+Admin + User dashboard
+
+Cron jobs for:
+
+price updates
+
+limit/stop triggers
+
+liquidation checks
+
+referral payouts
+
+Database tables (minimum)
+
+users
+
+admin_users
+
+wallets (user balances)
+
+deposits
+
+withdrawals
+
+markets
+
+prices_history
+
+orders
+
+positions
+
+trades (fills)
+
+referral_links
+
+referral_earnings
+
+audit_logs
+
+settings
+
+Folder structure (professional)
+/public_html
+  /public
+    index.php
+    assets/
+  /app
+    /Controllers
+    /Models
+    /Services
+    /Middleware
+    /Views
+  /routes
+    web.php
+    api.php
+  /storage
+    uploads/
+    logs/
+  /config
+    database.php
+    app.php
+  /cron
+    update_prices.php
+    trigger_orders.php
+    liquidation.php
+  /vendor (composer)
+  .env
+
+The best Replit AI Agent prompt (COPY + PASTE)
+
+Use this exactly:
+
+Build a professional trading platform using ONLY PHP 8.2 (no Node.js, no Python, no Laravel required). Use MySQL/MariaDB. Use an MVC structure with clean routing. Create 2 panels: (1) User dashboard (2) Admin dashboard.
+
+Core features:
+
+Authentication: register/login/logout/forgot password, password hashing, secure sessions, login logs.
+
+Wallet system (manual approvals): deposits are sent to admin wallet, user submits amount + txid + proof image, admin approves/rejects, user balance updates. Withdrawals: user requests amount + wallet address, admin approves/rejects, status paid/pending, admin marks paid manually. Prevent duplicate txid.
+
+Trading: markets for Forex & Crypto. Support market orders + limit orders + stop loss + take profit + leverage + margin. Store orders, positions, trades, and calculate PnL. Include liquidation when margin is insufficient.
+
+Prices: integrate a public price API (example: CoinGecko for crypto + a forex rates API). Save latest prices to DB every minute (cron). Use DB prices for charting and order triggers.
+
+Order triggers: cron job checks limit orders, stop loss, take profit. When triggered, execute trade, update position and wallet margin.
+
+Admin panel: manage users, suspend/activate, approve deposits/withdrawals, set leverage limits per market, set spreads/fees, manage referral rules (reward only after referred deposit reaches minimum).
+
+Security: CSRF protection, input validation, prepared statements, server-side authorization middleware, audit_logs table logging every admin action and financial change.
+
+UI: simple clean dashboard (Bootstrap allowed). Do not add complex JS frameworks.
+
+Deliverables:
+
+Full source code with the folder structure above
+
+database.sql schema + seed for admin user
+
+.env example
+
+Step-by-step setup instructions for cPanel hosting
+
+All code must be complete and runnable.

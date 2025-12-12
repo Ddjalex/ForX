@@ -1,0 +1,42 @@
+# Composer
+composer.phar
+/vendor/
+
+# CakePHP 3
+/config/app.php
+/tmp/cache/models/*
+!/tmp/cache/models/empty
+/tmp/cache/persistent/*
+!/tmp/cache/persistent/empty
+/tmp/cache/views/*
+!/tmp/cache/views/empty
+/tmp/sessions/*
+!/tmp/sessions/empty
+
+/logs/*
+!/logs/empty
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Storage
+storage/logs/*
+storage/uploads/*
+!storage/logs/.gitkeep
+!storage/uploads/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Replit
+.cache/
+.upm/
