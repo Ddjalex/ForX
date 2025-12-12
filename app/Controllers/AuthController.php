@@ -8,6 +8,7 @@ use App\Services\Router;
 use App\Services\Session;
 use App\Services\AuditLog;
 use App\Services\RateLimiter;
+use App\Services\EmailService;
 
 class AuthController
 {
@@ -48,7 +49,32 @@ class AuthController
             return;
         }
 
-        if (Auth::attempt($email, $password)) {
+        $result = Auth::attempt($email, $password);
+        
+        if ($result === 'unverified') {
+            $user = Database::fetch("SELECT name FROM users WHERE email = ?", [$email]);
+            if ($user) {
+                $verificationCode = EmailService::generateVerificationCode();
+                $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                
+                Database::update('users', [
+                    'verification_code' => $verificationCode,
+                    'verification_expires' => $expires,
+                ], 'email = ?', [$email]);
+                
+                $emailSent = EmailService::sendVerificationCode($email, $user['name'], $verificationCode);
+                
+                if ($emailSent) {
+                    Session::flash('error', 'Please verify your email first. A new code has been sent.');
+                } else {
+                    Session::flash('error', 'Please verify your email. Unable to send verification code, please try again later.');
+                }
+                Router::redirect('/verify-email?email=' . urlencode($email));
+                return;
+            }
+        }
+
+        if ($result === true) {
             RateLimiter::clear($rateLimitKey);
             AuditLog::log('login', 'user', Auth::id());
             
@@ -103,17 +129,37 @@ class AuthController
             return;
         }
 
-        $existing = Database::fetch("SELECT id FROM users WHERE email = ?", [$email]);
+        $existing = Database::fetch("SELECT id, email_verified FROM users WHERE email = ?", [$email]);
         if ($existing) {
+            if (!$existing['email_verified']) {
+                $verificationCode = EmailService::generateVerificationCode();
+                $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                
+                Database::update('users', [
+                    'verification_code' => $verificationCode,
+                    'verification_expires' => $expires,
+                ], 'id = ?', [$existing['id']]);
+                
+                EmailService::sendVerificationCode($email, $name, $verificationCode);
+                
+                Router::redirect('/verify-email?email=' . urlencode($email));
+                return;
+            }
             Session::flash('error', 'Email already registered.');
             Router::redirect('/register');
             return;
         }
 
+        $verificationCode = EmailService::generateVerificationCode();
+        $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
         $userId = Auth::register([
             'name' => $name,
             'email' => $email,
             'password' => $password,
+            'verification_code' => $verificationCode,
+            'verification_expires' => $expires,
+            'email_verified' => false,
         ]);
 
         Database::insert('wallets', [
@@ -125,8 +171,124 @@ class AuthController
 
         AuditLog::log('register', 'user', $userId);
 
-        Session::flash('success', 'Registration successful! Please log in.');
+        $emailSent = EmailService::sendVerificationCode($email, $name, $verificationCode);
+        
+        if (!$emailSent) {
+            Session::flash('error', 'Failed to send verification email. Please try again.');
+            Router::redirect('/register');
+            return;
+        }
+
+        Router::redirect('/verify-email?email=' . urlencode($email));
+    }
+
+    public function showVerifyEmail(): void
+    {
+        $email = filter_input(INPUT_GET, 'email', FILTER_SANITIZE_EMAIL);
+        
+        if (empty($email)) {
+            Router::redirect('/register');
+            return;
+        }
+
+        echo Router::render('auth/verify-email', [
+            'csrf_token' => Session::generateCsrfToken(),
+            'email' => $email,
+            'error' => Session::getFlash('error'),
+            'success' => Session::getFlash('success'),
+        ]);
+    }
+
+    public function verifyEmail(): void
+    {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request. Please try again.');
+            $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+            Router::redirect('/verify-email?email=' . urlencode($email));
+            return;
+        }
+
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $code = filter_input(INPUT_POST, 'code', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        if (empty($email) || empty($code)) {
+            Session::flash('error', 'Please enter the verification code.');
+            Router::redirect('/verify-email?email=' . urlencode($email));
+            return;
+        }
+
+        $user = Database::fetch(
+            "SELECT id, verification_code, verification_expires FROM users WHERE email = ? AND email_verified = false",
+            [$email]
+        );
+
+        if (!$user) {
+            Session::flash('error', 'Invalid email or already verified.');
+            Router::redirect('/login');
+            return;
+        }
+
+        if ($user['verification_code'] !== $code) {
+            Session::flash('error', 'Invalid verification code.');
+            Router::redirect('/verify-email?email=' . urlencode($email));
+            return;
+        }
+
+        if (strtotime($user['verification_expires']) < time()) {
+            Session::flash('error', 'Verification code has expired. Please request a new one.');
+            Router::redirect('/verify-email?email=' . urlencode($email));
+            return;
+        }
+
+        Database::update('users', [
+            'email_verified' => true,
+            'verification_code' => null,
+            'verification_expires' => null,
+        ], 'id = ?', [$user['id']]);
+
+        AuditLog::log('email_verified', 'user', $user['id']);
+
+        Session::flash('success', 'Email verified successfully! You can now log in.');
         Router::redirect('/login');
+    }
+
+    public function resendVerification(): void
+    {
+        $email = filter_input(INPUT_GET, 'email', FILTER_SANITIZE_EMAIL);
+
+        if (empty($email)) {
+            Router::redirect('/register');
+            return;
+        }
+
+        $user = Database::fetch(
+            "SELECT id, name FROM users WHERE email = ? AND email_verified = false",
+            [$email]
+        );
+
+        if (!$user) {
+            Session::flash('error', 'Invalid email or already verified.');
+            Router::redirect('/login');
+            return;
+        }
+
+        $verificationCode = EmailService::generateVerificationCode();
+        $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+        Database::update('users', [
+            'verification_code' => $verificationCode,
+            'verification_expires' => $expires,
+        ], 'id = ?', [$user['id']]);
+
+        $emailSent = EmailService::sendVerificationCode($email, $user['name'], $verificationCode);
+
+        if ($emailSent) {
+            Session::flash('success', 'A new verification code has been sent to your email.');
+        } else {
+            Session::flash('error', 'Failed to send verification email. Please try again.');
+        }
+
+        Router::redirect('/verify-email?email=' . urlencode($email));
     }
 
     public function logout(): void

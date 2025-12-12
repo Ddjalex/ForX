@@ -4,7 +4,7 @@ namespace App\Services;
 
 class Auth
 {
-    public static function attempt(string $email, string $password): bool
+    public static function attempt(string $email, string $password): bool|string
     {
         $user = Database::fetch(
             "SELECT * FROM users WHERE email = ? AND status = 'active'",
@@ -12,6 +12,10 @@ class Auth
         );
 
         if ($user && password_verify($password, $user['password'])) {
+            if (!$user['email_verified']) {
+                self::logLogin($user['id'], false);
+                return 'unverified';
+            }
             self::login($user);
             self::logLogin($user['id'], true);
             return true;
@@ -87,13 +91,32 @@ class Auth
     {
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
-        return Database::insert('users', [
+        $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $hashedPassword,
             'status' => 'active',
             'role' => 'user',
+            'email_verified' => $data['email_verified'] ?? false,
             'created_at' => date('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        if (isset($data['verification_code'])) {
+            $userData['verification_code'] = $data['verification_code'];
+        }
+        if (isset($data['verification_expires'])) {
+            $userData['verification_expires'] = $data['verification_expires'];
+        }
+        
+        return Database::insert('users', $userData);
+    }
+
+    public static function isEmailVerified(string $email): bool
+    {
+        $user = Database::fetch(
+            "SELECT email_verified FROM users WHERE email = ?",
+            [$email]
+        );
+        return $user && $user['email_verified'];
     }
 }

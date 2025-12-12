@@ -1,9 +1,9 @@
 -- Seed data for TradePro
 
 -- Admin user (password: admin123)
-INSERT INTO users (name, email, password, role, status) VALUES 
-('Admin', 'admin@tradepro.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin', 'active'),
-('Demo User', 'demo@tradepro.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', 'active')
+INSERT INTO users (name, email, password, role, status, email_verified) VALUES 
+('Admin', 'admin@tradepro.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin', 'active', true),
+('Demo User', 'demo@tradepro.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', 'active', true)
 ON CONFLICT (email) DO NOTHING;
 
 -- Create wallets for users

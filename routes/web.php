@@ -25,6 +25,9 @@ Router::get('/register', [AuthController::class, 'showRegister'], [GuestMiddlewa
 Router::post('/register', [AuthController::class, 'register']);
 Router::get('/forgot-password', [AuthController::class, 'showForgotPassword'], [GuestMiddleware::class]);
 Router::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Router::get('/verify-email', [AuthController::class, 'showVerifyEmail'], [GuestMiddleware::class]);
+Router::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Router::get('/resend-verification', [AuthController::class, 'resendVerification'], [GuestMiddleware::class]);
 Router::get('/logout', [AuthController::class, 'logout']);
 
 Router::get('/dashboard', [DashboardController::class, 'index'], [AuthMiddleware::class]);
