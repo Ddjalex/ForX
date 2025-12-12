@@ -27,7 +27,8 @@ A full-featured trading platform built with PHP 8.2 featuring Forex and Crypto t
 ```
 
 ## Features
-- **Authentication**: Register, login, logout, password reset
+- **Authentication**: Register, login, logout, password reset, email verification
+- **Email Verification**: 6-digit code sent via Brevo API during registration
 - **User Dashboard**: Balance overview, positions, transactions
 - **Trading**: Market/Limit orders, leverage up to 500x, stop-loss, take-profit
 - **Markets**: 8 Crypto pairs + 8 Forex pairs
@@ -60,3 +61,8 @@ PostgreSQL with the following main tables:
   - Enhanced file upload validation (MIME type + extension checks, 5MB limit)
   - Admin middleware with database role verification
   - Withdrawal balance verification before approval
+- December 2024: Email verification for registration:
+  - 6-digit verification codes sent via Brevo API
+  - Verification required before login is allowed
+  - Code expiration after 15 minutes
+  - Resend verification code functionality
