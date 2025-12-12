@@ -55,3 +55,8 @@ PostgreSQL with the following main tables:
 - December 2024: Initial build with complete trading platform
 - Exness-style dark UI with yellow (#FFCF00) accent color
 - Full MVC architecture with proper separation of concerns
+- December 2024: Security enhancements:
+  - Login rate limiting (5 attempts per 15 minutes)
+  - Enhanced file upload validation (MIME type + extension checks, 5MB limit)
+  - Admin middleware with database role verification
+  - Withdrawal balance verification before approval
