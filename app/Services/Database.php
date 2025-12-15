@@ -61,6 +61,7 @@ class Database
 
     public static function insert(string $table, array $data): int
     {
+        $data = self::convertBooleans($data);
         $columns = implode(', ', array_keys($data));
         $placeholders = implode(', ', array_fill(0, count($data), '?'));
         
@@ -68,6 +69,16 @@ class Database
         self::query($sql, array_values($data));
         
         return (int) self::getInstance()->lastInsertId();
+    }
+
+    private static function convertBooleans(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_bool($value)) {
+                $data[$key] = $value ? 'true' : 'false';
+            }
+        }
+        return $data;
     }
 
     public static function update(string $table, array $data, string $where, array $whereParams = []): int
