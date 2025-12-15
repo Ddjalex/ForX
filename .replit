@@ -40,3 +40,9 @@ outputType = "webview"
 task = "shell.exec"
 args = "php -S 0.0.0.0:5000 -t public"
 waitForPort = 5000
+
+[userenv]
+
+[userenv.shared]
+BREVO_SENDER_EMAIL = "noreply@tradepro.com"
+BREVO_SENDER_NAME = "TradePro"
