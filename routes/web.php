@@ -7,6 +7,7 @@ use App\Controllers\WalletController;
 use App\Controllers\TradingController;
 use App\Controllers\AdminController;
 use App\Controllers\ApiController;
+use App\Controllers\AccountsController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\GuestMiddleware;
@@ -60,6 +61,13 @@ Router::get('/admin/settings', [AdminController::class, 'settings'], [AdminMiddl
 Router::post('/admin/settings', [AdminController::class, 'updateSettings'], [AdminMiddleware::class]);
 Router::get('/admin/audit-logs', [AdminController::class, 'auditLogs'], [AdminMiddleware::class]);
 Router::get('/admin/positions', [AdminController::class, 'positions'], [AdminMiddleware::class]);
+
+Router::get('/accounts', [AccountsController::class, 'index'], [AuthMiddleware::class]);
+Router::post('/accounts/create', [AccountsController::class, 'create'], [AuthMiddleware::class]);
+Router::post('/accounts/set-balance', [AccountsController::class, 'setBalance'], [AuthMiddleware::class]);
+Router::get('/accounts/archive', [AccountsController::class, 'archive'], [AuthMiddleware::class]);
+Router::get('/accounts/restore', [AccountsController::class, 'restore'], [AuthMiddleware::class]);
+Router::get('/accounts/trade', [AccountsController::class, 'trade'], [AuthMiddleware::class]);
 
 Router::get('/api/prices', [ApiController::class, 'prices']);
 Router::get('/api/prices/{symbol}', [ApiController::class, 'marketPrice']);
