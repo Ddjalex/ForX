@@ -44,5 +44,5 @@ waitForPort = 5000
 [userenv]
 
 [userenv.shared]
-BREVO_SENDER_EMAIL = "noreply@tradepro.com"
+BREVO_SENDER_EMAIL = "almesagadw@gmail.com"
 BREVO_SENDER_NAME = "TradePro"
