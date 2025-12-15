@@ -77,11 +77,19 @@ ob_start();
                             <div class="dropdown">
                                 <button class="btn btn-icon"><i class="fas fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu">
-                                    <a href="/accounts/archive?id=<?= $account['id'] ?>" class="dropdown-item">Archive</a>
+                                    <form action="/accounts/archive" method="POST" style="margin:0;">
+                                        <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                                        <input type="hidden" name="id" value="<?= $account['id'] ?>">
+                                        <button type="submit" class="dropdown-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;">Archive</button>
+                                    </form>
                                 </div>
                             </div>
                         <?php else: ?>
-                            <a href="/accounts/restore?id=<?= $account['id'] ?>" class="btn btn-outline btn-sm">Restore</a>
+                            <form action="/accounts/restore" method="POST" style="display:inline;">
+                                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                                <input type="hidden" name="id" value="<?= $account['id'] ?>">
+                                <button type="submit" class="btn btn-outline btn-sm">Restore</button>
+                            </form>
                         <?php endif; ?>
                     </div>
                 </div>

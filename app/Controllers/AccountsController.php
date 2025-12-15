@@ -143,8 +143,14 @@ class AccountsController
             return;
         }
 
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/accounts');
+            return;
+        }
+
         $user = Auth::user();
-        $accountId = (int)($_GET['id'] ?? 0);
+        $accountId = (int)($_POST['id'] ?? 0);
 
         $account = Database::fetch(
             "SELECT * FROM trading_accounts WHERE id = ? AND user_id = ?",
@@ -175,8 +181,14 @@ class AccountsController
             return;
         }
 
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/accounts?tab=archived');
+            return;
+        }
+
         $user = Auth::user();
-        $accountId = (int)($_GET['id'] ?? 0);
+        $accountId = (int)($_POST['id'] ?? 0);
 
         $account = Database::fetch(
             "SELECT * FROM trading_accounts WHERE id = ? AND user_id = ? AND status = 'archived'",

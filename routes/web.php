@@ -65,8 +65,8 @@ Router::get('/admin/positions', [AdminController::class, 'positions'], [AdminMid
 Router::get('/accounts', [AccountsController::class, 'index'], [AuthMiddleware::class]);
 Router::post('/accounts/create', [AccountsController::class, 'create'], [AuthMiddleware::class]);
 Router::post('/accounts/set-balance', [AccountsController::class, 'setBalance'], [AuthMiddleware::class]);
-Router::get('/accounts/archive', [AccountsController::class, 'archive'], [AuthMiddleware::class]);
-Router::get('/accounts/restore', [AccountsController::class, 'restore'], [AuthMiddleware::class]);
+Router::post('/accounts/archive', [AccountsController::class, 'archive'], [AuthMiddleware::class]);
+Router::post('/accounts/restore', [AccountsController::class, 'restore'], [AuthMiddleware::class]);
 Router::get('/accounts/trade', [AccountsController::class, 'trade'], [AuthMiddleware::class]);
 
 Router::get('/api/prices', [ApiController::class, 'prices']);
