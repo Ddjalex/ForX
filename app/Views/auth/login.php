@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
 </head>
 <body>
     <div class="auth-container">
@@ -42,6 +43,10 @@
 
                 <div class="form-group" style="text-align: right;">
                     <a href="/forgot-password">Forgot password?</a>
+                </div>
+
+                <div class="form-group">
+                    <div class="cf-turnstile" data-sitekey="<?= $turnstile_site_key ?? '' ?>" data-theme="dark"></div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Sign In</button>

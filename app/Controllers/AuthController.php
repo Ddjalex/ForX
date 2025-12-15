@@ -9,6 +9,7 @@ use App\Services\Session;
 use App\Services\AuditLog;
 use App\Services\RateLimiter;
 use App\Services\EmailService;
+use App\Services\TurnstileService;
 
 class AuthController
 {
@@ -21,6 +22,7 @@ class AuthController
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
             'success' => Session::getFlash('success'),
+            'turnstile_site_key' => TurnstileService::getSiteKey(),
         ]);
     }
 
@@ -39,6 +41,13 @@ class AuthController
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, self::MAX_LOGIN_ATTEMPTS, self::LOCKOUT_SECONDS)) {
             Session::flash('error', 'Too many login attempts. Please try again in 15 minutes.');
+            Router::redirect('/login');
+            return;
+        }
+
+        $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+        if (!TurnstileService::verify($turnstileToken)) {
+            Session::flash('error', 'Please complete the captcha verification.');
             Router::redirect('/login');
             return;
         }
@@ -95,6 +104,7 @@ class AuthController
         echo Router::render('auth/register', [
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
+            'turnstile_site_key' => TurnstileService::getSiteKey(),
         ]);
     }
 
@@ -102,6 +112,13 @@ class AuthController
     {
         if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
             Session::flash('error', 'Invalid request. Please try again.');
+            Router::redirect('/register');
+            return;
+        }
+
+        $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+        if (!TurnstileService::verify($turnstileToken)) {
+            Session::flash('error', 'Please complete the captcha verification.');
             Router::redirect('/register');
             return;
         }

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
     <style>
         .auth-box-wide {
             max-width: 700px;
@@ -81,7 +82,6 @@
 
             <form method="POST" action="/register">
                 <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
-                <input type="hidden" name="captcha_answer" id="captcha_answer" value="">
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -400,11 +400,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Captcha</label>
-                    <div class="captcha-row">
-                        <div class="captcha-image" id="captchaDisplay"></div>
-                        <input type="text" id="captcha" name="captcha" class="form-control captcha-input" placeholder="Enter Captcha" required>
-                    </div>
+                    <div class="cf-turnstile" data-sitekey="<?= $turnstile_site_key ?? '' ?>" data-theme="dark"></div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block mt-4">Sign Up</button>
@@ -417,16 +413,6 @@
     </div>
 
     <script>
-        function generateCaptcha() {
-            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let captcha = '';
-            for (let i = 0; i < 6; i++) {
-                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('captchaDisplay').textContent = captcha;
-            document.getElementById('captcha_answer').value = captcha;
-        }
-
         function togglePassword(fieldId, btn) {
             const field = document.getElementById(fieldId);
             if (field.type === 'password') {
@@ -435,8 +421,6 @@
                 field.type = 'password';
             }
         }
-
-        generateCaptcha();
     </script>
 </body>
 </html>
