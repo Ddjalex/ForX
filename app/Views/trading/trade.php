@@ -12,7 +12,7 @@ $totalBalance = $wallet['balance'] ?? 0;
 <?php endif; ?>
 
 <div class="trade-action-bar">
-    <a href="/positions" class="action-btn trade-history">
+    <a href="/dashboard/trades/history" class="action-btn trade-history">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         Trade History
     </a>
@@ -69,7 +69,7 @@ $totalBalance = $wallet['balance'] ?? 0;
             </div>
         </div>
 
-        <form method="POST" action="/trade/order" id="tradeForm">
+        <form method="POST" action="/dashboard/trade/order" id="tradeForm">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" name="market_id" value="<?= $market['id'] ?>">
             <input type="hidden" name="side" id="orderSide" value="buy">

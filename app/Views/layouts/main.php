@@ -56,7 +56,7 @@
                     Withdraw
                 </a></li>
                 
-                <li><a href="/trade/BTC%2FUSD" class="<?= (strpos($_SERVER['REQUEST_URI'], '/markets') === 0 || strpos($_SERVER['REQUEST_URI'], '/trade') === 0) ? 'active' : '' ?>">
+                <li><a href="/dashboard/trade" class="<?= (strpos($_SERVER['REQUEST_URI'], '/markets') === 0 || strpos($_SERVER['REQUEST_URI'], '/dashboard/trade') === 0) ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
                     Trade
                 </a></li>
@@ -86,9 +86,9 @@
                     Loan
                 </a></li>
                 
-                <li><a href="/positions" class="<?= ($_SERVER['REQUEST_URI'] === '/positions') ? 'active' : '' ?>">
+                <li><a href="/dashboard/trades/history" class="<?= (strpos($_SERVER['REQUEST_URI'], '/dashboard/trades/history') === 0) ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    History
+                    Trade History
                 </a></li>
                 
                 <li><a href="/transactions" class="<?= ($_SERVER['REQUEST_URI'] === '/transactions') ? 'active' : '' ?>">

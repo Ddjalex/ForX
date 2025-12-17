@@ -9,7 +9,7 @@ if (empty($success) && $showSuccessModal) {
 ?>
 
 <div class="trade-action-bar">
-    <a href="/trade/BTC%2FUSD" class="action-btn trade-now">
+    <a href="/dashboard/trade" class="action-btn trade-now">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
         Trade Now
     </a>

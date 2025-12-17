@@ -40,13 +40,14 @@ Router::get('/wallet/withdraw', [WalletController::class, 'showWithdraw'], [Auth
 Router::post('/wallet/withdraw', [WalletController::class, 'withdraw'], [AuthMiddleware::class]);
 
 Router::get('/markets', [TradingController::class, 'markets'], [AuthMiddleware::class]);
-Router::get('/trade/{symbol}', [TradingController::class, 'trade'], [AuthMiddleware::class]);
-Router::post('/trade/order', [TradingController::class, 'placeOrder'], [AuthMiddleware::class]);
-Router::post('/trade/close', [TradingController::class, 'closePosition'], [AuthMiddleware::class]);
-Router::post('/trade/cancel', [TradingController::class, 'cancelOrder'], [AuthMiddleware::class]);
+Router::get('/dashboard/trade', [TradingController::class, 'tradeDefault'], [AuthMiddleware::class]);
+Router::get('/dashboard/trade/{symbol}', [TradingController::class, 'trade'], [AuthMiddleware::class]);
+Router::post('/dashboard/trade/order', [TradingController::class, 'placeOrder'], [AuthMiddleware::class]);
+Router::post('/dashboard/trade/close', [TradingController::class, 'closePosition'], [AuthMiddleware::class]);
+Router::post('/dashboard/trade/cancel', [TradingController::class, 'cancelOrder'], [AuthMiddleware::class]);
 Router::get('/positions', [TradingController::class, 'positions'], [AuthMiddleware::class]);
 Router::get('/orders', [TradingController::class, 'orders'], [AuthMiddleware::class]);
-Router::get('/trades/history', [TradingController::class, 'history'], [AuthMiddleware::class]);
+Router::get('/dashboard/trades/history', [TradingController::class, 'history'], [AuthMiddleware::class]);
 
 Router::get('/admin', [AdminController::class, 'dashboard'], [AdminMiddleware::class]);
 Router::get('/admin/users', [AdminController::class, 'users'], [AdminMiddleware::class]);

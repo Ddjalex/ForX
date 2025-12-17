@@ -26,6 +26,25 @@ class TradingController
         ]);
     }
 
+    public function tradeDefault(): void
+    {
+        $market = Database::fetch(
+            "SELECT m.*, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h
+             FROM markets m 
+             LEFT JOIN prices p ON m.id = p.market_id 
+             WHERE m.status = 'active'
+             ORDER BY m.type, m.symbol
+             LIMIT 1"
+        );
+
+        if (!$market) {
+            Router::redirect('/dashboard');
+            return;
+        }
+
+        $this->renderTrade($market);
+    }
+
     public function trade(string $symbol): void
     {
         $market = Database::fetch(
@@ -37,9 +56,15 @@ class TradingController
         );
 
         if (!$market) {
-            Router::redirect('/markets');
+            Router::redirect('/dashboard/trade');
             return;
         }
+
+        $this->renderTrade($market);
+    }
+
+    private function renderTrade(array $market): void
+    {
 
         $user = Auth::user();
         $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$user['id']]);
@@ -105,26 +130,26 @@ class TradingController
 
         if (!$marketId || !$orderType || !$side || !$amount) {
             Session::flash('error', 'Please fill in all required fields.');
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/markets');
+            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
             return;
         }
 
         $market = Database::fetch("SELECT * FROM markets WHERE id = ? AND status = 'active'", [$marketId]);
         if (!$market) {
             Session::flash('error', 'Invalid market.');
-            Router::redirect('/markets');
+            Router::redirect('/dashboard/trade');
             return;
         }
 
         if ($leverage > $market['max_leverage']) {
             Session::flash('error', "Maximum leverage for this market is {$market['max_leverage']}x.");
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/markets');
+            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
             return;
         }
 
         if ($amount < $market['min_trade_size']) {
             Session::flash('error', "Minimum trade size is {$market['min_trade_size']}.");
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/markets');
+            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
             return;
         }
 
@@ -141,7 +166,7 @@ class TradingController
 
         if ($marginRequired > $availableBalance) {
             Session::flash('error', 'Insufficient margin. Required: $' . number_format($marginRequired, 2));
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/markets');
+            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
             return;
         }
 
@@ -192,7 +217,7 @@ class TradingController
             ]);
 
             Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
-            Router::redirect('/trades/history');
+            Router::redirect('/dashboard/trades/history');
             return;
         } else {
             Database::insert('orders', [
@@ -225,7 +250,7 @@ class TradingController
             Session::flash('success', 'Order placed successfully.');
         }
 
-        Router::redirect("/trade/{$market['symbol']}");
+        Router::redirect("/dashboard/trade/{$market['symbol']}");
     }
 
     public function closePosition(): void
@@ -296,7 +321,7 @@ class TradingController
         ]);
 
         Session::flash('success', 'Position closed. PnL: $' . number_format($pnl, 2));
-        Router::redirect("/trade/{$position['symbol']}");
+        Router::redirect("/dashboard/trade/{$position['symbol']}");
     }
 
     public function cancelOrder(): void
@@ -332,7 +357,7 @@ class TradingController
         AuditLog::log('cancel_order', 'order', $orderId, ['market' => $order['symbol']]);
 
         Session::flash('success', 'Order cancelled successfully.');
-        Router::redirect("/trade/{$order['symbol']}");
+        Router::redirect("/dashboard/trade/{$order['symbol']}");
     }
 
     public function positions(): void
