@@ -102,4 +102,141 @@ class ApiController
             'available' => (float) ($wallet['balance'] - $wallet['margin_used']),
         ]]);
     }
+
+    public function executeTrade(): void
+    {
+        if (!Auth::check()) {
+            Router::json(['success' => false, 'message' => 'Please log in to trade'], 401);
+            return;
+        }
+
+        $userId = Auth::id();
+        $assetType = $_POST['asset_type'] ?? 'crypto';
+        $assetName = $_POST['asset_name'] ?? '';
+        $side = $_POST['side'] ?? '';
+        $amount = (float) ($_POST['amount'] ?? 0);
+        $leverage = (int) ($_POST['leverage'] ?? 5);
+        $duration = (int) ($_POST['duration'] ?? 1);
+        $takeProfit = (float) ($_POST['take_profit'] ?? 0);
+        $stopLoss = (float) ($_POST['stop_loss'] ?? 0);
+
+        if (empty($assetName) || empty($side) || $amount <= 0) {
+            Router::json(['success' => false, 'message' => 'Invalid trade parameters']);
+            return;
+        }
+
+        if (!in_array($side, ['buy', 'sell'])) {
+            Router::json(['success' => false, 'message' => 'Invalid trade side']);
+            return;
+        }
+
+        $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
+        if (!$wallet) {
+            Database::insert('wallets', [
+                'user_id' => $userId,
+                'balance' => 0,
+                'margin_used' => 0,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            $wallet = ['balance' => 0, 'margin_used' => 0];
+        }
+
+        $availableBalance = ($wallet['balance'] ?? 0) - ($wallet['margin_used'] ?? 0);
+        $marginRequired = $amount / $leverage;
+
+        if ($marginRequired > $availableBalance) {
+            Router::json(['success' => false, 'message' => 'Insufficient balance. Required margin: $' . number_format($marginRequired, 2)]);
+            return;
+        }
+
+        $market = Database::fetch("SELECT * FROM markets WHERE symbol = ?", [$assetName]);
+        if (!$market) {
+            Database::insert('markets', [
+                'symbol' => $assetName,
+                'name' => $assetName,
+                'type' => $assetType,
+                'status' => 'active',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            $market = Database::fetch("SELECT * FROM markets WHERE symbol = ?", [$assetName]);
+        }
+
+        $entryPrice = $this->getAssetPrice($assetName) ?? 0;
+        if ($entryPrice <= 0) {
+            $entryPrice = $this->getDefaultPrice($assetName);
+        }
+
+        $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
+
+        Database::insert('positions', [
+            'user_id' => $userId,
+            'market_id' => $market['id'],
+            'type' => $assetType,
+            'side' => $side,
+            'amount' => $amount,
+            'leverage' => $leverage,
+            'entry_price' => $entryPrice,
+            'current_price' => $entryPrice,
+            'take_profit' => $takeProfit > 0 ? $takeProfit : null,
+            'stop_loss' => $stopLoss > 0 ? $stopLoss : null,
+            'expires_at' => $expiresAt,
+            'pnl' => 0,
+            'status' => 'open',
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        Database::update('wallets', [
+            'margin_used' => ($wallet['margin_used'] ?? 0) + $marginRequired,
+            'updated_at' => date('Y-m-d H:i:s')
+        ], 'user_id = ?', [$userId]);
+
+        Router::json([
+            'success' => true,
+            'message' => ucfirst($side) . ' order executed successfully',
+            'data' => [
+                'asset' => $assetName,
+                'side' => $side,
+                'amount' => $amount,
+                'leverage' => $leverage,
+                'entry_price' => $entryPrice,
+                'expires_at' => $expiresAt
+            ]
+        ]);
+    }
+
+    private function getAssetPrice(string $symbol): ?float
+    {
+        $market = Database::fetch("SELECT id FROM markets WHERE symbol = ?", [$symbol]);
+        if ($market) {
+            $price = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$market['id']]);
+            if ($price) {
+                return (float) $price['price'];
+            }
+        }
+        return null;
+    }
+
+    private function getDefaultPrice(string $symbol): float
+    {
+        $defaultPrices = [
+            'BTCUSD' => 43500.00,
+            'ETHUSD' => 2280.00,
+            'XRPUSD' => 0.62,
+            'SOLUSD' => 98.50,
+            'BNBUSD' => 315.00,
+            'EURUSD' => 1.0875,
+            'GBPUSD' => 1.2650,
+            'USDJPY' => 149.50,
+            'AUDUSD' => 0.6580,
+            'AAPL' => 195.00,
+            'GOOGL' => 140.00,
+            'AMZN' => 155.00,
+            'TSLA' => 248.00,
+            'MSFT' => 378.00,
+            'XAUUSD' => 2025.00,
+            'XAGUSD' => 24.50,
+            'USOIL' => 72.50
+        ];
+        return $defaultPrices[$symbol] ?? 100.00;
+    }
 }

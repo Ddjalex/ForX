@@ -1242,3 +1242,184 @@ select.form-control {
         margin-left: 0;
     }
 }
+
+/* Live Trading Section Styles */
+.trading-section {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.trading-chart-card .card-body {
+    padding: 0;
+    min-height: 500px;
+}
+
+.tradingview-widget-container {
+    height: 500px;
+    width: 100%;
+}
+
+#tradingview_chart {
+    height: 100%;
+    width: 100%;
+}
+
+.live-trading-card {
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.card-header.collapsible {
+    cursor: pointer;
+    user-select: none;
+}
+
+.card-header .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.balance-display {
+    font-size: 14px;
+    color: var(--primary);
+}
+
+.balance-display strong {
+    color: var(--text-primary);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.icon-btn:hover {
+    color: var(--primary);
+}
+
+.collapse-icon {
+    transition: transform 0.3s;
+}
+
+.card-header.collapsed .collapse-icon {
+    transform: rotate(180deg);
+}
+
+.card-body.collapsed {
+    display: none;
+}
+
+.trading-form .form-group {
+    margin-bottom: 16px;
+}
+
+.trading-form label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.leverage-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.leverage-btn {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.leverage-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--primary);
+}
+
+.leverage-btn.active {
+    background: var(--primary);
+    color: var(--bg-dark);
+    border-color: var(--primary);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-group.half {
+    margin-bottom: 16px;
+}
+
+.trade-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.trade-btn {
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.trade-btn.buy {
+    background: #2196F3;
+    color: white;
+}
+
+.trade-btn.buy:hover {
+    background: #1976D2;
+}
+
+.trade-btn.sell {
+    background: var(--danger);
+    color: white;
+}
+
+.trade-btn.sell:hover {
+    background: #e63946;
+}
+
+@media (max-width: 1024px) {
+    .trading-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .live-trading-card {
+        max-height: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .leverage-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

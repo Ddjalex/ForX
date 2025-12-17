@@ -77,3 +77,4 @@ Router::get('/api/prices/{symbol}', [ApiController::class, 'marketPrice']);
 Router::get('/api/prices/{symbol}/history', [ApiController::class, 'priceHistory']);
 Router::get('/api/positions', [ApiController::class, 'userPositions']);
 Router::get('/api/wallet', [ApiController::class, 'walletBalance']);
+Router::post('/api/trade', [ApiController::class, 'executeTrade'], [AuthMiddleware::class]);
