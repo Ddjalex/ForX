@@ -149,8 +149,8 @@ ob_start();
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Asset Name</th>
-                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Action</th>
                     <th>Amount</th>
                     <th>Leverage</th>
                     <th>Take Profit</th>
@@ -161,11 +161,12 @@ ob_start();
                     <th>Opened At</th>
                     <th>Expires At</th>
                     <th>Time Left</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($openPositions)): ?>
-                    <tr><td colspan="13" class="text-center">No open trades</td></tr>
+                    <tr><td colspan="14" class="text-center">No open trades</td></tr>
                 <?php else: ?>
                     <?php $i = 1; foreach ($openPositions as $position): ?>
                         <tr data-position-id="<?= $position['id'] ?>">
@@ -188,6 +189,9 @@ ob_start();
                                     -
                                 <?php endif; ?>
                             </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm close-position-btn" data-position-id="<?= $position['id'] ?>">Close</button>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -200,8 +204,8 @@ ob_start();
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Asset Name</th>
-                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Action</th>
                     <th>Amount</th>
                     <th>Leverage</th>
                     <th>Take Profit</th>
@@ -210,13 +214,12 @@ ob_start();
                     <th>Result</th>
                     <th>Profit/Loss</th>
                     <th>Opened At</th>
-                    <th>Closed At</th>
-                    <th>Time Left</th>
+                    <th>Expires At</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($closedPositions)): ?>
-                    <tr><td colspan="13" class="text-center">No closed trades</td></tr>
+                    <tr><td colspan="12" class="text-center">No closed trades</td></tr>
                 <?php else: ?>
                     <?php $i = 1; foreach ($closedPositions as $position): ?>
                         <tr>
@@ -237,8 +240,7 @@ ob_start();
                                 <?= ($position['realized_pnl'] ?? 0) >= 0 ? '+' : '' ?>$<?= number_format($position['realized_pnl'] ?? 0, 2) ?>
                             </td>
                             <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
-                            <td><?= date('Y-m-d H:i', strtotime($position['closed_at'] ?? $position['created_at'])) ?></td>
-                            <td><span class="text-muted">Expired</span></td>
+                            <td><?= $position['expires_at'] ? date('Y-m-d H:i', strtotime($position['expires_at'])) : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -398,6 +400,21 @@ ob_start();
 .countdown {
     font-weight: 600;
 }
+.close-position-btn {
+    background: #dc3545 !important;
+    color: #fff !important;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.close-position-btn:hover {
+    background: #c82333 !important;
+    transform: translateY(-1px);
+}
 </style>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
@@ -508,6 +525,33 @@ function closeExpiredPosition() {
 setInterval(updateCountdowns, 1000);
 setInterval(closeExpiredPosition, 5000);
 updateCountdowns();
+
+// Manual close position buttons
+document.querySelectorAll('.close-position-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const positionId = this.dataset.positionId;
+        if (confirm('Are you sure you want to close this position?')) {
+            fetch('/api/positions/close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'position_id=' + positionId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Position closed. PnL: $' + data.pnl.toFixed(2));
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Failed to close position');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error closing position');
+            });
+        }
+    });
+});
 
 new TradingView.widget({
     "width": "100%",

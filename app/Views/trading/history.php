@@ -75,6 +75,7 @@ if (empty($success) && $showSuccessModal) {
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>
+                                <button type="button" class="btn btn-danger btn-sm close-position-btn" data-position-id="<?= $position['id'] ?>">Close</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -273,9 +274,30 @@ if (empty($success) && $showSuccessModal) {
 .countdown {
     color: var(--accent-primary);
     font-weight: 600;
+    margin-right: 10px;
 }
 .expired-text {
     color: var(--text-secondary);
+}
+.close-position-btn {
+    background: #dc3545 !important;
+    color: #fff !important;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.close-position-btn:hover {
+    background: #c82333 !important;
+    transform: translateY(-1px);
+}
+.time-left-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 </style>
 
@@ -353,6 +375,33 @@ function closeExpiredPositions() {
 setInterval(updateCountdowns, 1000);
 setInterval(closeExpiredPositions, 5000);
 updateCountdowns();
+
+// Manual close position buttons
+document.querySelectorAll('.close-position-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const positionId = this.dataset.positionId;
+        if (confirm('Are you sure you want to close this position?')) {
+            fetch('/api/positions/close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'position_id=' + positionId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Position closed. PnL: $' + data.pnl.toFixed(2));
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Failed to close position');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error closing position');
+            });
+        }
+    });
+});
 </script>
 
 <?php
