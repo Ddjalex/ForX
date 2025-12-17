@@ -253,94 +253,104 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
     </div>
 </div>
 
-<div class="grid-2">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Open Positions</h3>
-            <a href="/positions" class="btn btn-secondary btn-sm">View All</a>
+<div id="tradeConfirmModal" class="trade-confirm-modal" style="display: none;">
+    <div class="trade-confirm-overlay"></div>
+    <div class="trade-confirm-content">
+        <div class="trade-confirm-icon">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
         </div>
-        <div class="card-body">
-            <?php if (empty($openPositions)): ?>
-                <div class="empty-state">
-                    <p>No open positions</p>
-                    <a href="/markets" class="btn btn-primary btn-sm mt-3">Start Trading</a>
-                </div>
-            <?php else: ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Market</th>
-                            <th>Side</th>
-                            <th>Amount</th>
-                            <th>Entry</th>
-                            <th>PnL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach (array_slice($openPositions, 0, 5) as $position): ?>
-                            <tr>
-                                <td><strong><?= htmlspecialchars($position['symbol']) ?></strong></td>
-                                <td>
-                                    <span class="badge <?= $position['side'] === 'buy' ? 'badge-success' : 'badge-danger' ?>">
-                                        <?= strtoupper($position['side']) ?>
-                                    </span>
-                                </td>
-                                <td><?= number_format($position['amount'], 4) ?></td>
-                                <td>$<?= number_format($position['entry_price'], 2) ?></td>
-                                <td class="<?= ($position['unrealized_pnl'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
-                                    <?= ($position['unrealized_pnl'] ?? 0) >= 0 ? '+' : '' ?>$<?= number_format($position['unrealized_pnl'] ?? 0, 2) ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Recent Transactions</h3>
-            <a href="/wallet" class="btn btn-secondary btn-sm">View All</a>
-        </div>
-        <div class="card-body">
-            <?php if (empty($recentTransactions)): ?>
-                <div class="empty-state">
-                    <p>No recent transactions</p>
-                </div>
-            <?php else: ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentTransactions as $tx): ?>
-                            <tr>
-                                <td>
-                                    <span class="badge <?= $tx['type'] === 'deposit' ? 'badge-success' : 'badge-warning' ?>">
-                                        <?= ucfirst($tx['type']) ?>
-                                    </span>
-                                </td>
-                                <td>$<?= number_format($tx['amount'], 2) ?></td>
-                                <td>
-                                    <span class="badge badge-<?= $tx['status'] === 'approved' || $tx['status'] === 'paid' ? 'success' : ($tx['status'] === 'pending' ? 'warning' : 'danger') ?>">
-                                        <?= ucfirst($tx['status']) ?>
-                                    </span>
-                                </td>
-                                <td><?= date('M d, H:i', strtotime($tx['created_at'])) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
+        <h2 class="trade-confirm-title">Confirm <span id="confirmSideText">BUY</span> Trade</h2>
+        <p class="trade-confirm-message">Are you sure you want to execute this trade?</p>
+        <div class="trade-confirm-buttons">
+            <button type="button" id="confirmTradeBtn" class="trade-confirm-btn confirm-buy">Yes, BUY Now</button>
+            <button type="button" onclick="closeConfirmModal()" class="trade-confirm-btn confirm-cancel">No, Cancel</button>
         </div>
     </div>
 </div>
+
+<style>
+.trade-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.trade-confirm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+.trade-confirm-content {
+    position: relative;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 40px 50px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+.trade-confirm-icon {
+    margin-bottom: 20px;
+}
+.trade-confirm-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+.trade-confirm-message {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+.trade-confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+.trade-confirm-btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.confirm-buy {
+    background: var(--accent-primary);
+    color: #000;
+}
+.confirm-buy:hover {
+    background: #00e6b8;
+}
+.confirm-sell {
+    background: #dc3545;
+    color: #fff;
+}
+.confirm-sell:hover {
+    background: #c82333;
+}
+.confirm-cancel {
+    background: #6c757d;
+    color: #fff;
+}
+.confirm-cancel:hover {
+    background: #5a6268;
+}
+</style>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
@@ -423,16 +433,49 @@ function toggleCard(cardId) {
     header.classList.toggle('collapsed');
 }
 
+let pendingTradeSide = null;
+
 function executeTrade(side) {
-    const form = document.getElementById('tradeForm');
-    const formData = new FormData(form);
-    formData.append('side', side);
-    
     const amount = document.getElementById('tradeAmount').value;
     if (!amount || parseFloat(amount) <= 0) {
         alert('Please enter a valid trade amount');
         return;
     }
+
+    pendingTradeSide = side;
+    showConfirmModal(side);
+}
+
+function showConfirmModal(side) {
+    const modal = document.getElementById('tradeConfirmModal');
+    const sideText = document.getElementById('confirmSideText');
+    const confirmBtn = document.getElementById('confirmTradeBtn');
+    
+    sideText.textContent = side.toUpperCase();
+    confirmBtn.textContent = 'Yes, ' + side.toUpperCase() + ' Now';
+    
+    confirmBtn.className = 'trade-confirm-btn ' + (side === 'buy' ? 'confirm-buy' : 'confirm-sell');
+    
+    confirmBtn.onclick = function() {
+        confirmTrade();
+    };
+    
+    modal.style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    document.getElementById('tradeConfirmModal').style.display = 'none';
+    pendingTradeSide = null;
+}
+
+function confirmTrade() {
+    if (!pendingTradeSide) return;
+    
+    const form = document.getElementById('tradeForm');
+    const formData = new FormData(form);
+    formData.append('side', pendingTradeSide);
+    
+    closeConfirmModal();
 
     fetch('/api/trade', {
         method: 'POST',
@@ -441,8 +484,7 @@ function executeTrade(side) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Trade executed successfully!');
-            window.location.reload();
+            window.location.href = '/trades/history?success=1';
         } else {
             alert(data.message || 'Trade failed. Please try again.');
         }
