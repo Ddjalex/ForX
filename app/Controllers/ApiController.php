@@ -168,19 +168,22 @@ class ApiController
 
         $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
 
+        $marginRequired = $amount / $leverage;
+        
         Database::insert('positions', [
             'user_id' => $userId,
             'market_id' => $market['id'],
-            'type' => $assetType,
             'side' => $side,
             'amount' => $amount,
             'leverage' => $leverage,
             'entry_price' => $entryPrice,
-            'current_price' => $entryPrice,
+            'margin_used' => $marginRequired,
             'take_profit' => $takeProfit > 0 ? $takeProfit : null,
             'stop_loss' => $stopLoss > 0 ? $stopLoss : null,
+            'duration' => $duration,
             'expires_at' => $expiresAt,
-            'pnl' => 0,
+            'unrealized_pnl' => 0,
+            'realized_pnl' => 0,
             'status' => 'open',
             'created_at' => date('Y-m-d H:i:s')
         ]);

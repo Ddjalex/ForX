@@ -74,6 +74,11 @@ PostgreSQL with the following main tables:
 - audit_logs, login_logs, settings
 
 ## Recent Changes
+- December 2024: Fixed trading and security issues:
+  - Fixed buy/sell error caused by database columns mismatch in ApiController
+  - Added duration and expires_at columns to positions table for trade timing
+  - Fixed database schema to match all controller operations
+  - Removed admin panel link from user sidebar for improved security (admins can access via /admin directly)
 - December 2024: Initial build with complete trading platform
 - December 2024: Security enhancements (rate limiting, file validation, admin middleware)
 - December 2024: Email verification for registration

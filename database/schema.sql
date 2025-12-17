@@ -128,6 +128,8 @@ CREATE TABLE IF NOT EXISTS positions (
     take_profit DECIMAL(20, 8),
     unrealized_pnl DECIMAL(20, 8) DEFAULT 0,
     realized_pnl DECIMAL(20, 8) DEFAULT 0,
+    duration INTEGER DEFAULT 1,
+    expires_at TIMESTAMP,
     status VARCHAR(50) DEFAULT 'open',
     closed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
