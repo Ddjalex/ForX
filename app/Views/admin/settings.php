@@ -14,10 +14,78 @@ ob_start();
         <form method="POST" action="/admin/settings">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             
-            <h4 style="margin-bottom: 16px; color: var(--text-secondary);">Deposit Settings</h4>
+            <h4 style="margin-bottom: 16px; color: var(--text-secondary);">Deposit Network Settings</h4>
             
             <div class="form-group">
-                <label class="form-label">Deposit Wallet Address</label>
+                <label class="form-label">Bitcoin (BTC) Wallet Address</label>
+                <input type="text" name="deposit_btc_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_btc_address'] ?? '') ?>" placeholder="Enter Bitcoin wallet address">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Bitcoin Network Type</label>
+                <select name="deposit_btc_network" class="form-control">
+                    <option value="BTC" <?= ($settings['deposit_btc_network'] ?? '') === 'BTC' ? 'selected' : '' ?>>BTC (Native)</option>
+                    <option value="BEP20" <?= ($settings['deposit_btc_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Ethereum (ETH) Wallet Address</label>
+                <input type="text" name="deposit_eth_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_eth_address'] ?? '') ?>" placeholder="Enter Ethereum wallet address">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Ethereum Network Type</label>
+                <select name="deposit_eth_network" class="form-control">
+                    <option value="ERC20" <?= ($settings['deposit_eth_network'] ?? '') === 'ERC20' ? 'selected' : '' ?>>ERC20 (Ethereum)</option>
+                    <option value="BEP20" <?= ($settings['deposit_eth_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
+                    <option value="ARB" <?= ($settings['deposit_eth_network'] ?? '') === 'ARB' ? 'selected' : '' ?>>Arbitrum</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">USDT Wallet Address</label>
+                <input type="text" name="deposit_usdt_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_usdt_address'] ?? '') ?>" placeholder="Enter USDT wallet address">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">USDT Network Type</label>
+                <select name="deposit_usdt_network" class="form-control">
+                    <option value="TRC20" <?= ($settings['deposit_usdt_network'] ?? '') === 'TRC20' ? 'selected' : '' ?>>TRC20 (Tron)</option>
+                    <option value="ERC20" <?= ($settings['deposit_usdt_network'] ?? '') === 'ERC20' ? 'selected' : '' ?>>ERC20 (Ethereum)</option>
+                    <option value="BEP20" <?= ($settings['deposit_usdt_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Litecoin (LTC) Wallet Address</label>
+                <input type="text" name="deposit_ltc_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_ltc_address'] ?? '') ?>" placeholder="Enter Litecoin wallet address">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Litecoin Network Type</label>
+                <select name="deposit_ltc_network" class="form-control">
+                    <option value="LTC" <?= ($settings['deposit_ltc_network'] ?? '') === 'LTC' ? 'selected' : '' ?>>LTC (Native)</option>
+                    <option value="BEP20" <?= ($settings['deposit_ltc_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Solana (SOL) Wallet Address</label>
+                <input type="text" name="deposit_sol_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_sol_address'] ?? '') ?>" placeholder="Enter Solana wallet address">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Solana Network Type</label>
+                <select name="deposit_sol_network" class="form-control">
+                    <option value="SOL" <?= ($settings['deposit_sol_network'] ?? '') === 'SOL' ? 'selected' : '' ?>>SOL (Native)</option>
+                </select>
+            </div>
+            
+            <h4 style="margin: 24px 0 16px; color: var(--text-secondary);">Deposit Settings</h4>
+            
+            <div class="form-group">
+                <label class="form-label">Legacy Deposit Wallet Address (TRC20)</label>
                 <input type="text" name="deposit_wallet" class="form-control" value="<?= htmlspecialchars($settings['deposit_wallet'] ?? '') ?>" placeholder="TRC20 Wallet Address">
             </div>
             

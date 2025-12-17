@@ -38,10 +38,14 @@ class WalletController
 
     public function showDeposit(): void
     {
-        $settings = Database::fetch("SELECT * FROM settings WHERE key = 'deposit_wallet'");
+        $allSettings = Database::fetchAll("SELECT * FROM settings");
+        $settings = [];
+        foreach ($allSettings as $setting) {
+            $settings[$setting['key']] = $setting['value'];
+        }
         
         echo Router::render('user/deposit', [
-            'depositWallet' => $settings['value'] ?? 'TRC20: TYourWalletAddressHere',
+            'settings' => $settings,
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
             'success' => Session::getFlash('success'),
