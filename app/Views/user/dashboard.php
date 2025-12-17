@@ -266,8 +266,8 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
         <h2 class="trade-confirm-title">Confirm <span id="confirmSideText">BUY</span> Trade</h2>
         <p class="trade-confirm-message">Are you sure you want to execute this trade?</p>
         <div class="trade-confirm-buttons">
-            <button type="button" id="confirmTradeBtn" class="trade-confirm-btn confirm-buy">Yes, BUY Now</button>
             <button type="button" onclick="closeConfirmModal()" class="trade-confirm-btn confirm-cancel">No, Cancel</button>
+            <button type="button" id="confirmTradeBtn" class="trade-confirm-btn confirm-buy">Yes, BUY Now</button>
         </div>
     </div>
 </div>

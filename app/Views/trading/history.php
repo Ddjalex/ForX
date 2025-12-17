@@ -304,6 +304,8 @@ function closeSuccessModal() {
     if (modal) modal.style.display = 'none';
 }
 
+let hasExpired = false;
+
 function updateCountdowns() {
     document.querySelectorAll('.time-left-cell[data-expires]').forEach(cell => {
         const expiresAt = cell.dataset.expires;
@@ -319,8 +321,12 @@ function updateCountdowns() {
         const diff = expires - now;
         
         if (diff <= 0) {
-            countdown.textContent = 'Expired';
-            countdown.style.color = 'var(--text-secondary)';
+            countdown.textContent = 'Closing...';
+            countdown.style.color = '#ffc107';
+            if (!hasExpired) {
+                hasExpired = true;
+                closeExpiredPositions();
+            }
         } else {
             const minutes = Math.floor(diff / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
@@ -330,7 +336,22 @@ function updateCountdowns() {
     });
 }
 
+function closeExpiredPositions() {
+    fetch('/api/positions/close-expired', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.closed_count > 0) {
+            setTimeout(() => window.location.reload(), 1500);
+        }
+    })
+    .catch(err => console.error('Error closing positions:', err));
+}
+
 setInterval(updateCountdowns, 1000);
+setInterval(closeExpiredPositions, 5000);
 updateCountdowns();
 </script>
 

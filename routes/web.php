@@ -79,3 +79,5 @@ Router::get('/api/prices/{symbol}/history', [ApiController::class, 'priceHistory
 Router::get('/api/positions', [ApiController::class, 'userPositions']);
 Router::get('/api/wallet', [ApiController::class, 'walletBalance']);
 Router::post('/api/trade', [ApiController::class, 'executeTrade'], [AuthMiddleware::class]);
+Router::post('/api/positions/close-expired', [ApiController::class, 'closeExpiredPositions'], [AuthMiddleware::class]);
+Router::post('/api/positions/close', [ApiController::class, 'closePosition'], [AuthMiddleware::class]);

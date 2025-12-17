@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     setInterval(updatePrices, 30000);
-    
     setInterval(updatePositions, 10000);
+    setInterval(checkExpiredPositions, 5000);
+    checkExpiredPositions();
 });
 
 async function updatePrices() {
@@ -72,4 +73,20 @@ function formatNumber(num, decimals = 2) {
 
 function formatCurrency(num) {
     return '$' + formatNumber(num);
+}
+
+async function checkExpiredPositions() {
+    try {
+        const response = await fetch('/api/positions/close-expired', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.closed_count > 0) {
+            console.log(`Auto-closed ${data.closed_count} expired position(s)`);
+        }
+    } catch (e) {
+        console.log('Expired positions check failed:', e);
+    }
 }

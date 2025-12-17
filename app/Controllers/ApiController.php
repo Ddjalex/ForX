@@ -242,4 +242,133 @@ class ApiController
         ];
         return $defaultPrices[$symbol] ?? 100.00;
     }
+
+    public function closeExpiredPositions(): void
+    {
+        if (!Auth::check()) {
+            Router::json(['success' => false, 'error' => 'Unauthorized'], 401);
+            return;
+        }
+
+        $userId = Auth::id();
+
+        $expiredPositions = Database::fetchAll(
+            "SELECT p.*, m.symbol, m.spread 
+             FROM positions p 
+             JOIN markets m ON p.market_id = m.id 
+             WHERE p.status = 'open' AND p.expires_at IS NOT NULL AND p.expires_at <= NOW() AND p.user_id = ?",
+            [$userId]
+        );
+
+        $closedCount = 0;
+        $results = [];
+
+        foreach ($expiredPositions as $position) {
+            $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$position['market_id']]);
+            $exitPrice = $currentPrice['price'] ?? $position['entry_price'];
+
+            $spread = $position['spread'] ?? 0;
+            $exitPrice = $position['side'] === 'buy' 
+                ? $exitPrice * (1 - $spread) 
+                : $exitPrice * (1 + $spread);
+
+            if ($position['side'] === 'buy') {
+                $pnl = ($exitPrice - $position['entry_price']) * $position['amount'];
+            } else {
+                $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
+            }
+
+            Database::update('positions', [
+                'exit_price' => $exitPrice,
+                'realized_pnl' => $pnl,
+                'status' => 'closed',
+                'closed_at' => date('Y-m-d H:i:s'),
+            ], 'id = ?', [$position['id']]);
+
+            $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
+            if ($wallet) {
+                Database::update('wallets', [
+                    'balance' => $wallet['balance'] + $pnl,
+                    'margin_used' => max(0, $wallet['margin_used'] - $position['margin_used']),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ], 'user_id = ?', [$userId]);
+            }
+
+            $closedCount++;
+            $results[] = [
+                'position_id' => $position['id'],
+                'symbol' => $position['symbol'],
+                'pnl' => round($pnl, 2)
+            ];
+        }
+
+        Router::json([
+            'success' => true,
+            'closed_count' => $closedCount,
+            'positions' => $results
+        ]);
+    }
+
+    public function closePosition(): void
+    {
+        if (!Auth::check()) {
+            Router::json(['success' => false, 'error' => 'Unauthorized'], 401);
+            return;
+        }
+
+        $userId = Auth::id();
+        $positionId = filter_input(INPUT_POST, 'position_id', FILTER_VALIDATE_INT);
+
+        if (!$positionId) {
+            Router::json(['success' => false, 'error' => 'Invalid position ID']);
+            return;
+        }
+
+        $position = Database::fetch(
+            "SELECT p.*, m.symbol, m.spread FROM positions p 
+             JOIN markets m ON p.market_id = m.id 
+             WHERE p.id = ? AND p.user_id = ? AND p.status = 'open'",
+            [$positionId, $userId]
+        );
+
+        if (!$position) {
+            Router::json(['success' => false, 'error' => 'Position not found']);
+            return;
+        }
+
+        $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$position['market_id']]);
+        $exitPrice = $currentPrice['price'] ?? $position['entry_price'];
+
+        $spread = $position['spread'] ?? 0;
+        $exitPrice = $position['side'] === 'buy' 
+            ? $exitPrice * (1 - $spread) 
+            : $exitPrice * (1 + $spread);
+
+        if ($position['side'] === 'buy') {
+            $pnl = ($exitPrice - $position['entry_price']) * $position['amount'];
+        } else {
+            $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
+        }
+
+        Database::update('positions', [
+            'exit_price' => $exitPrice,
+            'realized_pnl' => $pnl,
+            'status' => 'closed',
+            'closed_at' => date('Y-m-d H:i:s'),
+        ], 'id = ?', [$positionId]);
+
+        $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
+        Database::update('wallets', [
+            'balance' => $wallet['balance'] + $pnl,
+            'margin_used' => max(0, $wallet['margin_used'] - $position['margin_used']),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ], 'user_id = ?', [$userId]);
+
+        Router::json([
+            'success' => true,
+            'message' => 'Position closed successfully',
+            'pnl' => $pnl,
+            'exit_price' => $exitPrice
+        ]);
+    }
 }

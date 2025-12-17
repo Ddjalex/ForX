@@ -23,8 +23,8 @@ ob_start();
         <h2 id="confirmModalTitle">Confirm BUY Trade</h2>
         <p>Are you sure you want to execute this trade?</p>
         <div class="modal-buttons">
-            <button type="button" id="confirmTradeBtn" class="btn btn-buy">Yes, BUY Now</button>
             <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">No, Cancel</button>
+            <button type="button" id="confirmTradeBtn" class="btn btn-buy">Yes, BUY Now</button>
         </div>
     </div>
 </div>
@@ -168,7 +168,7 @@ ob_start();
                     <tr><td colspan="13" class="text-center">No open trades</td></tr>
                 <?php else: ?>
                     <?php $i = 1; foreach ($openPositions as $position): ?>
-                        <tr>
+                        <tr data-position-id="<?= $position['id'] ?>">
                             <td><?= $i++ ?></td>
                             <td><?= htmlspecialchars($position['symbol']) ?></td>
                             <td class="<?= $position['side'] === 'buy' ? 'text-success' : 'text-danger' ?>"><?= strtoupper($position['side']) ?></td>
@@ -292,18 +292,37 @@ ob_start();
     display: flex;
     gap: 12px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 .modal-buttons .btn {
     padding: 12px 24px;
     font-weight: 600;
+    min-width: 130px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+}
+.modal-buttons .btn-secondary {
+    background: #4a5568;
+    color: #fff;
+}
+.modal-buttons .btn-secondary:hover {
+    background: #5a6578;
 }
 .btn-buy {
-    background: var(--accent-primary);
-    color: #000;
+    background: var(--primary, #00D4AA) !important;
+    color: #000 !important;
+}
+.btn-buy:hover {
+    background: var(--primary-dark, #00B894) !important;
 }
 .btn-sell {
-    background: #dc3545;
-    color: #fff;
+    background: #dc3545 !important;
+    color: #fff !important;
+}
+.btn-sell:hover {
+    background: #c82333 !important;
 }
 .status-badge {
     padding: 4px 12px;
@@ -406,6 +425,8 @@ document.getElementById('confirmTradeBtn').addEventListener('click', function() 
 });
 
 // Countdown timer for open trades
+let expiredPositions = new Set();
+
 function updateCountdowns() {
     document.querySelectorAll('.time-left[data-expires]').forEach(cell => {
         const expiresAt = cell.dataset.expires;
@@ -414,13 +435,21 @@ function updateCountdowns() {
         const countdown = cell.querySelector('.countdown');
         if (!countdown) return;
         
+        const row = cell.closest('tr');
+        const positionId = row ? row.dataset.positionId : null;
+        
         const now = new Date();
         const expires = new Date(expiresAt);
         const diff = expires - now;
         
         if (diff <= 0) {
-            countdown.textContent = 'Expired';
-            countdown.className = 'countdown text-muted';
+            countdown.textContent = 'Closing...';
+            countdown.className = 'countdown text-warning';
+            
+            if (positionId && !expiredPositions.has(positionId)) {
+                expiredPositions.add(positionId);
+                closeExpiredPosition();
+            }
         } else {
             const minutes = Math.floor(diff / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
@@ -430,7 +459,24 @@ function updateCountdowns() {
     });
 }
 
+function closeExpiredPosition() {
+    fetch('/api/positions/close-expired', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.closed_count > 0) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        }
+    })
+    .catch(err => console.error('Error closing expired positions:', err));
+}
+
 setInterval(updateCountdowns, 1000);
+setInterval(closeExpiredPosition, 5000);
 updateCountdowns();
 
 new TradingView.widget({
