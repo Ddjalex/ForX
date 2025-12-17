@@ -98,7 +98,7 @@ if (empty($success) && $showSuccessModal) {
                             <td>-</td>
                             <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
                             <td><?= $position['expires_at'] ? date('Y-m-d H:i', strtotime($position['expires_at'])) : '-' ?></td>
-                            <td class="time-left-cell" data-expires="<?= $position['expires_at'] ?? '' ?>" data-status="open">
+                            <td class="time-left-cell" data-expires-timestamp="<?= $position['expires_at'] ? strtotime($position['expires_at']) * 1000 : '' ?>" data-status="open">
                                 <?php if ($position['expires_at']): ?>
                                     <span class="countdown"></span>
                                 <?php else: ?>
@@ -381,18 +381,17 @@ function closeSuccessModal() {
 let hasExpired = false;
 
 function updateCountdowns() {
-    document.querySelectorAll('.time-left-cell[data-expires]').forEach(cell => {
-        const expiresAt = cell.dataset.expires;
+    document.querySelectorAll('.time-left-cell[data-expires-timestamp]').forEach(cell => {
+        const expiresTimestamp = parseInt(cell.dataset.expiresTimestamp);
         const status = cell.dataset.status;
         
-        if (!expiresAt || status !== 'open') return;
+        if (!expiresTimestamp || status !== 'open') return;
         
         const countdown = cell.querySelector('.countdown');
         if (!countdown) return;
         
-        const now = new Date();
-        const expires = new Date(expiresAt);
-        const diff = expires - now;
+        const now = Date.now();
+        const diff = expiresTimestamp - now;
         
         if (diff <= 0) {
             countdown.textContent = 'Closing...';
