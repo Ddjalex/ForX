@@ -15,9 +15,9 @@ ob_start();
     <div class="modal-overlay" onclick="closeConfirmModal()"></div>
     <div class="modal-content">
         <div class="modal-icon">
-            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                <circle cx="30" cy="30" r="28" stroke="#f5a623" stroke-width="2" fill="none"/>
-                <text x="30" y="38" text-anchor="middle" fill="#f5a623" font-size="32" font-weight="bold">!</text>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <circle cx="40" cy="40" r="36" stroke="#f5a623" stroke-width="3" fill="none"/>
+                <text x="40" y="52" text-anchor="middle" fill="#f5a623" font-size="44" font-weight="bold">!</text>
             </svg>
         </div>
         <h2 id="confirmModalTitle">Confirm BUY Trade</h2>
@@ -254,7 +254,7 @@ ob_start();
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000;
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -265,64 +265,94 @@ ob_start();
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
 }
 .modal-content {
     position: relative;
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 40px;
+    background: linear-gradient(180deg, #1a2a3a 0%, #0d1a2a 100%);
+    border-radius: 16px;
+    padding: 50px 40px;
     text-align: center;
-    max-width: 400px;
+    max-width: 450px;
     width: 90%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalFadeIn 0.3s ease-out;
+}
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 .modal-icon {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+}
+.modal-icon svg {
+    filter: drop-shadow(0 0 20px rgba(245, 166, 35, 0.5));
 }
 .modal-content h2 {
-    color: var(--text-primary);
-    margin-bottom: 10px;
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 .modal-content p {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 35px;
+    font-size: 16px;
+    line-height: 1.5;
 }
 .modal-buttons {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     justify-content: center;
     flex-wrap: wrap;
 }
 .modal-buttons .btn {
-    padding: 12px 24px;
-    font-weight: 600;
-    min-width: 130px;
-    border-radius: 8px;
+    padding: 14px 32px;
+    font-weight: 700;
+    min-width: 150px;
+    border-radius: 10px;
     cursor: pointer;
     border: none;
-    font-size: 14px;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
 }
 .modal-buttons .btn-secondary {
-    background: #4a5568;
+    background: #3a4a5a;
     color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 .modal-buttons .btn-secondary:hover {
-    background: #5a6578;
+    background: #4a5a6a;
+    transform: translateY(-2px);
 }
 .btn-buy {
-    background: var(--primary, #00D4AA) !important;
+    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%) !important;
     color: #000 !important;
+    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.4) !important;
 }
 .btn-buy:hover {
-    background: var(--primary-dark, #00B894) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 212, 170, 0.5) !important;
 }
 .btn-sell {
-    background: #dc3545 !important;
+    background: linear-gradient(135deg, #ff4757 0%, #dc3545 100%) !important;
     color: #fff !important;
+    box-shadow: 0 4px 20px rgba(220, 53, 69, 0.4) !important;
 }
 .btn-sell:hover {
-    background: #c82333 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(220, 53, 69, 0.5) !important;
 }
 .status-badge {
     padding: 4px 12px;
