@@ -94,3 +94,8 @@ PostgreSQL with the following main tables:
   - Admin navigation bar for easy access to all management sections
   - Recent users display on admin dashboard
   - Clickable stat cards for quick navigation
+- December 2024: Dashboard Market Data Panels:
+  - Added Cryptocurrency Market panel with TradingView crypto screener widget
+  - Added Stock Market Data panel with TradingView hotlists widget
+  - Live real-time market data for cryptocurrencies and US stocks
+  - Brevo API integration for email verification (BREVO_API_KEY, BREVO_SENDER_EMAIL secrets configured)
