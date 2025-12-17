@@ -63,28 +63,376 @@
     </aside>
 
     <main class="main-content">
-        <div class="tradingview-ticker-container">
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-                {
-                    "symbols": [
-                        {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
-                        {"proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100"},
-                        {"proName": "FX_IDC:EURUSD", "title": "EUR/USD"},
-                        {"proName": "BITSTAMP:BTCUSD", "title": "BTC/USD"},
-                        {"proName": "BITSTAMP:ETHUSD", "title": "ETH/USD"},
-                        {"proName": "FOREXCOM:XAUUSD", "title": "Gold"},
-                        {"proName": "FX_IDC:GBPUSD", "title": "GBP/USD"},
-                        {"proName": "FX_IDC:USDJPY", "title": "USD/JPY"}
-                    ],
-                    "showSymbolLogo": true,
-                    "isTransparent": true,
-                    "displayMode": "adaptive",
-                    "colorTheme": "dark",
-                    "locale": "en"
-                }
-                </script>
+        <div class="pro-ticker-wrapper">
+            <div class="pro-ticker-track">
+                <div class="pro-ticker-content">
+                    <div class="ticker-category">
+                        <span class="category-label indices">INDICES</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="SPX500">
+                        <span class="ticker-symbol">S&P 500</span>
+                        <span class="ticker-price" id="price-spx">5,892.45</span>
+                        <span class="ticker-change positive" id="change-spx">+0.82%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NASDAQ">
+                        <span class="ticker-symbol">NASDAQ</span>
+                        <span class="ticker-price" id="price-nasdaq">18,542.18</span>
+                        <span class="ticker-change positive" id="change-nasdaq">+1.24%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="DJI">
+                        <span class="ticker-symbol">DOW JONES</span>
+                        <span class="ticker-price" id="price-dji">42,156.89</span>
+                        <span class="ticker-change negative" id="change-dji">-0.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="FTSE">
+                        <span class="ticker-symbol">FTSE 100</span>
+                        <span class="ticker-price" id="price-ftse">8,245.67</span>
+                        <span class="ticker-change positive" id="change-ftse">+0.45%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="DAX">
+                        <span class="ticker-symbol">DAX</span>
+                        <span class="ticker-price" id="price-dax">18,892.34</span>
+                        <span class="ticker-change positive" id="change-dax">+0.67%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NIKKEI">
+                        <span class="ticker-symbol">NIKKEI 225</span>
+                        <span class="ticker-price" id="price-nikkei">38,456.12</span>
+                        <span class="ticker-change negative" id="change-nikkei">-0.32%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label crypto">CRYPTO</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="BTC">
+                        <span class="ticker-symbol">BTC/USD</span>
+                        <span class="ticker-price" id="price-btc">$104,256.78</span>
+                        <span class="ticker-change positive" id="change-btc">+3.45%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="ETH">
+                        <span class="ticker-symbol">ETH/USD</span>
+                        <span class="ticker-price" id="price-eth">$3,892.45</span>
+                        <span class="ticker-change positive" id="change-eth">+2.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="XRP">
+                        <span class="ticker-symbol">XRP/USD</span>
+                        <span class="ticker-price" id="price-xrp">$2.3456</span>
+                        <span class="ticker-change positive" id="change-xrp">+5.67%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="SOL">
+                        <span class="ticker-symbol">SOL/USD</span>
+                        <span class="ticker-price" id="price-sol">$218.92</span>
+                        <span class="ticker-change negative" id="change-sol">-1.23%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="BNB">
+                        <span class="ticker-symbol">BNB/USD</span>
+                        <span class="ticker-price" id="price-bnb">$712.34</span>
+                        <span class="ticker-change positive" id="change-bnb">+0.89%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="ADA">
+                        <span class="ticker-symbol">ADA/USD</span>
+                        <span class="ticker-price" id="price-ada">$1.0234</span>
+                        <span class="ticker-change positive" id="change-ada">+4.12%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label forex">FOREX</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="EURUSD">
+                        <span class="ticker-symbol">EUR/USD</span>
+                        <span class="ticker-price" id="price-eurusd">1.0523</span>
+                        <span class="ticker-change negative" id="change-eurusd">-0.15%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="GBPUSD">
+                        <span class="ticker-symbol">GBP/USD</span>
+                        <span class="ticker-price" id="price-gbpusd">1.2678</span>
+                        <span class="ticker-change positive" id="change-gbpusd">+0.23%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="USDJPY">
+                        <span class="ticker-symbol">USD/JPY</span>
+                        <span class="ticker-price" id="price-usdjpy">153.45</span>
+                        <span class="ticker-change positive" id="change-usdjpy">+0.42%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="AUDUSD">
+                        <span class="ticker-symbol">AUD/USD</span>
+                        <span class="ticker-price" id="price-audusd">0.6342</span>
+                        <span class="ticker-change negative" id="change-audusd">-0.31%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="USDCAD">
+                        <span class="ticker-symbol">USD/CAD</span>
+                        <span class="ticker-price" id="price-usdcad">1.4234</span>
+                        <span class="ticker-change positive" id="change-usdcad">+0.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="USDCHF">
+                        <span class="ticker-symbol">USD/CHF</span>
+                        <span class="ticker-price" id="price-usdchf">0.8923</span>
+                        <span class="ticker-change negative" id="change-usdchf">-0.08%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label commodities">COMMODITIES</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="XAUUSD">
+                        <span class="ticker-symbol">GOLD</span>
+                        <span class="ticker-price" id="price-gold">$2,678.45</span>
+                        <span class="ticker-change positive" id="change-gold">+0.56%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="XAGUSD">
+                        <span class="ticker-symbol">SILVER</span>
+                        <span class="ticker-price" id="price-silver">$31.23</span>
+                        <span class="ticker-change positive" id="change-silver">+1.12%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="WTICOUSD">
+                        <span class="ticker-symbol">CRUDE OIL</span>
+                        <span class="ticker-price" id="price-oil">$71.45</span>
+                        <span class="ticker-change negative" id="change-oil">-0.89%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NATGAS">
+                        <span class="ticker-symbol">NAT GAS</span>
+                        <span class="ticker-price" id="price-natgas">$3.245</span>
+                        <span class="ticker-change positive" id="change-natgas">+2.34%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="COPPER">
+                        <span class="ticker-symbol">COPPER</span>
+                        <span class="ticker-price" id="price-copper">$4.12</span>
+                        <span class="ticker-change positive" id="change-copper">+0.78%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="PLATINUM">
+                        <span class="ticker-symbol">PLATINUM</span>
+                        <span class="ticker-price" id="price-platinum">$956.78</span>
+                        <span class="ticker-change negative" id="change-platinum">-0.45%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label stocks">STOCKS</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="AAPL">
+                        <span class="ticker-symbol">AAPL</span>
+                        <span class="ticker-price" id="price-aapl">$248.92</span>
+                        <span class="ticker-change positive" id="change-aapl">+1.45%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="MSFT">
+                        <span class="ticker-symbol">MSFT</span>
+                        <span class="ticker-price" id="price-msft">$438.56</span>
+                        <span class="ticker-change positive" id="change-msft">+0.92%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="GOOGL">
+                        <span class="ticker-symbol">GOOGL</span>
+                        <span class="ticker-price" id="price-googl">$192.34</span>
+                        <span class="ticker-change positive" id="change-googl">+2.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="AMZN">
+                        <span class="ticker-symbol">AMZN</span>
+                        <span class="ticker-price" id="price-amzn">$225.67</span>
+                        <span class="ticker-change negative" id="change-amzn">-0.34%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NVDA">
+                        <span class="ticker-symbol">NVDA</span>
+                        <span class="ticker-price" id="price-nvda">$138.45</span>
+                        <span class="ticker-change positive" id="change-nvda">+3.67%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="TSLA">
+                        <span class="ticker-symbol">TSLA</span>
+                        <span class="ticker-price" id="price-tsla">$478.92</span>
+                        <span class="ticker-change positive" id="change-tsla">+4.23%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="META">
+                        <span class="ticker-symbol">META</span>
+                        <span class="ticker-price" id="price-meta">$612.34</span>
+                        <span class="ticker-change positive" id="change-meta">+1.56%</span>
+                    </div>
+                </div>
+                <div class="pro-ticker-content">
+                    <div class="ticker-category">
+                        <span class="category-label indices">INDICES</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="SPX500">
+                        <span class="ticker-symbol">S&P 500</span>
+                        <span class="ticker-price">5,892.45</span>
+                        <span class="ticker-change positive">+0.82%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NASDAQ">
+                        <span class="ticker-symbol">NASDAQ</span>
+                        <span class="ticker-price">18,542.18</span>
+                        <span class="ticker-change positive">+1.24%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="DJI">
+                        <span class="ticker-symbol">DOW JONES</span>
+                        <span class="ticker-price">42,156.89</span>
+                        <span class="ticker-change negative">-0.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="FTSE">
+                        <span class="ticker-symbol">FTSE 100</span>
+                        <span class="ticker-price">8,245.67</span>
+                        <span class="ticker-change positive">+0.45%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="DAX">
+                        <span class="ticker-symbol">DAX</span>
+                        <span class="ticker-price">18,892.34</span>
+                        <span class="ticker-change positive">+0.67%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NIKKEI">
+                        <span class="ticker-symbol">NIKKEI 225</span>
+                        <span class="ticker-price">38,456.12</span>
+                        <span class="ticker-change negative">-0.32%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label crypto">CRYPTO</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="BTC">
+                        <span class="ticker-symbol">BTC/USD</span>
+                        <span class="ticker-price">$104,256.78</span>
+                        <span class="ticker-change positive">+3.45%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="ETH">
+                        <span class="ticker-symbol">ETH/USD</span>
+                        <span class="ticker-price">$3,892.45</span>
+                        <span class="ticker-change positive">+2.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="XRP">
+                        <span class="ticker-symbol">XRP/USD</span>
+                        <span class="ticker-price">$2.3456</span>
+                        <span class="ticker-change positive">+5.67%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="SOL">
+                        <span class="ticker-symbol">SOL/USD</span>
+                        <span class="ticker-price">$218.92</span>
+                        <span class="ticker-change negative">-1.23%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="BNB">
+                        <span class="ticker-symbol">BNB/USD</span>
+                        <span class="ticker-price">$712.34</span>
+                        <span class="ticker-change positive">+0.89%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="ADA">
+                        <span class="ticker-symbol">ADA/USD</span>
+                        <span class="ticker-price">$1.0234</span>
+                        <span class="ticker-change positive">+4.12%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label forex">FOREX</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="EURUSD">
+                        <span class="ticker-symbol">EUR/USD</span>
+                        <span class="ticker-price">1.0523</span>
+                        <span class="ticker-change negative">-0.15%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="GBPUSD">
+                        <span class="ticker-symbol">GBP/USD</span>
+                        <span class="ticker-price">1.2678</span>
+                        <span class="ticker-change positive">+0.23%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="USDJPY">
+                        <span class="ticker-symbol">USD/JPY</span>
+                        <span class="ticker-price">153.45</span>
+                        <span class="ticker-change positive">+0.42%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="AUDUSD">
+                        <span class="ticker-symbol">AUD/USD</span>
+                        <span class="ticker-price">0.6342</span>
+                        <span class="ticker-change negative">-0.31%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="USDCAD">
+                        <span class="ticker-symbol">USD/CAD</span>
+                        <span class="ticker-price">1.4234</span>
+                        <span class="ticker-change positive">+0.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="USDCHF">
+                        <span class="ticker-symbol">USD/CHF</span>
+                        <span class="ticker-price">0.8923</span>
+                        <span class="ticker-change negative">-0.08%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label commodities">COMMODITIES</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="XAUUSD">
+                        <span class="ticker-symbol">GOLD</span>
+                        <span class="ticker-price">$2,678.45</span>
+                        <span class="ticker-change positive">+0.56%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="XAGUSD">
+                        <span class="ticker-symbol">SILVER</span>
+                        <span class="ticker-price">$31.23</span>
+                        <span class="ticker-change positive">+1.12%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="WTICOUSD">
+                        <span class="ticker-symbol">CRUDE OIL</span>
+                        <span class="ticker-price">$71.45</span>
+                        <span class="ticker-change negative">-0.89%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NATGAS">
+                        <span class="ticker-symbol">NAT GAS</span>
+                        <span class="ticker-price">$3.245</span>
+                        <span class="ticker-change positive">+2.34%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="COPPER">
+                        <span class="ticker-symbol">COPPER</span>
+                        <span class="ticker-price">$4.12</span>
+                        <span class="ticker-change positive">+0.78%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="PLATINUM">
+                        <span class="ticker-symbol">PLATINUM</span>
+                        <span class="ticker-price">$956.78</span>
+                        <span class="ticker-change negative">-0.45%</span>
+                    </div>
+                    
+                    <div class="ticker-divider"></div>
+                    
+                    <div class="ticker-category">
+                        <span class="category-label stocks">STOCKS</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="AAPL">
+                        <span class="ticker-symbol">AAPL</span>
+                        <span class="ticker-price">$248.92</span>
+                        <span class="ticker-change positive">+1.45%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="MSFT">
+                        <span class="ticker-symbol">MSFT</span>
+                        <span class="ticker-price">$438.56</span>
+                        <span class="ticker-change positive">+0.92%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="GOOGL">
+                        <span class="ticker-symbol">GOOGL</span>
+                        <span class="ticker-price">$192.34</span>
+                        <span class="ticker-change positive">+2.18%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="AMZN">
+                        <span class="ticker-symbol">AMZN</span>
+                        <span class="ticker-price">$225.67</span>
+                        <span class="ticker-change negative">-0.34%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="NVDA">
+                        <span class="ticker-symbol">NVDA</span>
+                        <span class="ticker-price">$138.45</span>
+                        <span class="ticker-change positive">+3.67%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="TSLA">
+                        <span class="ticker-symbol">TSLA</span>
+                        <span class="ticker-price">$478.92</span>
+                        <span class="ticker-change positive">+4.23%</span>
+                    </div>
+                    <div class="ticker-item" data-symbol="META">
+                        <span class="ticker-symbol">META</span>
+                        <span class="ticker-price">$612.34</span>
+                        <span class="ticker-change positive">+1.56%</span>
+                    </div>
+                </div>
             </div>
         </div>
 
