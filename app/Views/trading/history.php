@@ -1,7 +1,7 @@
 <?php
 ob_start();
-$openPositions = array_filter($positions, fn($p) => $p['status'] === 'open');
-$closedPositions = array_filter($positions, fn($p) => $p['status'] === 'closed');
+$allPositions = $positions;
+usort($allPositions, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
 $showSuccessModal = isset($_GET['success']) && $_GET['success'] == '1';
 if (empty($success) && $showSuccessModal) {
     $success = "Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.";
@@ -52,15 +52,11 @@ if (empty($success) && $showSuccessModal) {
 <?php endif; ?>
 
 <div class="card">
-    <div class="card-header" style="flex-direction: column; align-items: flex-start;">
-        <h2 class="card-title" style="font-size: 24px; text-align: center; width: 100%; margin-bottom: 20px;">Trade History</h2>
-        <div class="trade-tabs">
-            <button type="button" class="trade-tab active" id="openTab" onclick="showTab('open')">Open</button>
-            <button type="button" class="trade-tab" id="closedTab" onclick="showTab('closed')">Closed</button>
-        </div>
+    <div class="card-header">
+        <h2 class="card-title" style="font-size: 24px; text-align: center; width: 100;">Trade History</h2>
     </div>
     <div class="card-body" style="overflow-x: auto;">
-        <table class="table history-table" id="openTable">
+        <table class="table history-table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -79,87 +75,56 @@ if (empty($success) && $showSuccessModal) {
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($openPositions)): ?>
+                <?php if (empty($allPositions)): ?>
                     <tr><td colspan="13" class="text-center">No trades found.</td></tr>
                 <?php else: ?>
-                    <?php $i = 1; foreach ($openPositions as $position): ?>
-                        <tr>
-                            <td><?= $i++ ?></td>
-                            <td><?= htmlspecialchars($position['symbol']) ?></td>
-                            <td class="<?= $position['side'] === 'buy' ? 'action-buy' : 'action-sell' ?>">
-                                <?= ucfirst($position['side']) ?>
-                            </td>
-                            <td>$<?= number_format($position['amount'], 2) ?></td>
-                            <td><?= $position['leverage'] ?>x</td>
-                            <td><?= number_format($position['take_profit'] ?? 0, 2) ?></td>
-                            <td><?= number_format($position['stop_loss'] ?? 0, 2) ?></td>
-                            <td><span class="status-badge status-open">Open</span></td>
-                            <td><span class="result-badge result-pending">PENDING</span></td>
-                            <td>-</td>
-                            <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
-                            <td><?= $position['expires_at'] ? date('Y-m-d H:i', strtotime($position['expires_at'])) : '-' ?></td>
-                            <td class="time-left-cell" data-expires-timestamp="<?= $position['expires_at'] ? strtotime($position['expires_at']) * 1000 : '' ?>" data-status="open">
-                                <?php if ($position['expires_at']): ?>
-                                    <span class="countdown"></span>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
-                                <button type="button" class="btn btn-danger btn-sm close-position-btn" data-position-id="<?= $position['id'] ?>">Close</button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
-
-        <table class="table history-table" id="closedTable" style="display: none;">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Asset</th>
-                    <th>Action</th>
-                    <th>Amount</th>
-                    <th>Leverage</th>
-                    <th>Take Profit</th>
-                    <th>Stop Loss</th>
-                    <th>Status</th>
-                    <th>Result</th>
-                    <th>Profit/Loss</th>
-                    <th>Opened At</th>
-                    <th>Expires At</th>
-                    <th>Time Left</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($closedPositions)): ?>
-                    <tr><td colspan="13" class="text-center">No closed trades found.</td></tr>
-                <?php else: ?>
-                    <?php $i = 1; foreach ($closedPositions as $position): 
-                        $pnl = $position['realized_pnl'] ?? 0;
+                    <?php $i = 1; foreach ($allPositions as $position): 
+                        $isOpen = $position['status'] === 'open';
+                        $pnl = $isOpen ? ($position['unrealized_pnl'] ?? 0) : ($position['realized_pnl'] ?? 0);
                         $isWin = $pnl >= 0;
                     ?>
                         <tr>
                             <td><?= $i++ ?></td>
                             <td><?= htmlspecialchars($position['symbol']) ?></td>
                             <td class="<?= $position['side'] === 'buy' ? 'action-buy' : 'action-sell' ?>">
-                                <?= ucfirst($position['side']) ?>
+                                <?= strtoupper($position['side']) ?>
                             </td>
                             <td>$<?= number_format($position['amount'], 2) ?></td>
                             <td><?= $position['leverage'] ?>x</td>
                             <td><?= number_format($position['take_profit'] ?? 0, 2) ?></td>
                             <td><?= number_format($position['stop_loss'] ?? 0, 2) ?></td>
-                            <td><span class="status-badge status-closed">Closed</span></td>
                             <td>
-                                <span class="result-badge <?= $isWin ? 'result-win' : 'result-loss' ?>">
-                                    <?= $isWin ? 'WIN' : 'LOSS' ?>
+                                <span class="status-badge <?= $isOpen ? 'status-open' : 'status-closed' ?>">
+                                    <?= $isOpen ? 'Open' : 'Closed' ?>
                                 </span>
                             </td>
+                            <td>
+                                <?php if ($isOpen): ?>
+                                    <span class="result-badge result-pending">PENDING</span>
+                                <?php else: ?>
+                                    <span class="result-badge <?= $isWin ? 'result-win' : 'result-loss' ?>">
+                                        <?= $isWin ? 'WIN' : 'LOSS' ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
                             <td class="<?= $isWin ? 'pnl-positive' : 'pnl-negative' ?>">
-                                <?= $isWin ? '+' : '' ?>$<?= number_format($pnl, 2) ?>
+                                <?php if ($isOpen): ?>
+                                    -$<?= number_format(abs($pnl), 2) ?>
+                                <?php else: ?>
+                                    <?= $isWin ? '+' : '-' ?>$<?= number_format(abs($pnl), 2) ?>
+                                <?php endif; ?>
                             </td>
                             <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
                             <td><?= $position['expires_at'] ? date('Y-m-d H:i', strtotime($position['expires_at'])) : '-' ?></td>
-                            <td><span class="expired-text">Expired</span></td>
+                            <td class="time-left-cell" data-expires-timestamp="<?= $position['expires_at'] ? strtotime($position['expires_at']) * 1000 : '' ?>" data-status="<?= $position['status'] ?>">
+                                <?php if (!$isOpen): ?>
+                                    <span class="expired-text">Expired</span>
+                                <?php elseif ($position['expires_at']): ?>
+                                    <span class="countdown"></span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -169,28 +134,6 @@ if (empty($success) && $showSuccessModal) {
 </div>
 
 <style>
-.trade-tabs {
-    display: flex;
-    gap: 0;
-}
-.trade-tab {
-    padding: 10px 30px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.trade-tab.active {
-    background: var(--accent-primary);
-    color: #000;
-    border-radius: 4px;
-}
-.trade-tab:hover:not(.active) {
-    color: var(--text-primary);
-}
 .success-modal {
     position: fixed;
     top: 0;
@@ -321,7 +264,6 @@ if (empty($success) && $showSuccessModal) {
 .countdown {
     color: #ff6b6b;
     font-weight: 600;
-    margin-right: 10px;
     font-size: 13px;
 }
 .countdown.active {
@@ -331,21 +273,6 @@ if (empty($success) && $showSuccessModal) {
     color: #8899a6;
     font-style: italic;
 }
-.close-position-btn {
-    background: #dc3545 !important;
-    color: #fff !important;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.close-position-btn:hover {
-    background: #c82333 !important;
-    transform: translateY(-1px);
-}
 .time-left-cell {
     display: flex;
     align-items: center;
@@ -354,31 +281,10 @@ if (empty($success) && $showSuccessModal) {
 </style>
 
 <script>
-function showTab(tab) {
-    const openTable = document.getElementById('openTable');
-    const closedTable = document.getElementById('closedTable');
-    const openTab = document.getElementById('openTab');
-    const closedTab = document.getElementById('closedTab');
-    
-    if (tab === 'open') {
-        openTable.style.display = 'table';
-        closedTable.style.display = 'none';
-        openTab.classList.add('active');
-        closedTab.classList.remove('active');
-    } else {
-        openTable.style.display = 'none';
-        closedTable.style.display = 'table';
-        openTab.classList.remove('active');
-        closedTab.classList.add('active');
-    }
-}
-
 function closeSuccessModal() {
     const modal = document.getElementById('successModal');
     if (modal) modal.style.display = 'none';
 }
-
-let hasExpired = false;
 
 function updateCountdowns() {
     document.querySelectorAll('.time-left-cell[data-expires-timestamp]').forEach(cell => {
@@ -397,10 +303,6 @@ function updateCountdowns() {
             countdown.textContent = 'Closing...';
             countdown.style.color = '#ffc107';
             countdown.classList.remove('active');
-            if (!hasExpired) {
-                hasExpired = true;
-                closeExpiredPositions();
-            }
         } else {
             const minutes = Math.floor(diff / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
@@ -411,50 +313,8 @@ function updateCountdowns() {
     });
 }
 
-function closeExpiredPositions() {
-    fetch('/api/positions/close-expired', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.closed_count > 0) {
-            setTimeout(() => window.location.reload(), 1500);
-        }
-    })
-    .catch(err => console.error('Error closing positions:', err));
-}
-
 setInterval(updateCountdowns, 1000);
-setInterval(closeExpiredPositions, 5000);
 updateCountdowns();
-
-// Manual close position buttons
-document.querySelectorAll('.close-position-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const positionId = this.dataset.positionId;
-        if (confirm('Are you sure you want to close this position?')) {
-            fetch('/api/positions/close', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'position_id=' + positionId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Position closed. PnL: $' + data.pnl.toFixed(2));
-                    window.location.reload();
-                } else {
-                    alert(data.error || 'Failed to close position');
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                alert('Error closing position');
-            });
-        }
-    });
-});
 </script>
 
 <?php
