@@ -53,6 +53,7 @@ Router::get('/admin', [AdminController::class, 'dashboard'], [AdminMiddleware::c
 Router::get('/admin/users', [AdminController::class, 'users'], [AdminMiddleware::class]);
 Router::post('/admin/users/update', [AdminController::class, 'updateUser'], [AdminMiddleware::class]);
 Router::post('/admin/users/balance', [AdminController::class, 'editBalance'], [AdminMiddleware::class]);
+Router::post('/admin/users/verify', [AdminController::class, 'verifyUser'], [AdminMiddleware::class]);
 Router::get('/admin/deposits', [AdminController::class, 'deposits'], [AdminMiddleware::class]);
 Router::post('/admin/deposits/approve', [AdminController::class, 'approveDeposit'], [AdminMiddleware::class]);
 Router::get('/admin/withdrawals', [AdminController::class, 'withdrawals'], [AdminMiddleware::class]);

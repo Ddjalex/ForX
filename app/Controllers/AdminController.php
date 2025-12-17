@@ -113,6 +113,30 @@ class AdminController
         Router::redirect('/admin/users');
     }
 
+    public function verifyUser(): void
+    {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/admin/users');
+            return;
+        }
+
+        $userId = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
+
+        $user = Database::fetch("SELECT * FROM users WHERE id = ?", [$userId]);
+        if (!$user) {
+            Session::flash('error', 'User not found.');
+            Router::redirect('/admin/users');
+            return;
+        }
+
+        Database::update('users', ['email_verified' => true], 'id = ?', [$userId]);
+        AuditLog::log('verify_user', 'user', $userId, ['verified_by_admin' => true]);
+        Session::flash('success', 'User has been verified successfully.');
+
+        Router::redirect('/admin/users');
+    }
+
     public function editBalance(): void
     {
         if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
