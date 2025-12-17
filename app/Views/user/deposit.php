@@ -10,49 +10,133 @@ ob_start();
     <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
 
-<div class="card" style="max-width: 600px;">
-    <div class="card-header">
-        <h3 class="card-title">Make a Deposit</h3>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-warning mb-4">
-            <strong>Deposit Address:</strong><br>
-            <code style="word-break: break-all;"><?= htmlspecialchars($depositWallet) ?></code>
+<div class="deposit-grid">
+    <div class="deposit-section">
+        <div class="card-header collapsible">
+            <h3 class="card-title">Deposit Using Bitcoin/Ethereum</h3>
         </div>
-        
-        <p style="color: var(--text-secondary); margin-bottom: 24px;">
-            Send USDT (TRC20) to the address above, then submit the transaction details below for verification.
-        </p>
 
-        <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-            
-            <div class="form-group">
-                <label class="form-label" for="amount">Amount (USDT)</label>
-                <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount" step="0.01" min="10" required>
-            </div>
+        <div class="deposit-method">
+            <h4>Bitcoin Deposit Method</h4>
+            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
+            <p>On confirmation, our system will automatically convert your Bitcoin to live value of Dollars. Ensure that you deposit the actual Bitcoin to the address specified on the payment Page.</p>
+            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="method" value="bitcoin">
+                <div class="form-group">
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="10" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)">
+                </div>
+                <div class="form-group">
+                    <input type="file" name="proof" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Make Deposit</button>
+            </form>
+        </div>
 
-            <div class="form-group">
-                <label class="form-label" for="txid">Transaction ID (TXID)</label>
-                <input type="text" id="txid" name="txid" class="form-control" placeholder="Enter the blockchain transaction ID" required>
-            </div>
+        <div class="deposit-method">
+            <h4>Ethereum Deposit Method</h4>
+            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
+            <p>On confirmation, our system will automatically convert your Ethereum to live value of Dollars. Ensure that you deposit the actual Ethereum to the address specified on the payment Page.</p>
+            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="method" value="ethereum">
+                <div class="form-group">
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="10" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)">
+                </div>
+                <div class="form-group">
+                    <input type="file" name="proof" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Make Deposit</button>
+            </form>
+        </div>
 
-            <div class="form-group">
-                <label class="form-label" for="proof">Proof Screenshot (Optional)</label>
-                <input type="file" id="proof" name="proof" class="form-control" accept="image/*">
-            </div>
+        <div class="deposit-method">
+            <h4>Litecoin Deposit Method</h4>
+            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
+            <p>On confirmation, our system will automatically convert your Litecoin to live value of Dollars. Ensure that you deposit the actual Litecoin to the address specified on the payment Page.</p>
+            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="method" value="litecoin">
+                <div class="form-group">
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="10" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)">
+                </div>
+                <div class="form-group">
+                    <input type="file" name="proof" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Make Deposit</button>
+            </form>
+        </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Submit Deposit Request</button>
-        </form>
+        <div class="deposit-method">
+            <h4>USDT Deposit Method</h4>
+            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
+            <p>On confirmation, our system will automatically convert your USDT to live value of Dollars. Ensure that you deposit the actual USDT to the address specified on the payment Page.</p>
+            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="method" value="usdt">
+                <div class="form-group">
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="10" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)">
+                </div>
+                <div class="form-group">
+                    <input type="file" name="proof" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Make Deposit</button>
+            </form>
+        </div>
 
-        <p class="text-center mt-4" style="color: var(--text-muted); font-size: 13px;">
-            Deposits are usually processed within 1-24 hours after confirmation.
-        </p>
+        <div class="deposit-method">
+            <h4>Solana Deposit Method</h4>
+            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
+            <p>On confirmation, our system will automatically convert your Solana to live value of Dollars. Ensure that you deposit the actual Solana to the address specified on the payment Page.</p>
+            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="method" value="solana">
+                <div class="form-group">
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="10" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)">
+                </div>
+                <div class="form-group">
+                    <input type="file" name="proof" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Make Deposit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="deposit-section">
+        <div class="card-header collapsible">
+            <h3 class="card-title">Other Deposit Options</h3>
+        </div>
+
+        <div class="deposit-method">
+            <h4>Request other available Deposit Method</h4>
+            <p>Once payment is made using this method you are to send your payment proof to our support mail <a href="mailto:support@tradeflowglobalex.com">support@tradeflowglobalex.com</a></p>
+            <p>Once requested, you will receive the payment details via our support mail....</p>
+            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="method" value="other">
+                <button type="submit" class="btn btn-secondary">Processed</button>
+            </form>
+        </div>
     </div>
 </div>
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Deposit';
+$pageTitle = 'Make Deposit';
 include __DIR__ . '/../layouts/main.php';
 ?>

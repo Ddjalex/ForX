@@ -44,9 +44,18 @@ class TradingController
         $user = Auth::user();
         $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$user['id']]);
 
+        $allMarkets = Database::fetchAll(
+            "SELECT m.*, p.price FROM markets m LEFT JOIN prices p ON m.id = p.market_id WHERE m.status = 'active' ORDER BY m.symbol"
+        );
+
         $openPositions = Database::fetchAll(
-            "SELECT * FROM positions WHERE user_id = ? AND market_id = ? AND status = 'open'",
-            [$user['id'], $market['id']]
+            "SELECT p.*, m.symbol FROM positions p JOIN markets m ON p.market_id = m.id WHERE p.user_id = ? AND p.status = 'open' ORDER BY p.created_at DESC",
+            [$user['id']]
+        );
+
+        $closedPositions = Database::fetchAll(
+            "SELECT p.*, m.symbol FROM positions p JOIN markets m ON p.market_id = m.id WHERE p.user_id = ? AND p.status = 'closed' ORDER BY p.closed_at DESC LIMIT 50",
+            [$user['id']]
         );
 
         $pendingOrders = Database::fetchAll(
@@ -62,9 +71,12 @@ class TradingController
         );
 
         echo Router::render('trading/trade', [
+            'user' => $user,
             'market' => $market,
             'wallet' => $wallet,
+            'allMarkets' => $allMarkets,
             'openPositions' => $openPositions,
+            'closedPositions' => $closedPositions,
             'pendingOrders' => $pendingOrders,
             'priceHistory' => array_reverse($priceHistory),
             'csrf_token' => Session::generateCsrfToken(),

@@ -63,6 +63,9 @@ Router::get('/admin/audit-logs', [AdminController::class, 'auditLogs'], [AdminMi
 Router::get('/admin/positions', [AdminController::class, 'positions'], [AdminMiddleware::class]);
 
 Router::get('/accounts', [AccountsController::class, 'index'], [AuthMiddleware::class]);
+Router::post('/accounts/update-profile', [AccountsController::class, 'updateProfile'], [AuthMiddleware::class]);
+Router::post('/accounts/change-password', [AccountsController::class, 'changePassword'], [AuthMiddleware::class]);
+Router::post('/accounts/update-avatar', [AccountsController::class, 'updateAvatar'], [AuthMiddleware::class]);
 Router::post('/accounts/create', [AccountsController::class, 'create'], [AuthMiddleware::class]);
 Router::post('/accounts/set-balance', [AccountsController::class, 'setBalance'], [AuthMiddleware::class]);
 Router::post('/accounts/archive', [AccountsController::class, 'archive'], [AuthMiddleware::class]);

@@ -18,33 +18,143 @@ class AccountsController
         }
 
         $user = Auth::user();
-        $tab = $_GET['tab'] ?? 'real';
-        $sort = $_GET['sort'] ?? 'newest';
-
-        $orderBy = $sort === 'oldest' ? 'ASC' : 'DESC';
-
-        if ($tab === 'archived') {
-            $accounts = Database::fetchAll(
-                "SELECT * FROM trading_accounts WHERE user_id = ? AND status = 'archived' ORDER BY created_at {$orderBy}",
-                [$user['id']]
-            );
-        } else {
-            $accountType = $tab === 'demo' ? 'demo' : 'real';
-            $accounts = Database::fetchAll(
-                "SELECT * FROM trading_accounts WHERE user_id = ? AND account_type = ? AND status = 'active' ORDER BY created_at {$orderBy}",
-                [$user['id'], $accountType]
-            );
-        }
+        $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$user['id']]);
+        
+        $deposits = Database::fetchAll("SELECT * FROM deposits WHERE user_id = ?", [$user['id']]);
+        $withdrawals = Database::fetchAll("SELECT * FROM withdrawals WHERE user_id = ?", [$user['id']]);
 
         echo Router::render('user/accounts', [
             'user' => $user,
-            'accounts' => $accounts,
-            'tab' => $tab,
-            'sort' => $sort,
+            'wallet' => $wallet,
+            'deposits' => $deposits,
+            'withdrawals' => $withdrawals,
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
             'success' => Session::getFlash('success'),
         ]);
+    }
+
+    public function updateProfile(): void
+    {
+        if (!Auth::check()) {
+            Router::redirect('/login');
+            return;
+        }
+
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/accounts');
+            return;
+        }
+
+        $user = Auth::user();
+        
+        $updateData = [
+            'name' => filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS),
+            'username' => filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS),
+            'phone' => filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS),
+            'country' => filter_input(INPUT_POST, 'country', FILTER_SANITIZE_SPECIAL_CHARS),
+            'state' => filter_input(INPUT_POST, 'state', FILTER_SANITIZE_SPECIAL_CHARS),
+            'zip' => filter_input(INPUT_POST, 'zip', FILTER_SANITIZE_SPECIAL_CHARS),
+            'address' => filter_input(INPUT_POST, 'address', FILTER_SANITIZE_SPECIAL_CHARS),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+
+        Database::update('users', $updateData, 'id = ?', [$user['id']]);
+        
+        AuditLog::log('profile_updated', 'user', $user['id']);
+        
+        Session::flash('success', 'Profile updated successfully.');
+        Router::redirect('/accounts?tab=profile');
+    }
+
+    public function changePassword(): void
+    {
+        if (!Auth::check()) {
+            Router::redirect('/login');
+            return;
+        }
+
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/accounts?tab=settings');
+            return;
+        }
+
+        $user = Auth::user();
+        $oldPassword = $_POST['old_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (!password_verify($oldPassword, $user['password'])) {
+            Session::flash('error', 'Current password is incorrect.');
+            Router::redirect('/accounts?tab=settings');
+            return;
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            Session::flash('error', 'New passwords do not match.');
+            Router::redirect('/accounts?tab=settings');
+            return;
+        }
+
+        if (strlen($newPassword) < 8) {
+            Session::flash('error', 'Password must be at least 8 characters.');
+            Router::redirect('/accounts?tab=settings');
+            return;
+        }
+
+        Database::update('users', [
+            'password' => password_hash($newPassword, PASSWORD_DEFAULT),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ], 'id = ?', [$user['id']]);
+
+        AuditLog::log('password_changed', 'user', $user['id']);
+        
+        Session::flash('success', 'Password changed successfully.');
+        Router::redirect('/accounts?tab=settings');
+    }
+
+    public function updateAvatar(): void
+    {
+        if (!Auth::check()) {
+            Router::redirect('/login');
+            return;
+        }
+
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/accounts?tab=settings');
+            return;
+        }
+
+        $user = Auth::user();
+
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = ROOT_PATH . '/storage/avatars/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+            $filename = $user['id'] . '_' . time() . '.' . $extension;
+            $filepath = $uploadDir . $filename;
+
+            if (move_uploaded_file($_FILES['avatar']['tmp_name'], $filepath)) {
+                Database::update('users', [
+                    'avatar' => '/storage/avatars/' . $filename,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ], 'id = ?', [$user['id']]);
+
+                Session::flash('success', 'Profile image updated successfully.');
+            } else {
+                Session::flash('error', 'Failed to upload image.');
+            }
+        } else {
+            Session::flash('error', 'Please select an image to upload.');
+        }
+
+        Router::redirect('/accounts?tab=settings');
     }
 
     public function create(): void
