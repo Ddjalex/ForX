@@ -38,11 +38,16 @@ class AdminController
              ORDER BY a.created_at DESC LIMIT 10"
         );
 
+        $recentUsers = Database::fetchAll(
+            "SELECT * FROM users ORDER BY created_at DESC LIMIT 5"
+        );
+
         echo Router::render('admin/dashboard', [
             'stats' => $stats,
             'recentDeposits' => $recentDeposits,
             'recentWithdrawals' => $recentWithdrawals,
             'recentLogs' => $recentLogs,
+            'recentUsers' => $recentUsers,
             'csrf_token' => Session::generateCsrfToken(),
         ]);
     }

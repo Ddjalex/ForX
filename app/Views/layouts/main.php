@@ -63,30 +63,28 @@
     </aside>
 
     <main class="main-content">
-        <div class="market-ticker">
-            <div class="ticker-item">
-                <span class="ticker-badge sp500">500</span>
-                <span class="ticker-symbol">S&P 500</span>
-                <span class="ticker-price" id="sp500-price">6,805.2</span>
-                <span class="ticker-change positive" id="sp500-change">+15.20 (+0.22%)</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-badge nasdaq">100</span>
-                <span class="ticker-symbol">Nasdaq 100</span>
-                <span class="ticker-price" id="nasdaq-price">25,158.7</span>
-                <span class="ticker-change positive" id="nasdaq-change">+87.70 (+0.35%)</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-badge eur">€</span>
-                <span class="ticker-symbol">EUR/USD</span>
-                <span class="ticker-price" id="eurusd-price">1.17191</span>
-                <span class="ticker-change negative" id="eurusd-change">-0.00 (-0.21%)</span>
-            </div>
-            <div class="ticker-item">
-                <span class="ticker-badge btc">₿</span>
-                <span class="ticker-symbol">BTC/USD</span>
-                <span class="ticker-price" id="btc-price">86,422</span>
-                <span class="ticker-change negative" id="btc-change">-1,421.00 (-1.62%)</span>
+        <div class="tradingview-ticker-container">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                {
+                    "symbols": [
+                        {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
+                        {"proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100"},
+                        {"proName": "FX_IDC:EURUSD", "title": "EUR/USD"},
+                        {"proName": "BITSTAMP:BTCUSD", "title": "BTC/USD"},
+                        {"proName": "BITSTAMP:ETHUSD", "title": "ETH/USD"},
+                        {"proName": "FOREXCOM:XAUUSD", "title": "Gold"},
+                        {"proName": "FX_IDC:GBPUSD", "title": "GBP/USD"},
+                        {"proName": "FX_IDC:USDJPY", "title": "USD/JPY"}
+                    ],
+                    "showSymbolLogo": true,
+                    "isTransparent": true,
+                    "displayMode": "adaptive",
+                    "colorTheme": "dark",
+                    "locale": "en"
+                }
+                </script>
             </div>
         </div>
 

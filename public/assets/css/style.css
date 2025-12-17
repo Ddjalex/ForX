@@ -1423,3 +1423,20 @@ select.form-control {
         grid-template-columns: 1fr;
     }
 }
+
+/* TradingView Ticker Tape Styles */
+.tradingview-ticker-container {
+    width: 100%;
+    height: 46px;
+    background: rgba(10, 22, 40, 0.95);
+    border-bottom: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.tradingview-ticker-container .tradingview-widget-container {
+    height: 100%;
+}
+
+.tradingview-ticker-container .tradingview-widget-container__widget {
+    height: 100%;
+}
