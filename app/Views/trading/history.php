@@ -127,11 +127,12 @@ if (empty($success) && $showSuccessModal) {
                     <th>Profit/Loss</th>
                     <th>Opened At</th>
                     <th>Expires At</th>
+                    <th>Time Left</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($closedPositions)): ?>
-                    <tr><td colspan="12" class="text-center">No closed trades found.</td></tr>
+                    <tr><td colspan="13" class="text-center">No closed trades found.</td></tr>
                 <?php else: ?>
                     <?php $i = 1; foreach ($closedPositions as $position): 
                         $pnl = $position['realized_pnl'] ?? 0;
@@ -158,6 +159,7 @@ if (empty($success) && $showSuccessModal) {
                             </td>
                             <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
                             <td><?= $position['expires_at'] ? date('Y-m-d H:i', strtotime($position['expires_at'])) : '-' ?></td>
+                            <td><span class="expired-text">Expired</span></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -237,18 +239,34 @@ if (empty($success) && $showSuccessModal) {
 .history-table {
     width: 100%;
     min-width: 1200px;
+    border-collapse: collapse;
 }
 .history-table th {
-    background: var(--bg-tertiary);
+    background: #2d3a4f;
     padding: 12px 10px;
     font-weight: 600;
     text-align: left;
     white-space: nowrap;
+    color: #8899a6;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #3d4a5f;
+}
+.history-table tbody tr {
+    background: #1a2332;
+}
+.history-table tbody tr:nth-child(even) {
+    background: #1e2a3a;
+}
+.history-table tbody tr:hover {
+    background: #243447;
 }
 .history-table td {
     padding: 12px 10px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid #2d3a4f;
     white-space: nowrap;
+    color: #e0e0e0;
 }
 .action-buy {
     color: var(--accent-primary) !important;
@@ -301,12 +319,17 @@ if (empty($success) && $showSuccessModal) {
     font-weight: 600;
 }
 .countdown {
-    color: var(--accent-primary);
+    color: #ff6b6b;
     font-weight: 600;
     margin-right: 10px;
+    font-size: 13px;
+}
+.countdown.active {
+    color: #ff6b6b;
 }
 .expired-text {
-    color: var(--text-secondary);
+    color: #8899a6;
+    font-style: italic;
 }
 .close-position-btn {
     background: #dc3545 !important;
@@ -374,6 +397,7 @@ function updateCountdowns() {
         if (diff <= 0) {
             countdown.textContent = 'Closing...';
             countdown.style.color = '#ffc107';
+            countdown.classList.remove('active');
             if (!hasExpired) {
                 hasExpired = true;
                 closeExpiredPositions();
@@ -381,8 +405,9 @@ function updateCountdowns() {
         } else {
             const minutes = Math.floor(diff / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
-            countdown.textContent = `${minutes}m ${seconds}s`;
-            countdown.style.color = 'var(--accent-primary)';
+            countdown.textContent = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+            countdown.style.color = '#ff6b6b';
+            countdown.classList.add('active');
         }
     });
 }
