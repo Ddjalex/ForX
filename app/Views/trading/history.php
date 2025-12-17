@@ -286,7 +286,11 @@ function closeSuccessModal() {
     if (modal) modal.style.display = 'none';
 }
 
+let hasExpired = false;
+
 function updateCountdowns() {
+    let anyExpired = false;
+    
     document.querySelectorAll('.time-left-cell[data-expires-timestamp]').forEach(cell => {
         const expiresTimestamp = parseInt(cell.dataset.expiresTimestamp);
         const status = cell.dataset.status;
@@ -300,9 +304,10 @@ function updateCountdowns() {
         const diff = expiresTimestamp - now;
         
         if (diff <= 0) {
-            countdown.textContent = 'Closing...';
-            countdown.style.color = '#ffc107';
+            countdown.textContent = 'Expired';
+            countdown.style.color = '#8899a6';
             countdown.classList.remove('active');
+            anyExpired = true;
         } else {
             const minutes = Math.floor(diff / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
@@ -310,6 +315,30 @@ function updateCountdowns() {
             countdown.style.color = '#ff6b6b';
             countdown.classList.add('active');
         }
+    });
+    
+    if (anyExpired && !hasExpired) {
+        hasExpired = true;
+        closeExpiredAndRedirect();
+    }
+}
+
+function closeExpiredAndRedirect() {
+    fetch('/api/positions/close-expired', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1500);
+    })
+    .catch(err => {
+        console.error('Error closing positions:', err);
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1500);
     });
 }
 
