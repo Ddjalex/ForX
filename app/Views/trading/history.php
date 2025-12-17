@@ -24,7 +24,7 @@ if (empty($success) && $showSuccessModal) {
 
 <div class="card">
     <div class="card-header" style="flex-direction: column; align-items: flex-start;">
-        <h2 class="card-title" style="font-size: 24px; text-align: center; width: 100%; margin-bottom: 20px;">Trades Transactions</h2>
+        <h2 class="card-title" style="font-size: 24px; text-align: center; width: 100%; margin-bottom: 20px;">Trade History</h2>
         <div class="trade-tabs">
             <button type="button" class="trade-tab active" id="openTab" onclick="showTab('open')">Open</button>
             <button type="button" class="trade-tab" id="closedTab" onclick="showTab('closed')">Closed</button>
@@ -35,8 +35,8 @@ if (empty($success) && $showSuccessModal) {
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Asset Name</th>
-                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Action</th>
                     <th>Amount</th>
                     <th>Leverage</th>
                     <th>Take Profit</th>
@@ -86,8 +86,8 @@ if (empty($success) && $showSuccessModal) {
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Asset Name</th>
-                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Action</th>
                     <th>Amount</th>
                     <th>Leverage</th>
                     <th>Take Profit</th>
