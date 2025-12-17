@@ -1624,16 +1624,18 @@ select.form-control {
 
 .market-data-card .card-header {
     border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
 }
 
 .market-widget-container {
     padding: 0;
-    min-height: 400px;
+    min-height: 280px;
+    max-height: 280px;
     overflow: hidden;
 }
 
 .market-widget-container .tradingview-widget-container {
-    height: 400px;
+    height: 280px;
     width: 100%;
 }
 

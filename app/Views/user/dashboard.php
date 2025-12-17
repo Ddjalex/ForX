@@ -210,7 +210,7 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
             {
                 "width": "100%",
-                "height": 400,
+                "height": 280,
                 "defaultColumn": "overview",
                 "screener_type": "crypto_mkt",
                 "displayCurrency": "USD",
@@ -246,7 +246,7 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
                 "showSymbolLogo": true,
                 "showFloatingTooltip": false,
                 "width": "100%",
-                "height": 400
+                "height": 280
             }
             </script>
         </div>
