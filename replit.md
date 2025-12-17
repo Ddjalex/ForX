@@ -74,6 +74,13 @@ PostgreSQL with the following main tables:
 - audit_logs, login_logs, settings
 
 ## Recent Changes
+- December 2024: Trade Auto-Close and Security Improvements:
+  - Added secure `/api/positions/close-expired` endpoint with AuthMiddleware protection
+  - Implemented automatic position closing when trade duration countdown expires
+  - Positions are scoped per authenticated user to prevent cross-account manipulation
+  - Added `checkExpiredPositions()` function in app.js that polls every 5 seconds
+  - Fixed trade confirmation modal - proper button ordering (Cancel left, Yes right)
+  - Enhanced button styling with improved colors and hover states
 - December 2024: Fixed trading and security issues:
   - Fixed buy/sell error caused by database columns mismatch in ApiController
   - Added duration and expires_at columns to positions table for trade timing
