@@ -1617,3 +1617,27 @@ select.form-control {
         padding: 3px 8px;
     }
 }
+
+.market-data-card {
+    overflow: hidden;
+}
+
+.market-data-card .card-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.market-widget-container {
+    padding: 0;
+    min-height: 400px;
+    overflow: hidden;
+}
+
+.market-widget-container .tradingview-widget-container {
+    height: 400px;
+    width: 100%;
+}
+
+.market-widget-container .tradingview-widget-container__widget {
+    height: 100%;
+    width: 100%;
+}

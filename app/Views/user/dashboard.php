@@ -195,6 +195,65 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
 </div>
 
 <div class="grid-2">
+    <div class="card market-data-card">
+        <div class="card-header">
+            <h3 class="card-title">Cryptocurrency Market</h3>
+            <div class="card-actions">
+                <button class="icon-btn expand-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
+                <button class="icon-btn collapse-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+            </div>
+        </div>
+        <div class="card-body market-widget-container">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+            </div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+            {
+                "width": "100%",
+                "height": 400,
+                "defaultColumn": "overview",
+                "screener_type": "crypto_mkt",
+                "displayCurrency": "USD",
+                "colorTheme": "dark",
+                "locale": "en",
+                "isTransparent": true
+            }
+            </script>
+        </div>
+    </div>
+
+    <div class="card market-data-card">
+        <div class="card-header">
+            <h3 class="card-title">Stock Market Data</h3>
+            <div class="card-actions">
+                <button class="icon-btn expand-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
+                <button class="icon-btn collapse-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+            </div>
+        </div>
+        <div class="card-body market-widget-container">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+            </div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async>
+            {
+                "colorTheme": "dark",
+                "dateRange": "12M",
+                "exchange": "US",
+                "showChart": false,
+                "locale": "en",
+                "largeChartUrl": "",
+                "isTransparent": true,
+                "showSymbolLogo": true,
+                "showFloatingTooltip": false,
+                "width": "100%",
+                "height": 400
+            }
+            </script>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Open Positions</h3>
