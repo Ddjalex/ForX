@@ -1,13 +1,13 @@
-# TradePro - Professional Trading Platform
+# Trade Flow Globalex - Professional Trading Platform
 
 ## Overview
-A full-featured trading platform built with PHP 8.2 featuring Forex and Crypto trading, user management, wallet system with manual approvals, and comprehensive admin controls. The UI is styled similar to Exness with a dark theme and yellow accents.
+A full-featured trading platform built with PHP 8.2 featuring Forex, Crypto, Stocks, and Indices trading, user management, wallet system with manual approvals, and comprehensive admin controls. The UI is styled with a dark blue theme (#0a1628) matching the TradeFlow Globalex design with teal (#00D4AA) accent colors.
 
 ## Tech Stack
 - **Backend**: PHP 8.2 (vanilla MVC architecture)
 - **Database**: PostgreSQL
-- **Frontend**: HTML, CSS (custom Exness-style), vanilla JavaScript
-- **Charting**: Chart.js
+- **Frontend**: HTML, CSS (custom dark theme), vanilla JavaScript
+- **Charting**: TradingView Widget
 
 ## Project Structure
 ```
@@ -22,18 +22,39 @@ A full-featured trading platform built with PHP 8.2 featuring Forex and Crypto t
 /routes           - Route definitions
 /config           - Database and app configuration
 /database         - SQL schema and seed files
-/storage          - Uploads and logs
+/storage          - Uploads, avatars, and logs
 /cron             - Scheduled tasks
 ```
 
 ## Features
 - **Authentication**: Register, login, logout, password reset, email verification
 - **Email Verification**: 6-digit code sent via Brevo API during registration
-- **User Dashboard**: Balance overview, positions, transactions
-- **Trading**: Market/Limit orders, leverage up to 500x, stop-loss, take-profit
-- **Markets**: 8 Crypto pairs + 8 Forex pairs
-- **Wallet**: Deposits (with TXID verification), withdrawals (manual approval)
+- **User Dashboard**: 
+  - Market ticker (S&P 500, Nasdaq, EUR/USD, BTC/USD)
+  - Stats cards (Balance, Profit, Bonus, Account Status, Trades, Win/Loss Ratio)
+  - Open positions and recent transactions
+  - Quick action buttons
+- **Trading**: 
+  - TradingView live charts
+  - Leverage selection grid (1x to 100x)
+  - Market/Limit orders with stop-loss and take-profit
+  - Trade duration options
+  - Open/Closed trades tabs
+- **Wallet**: 
+  - Multiple deposit methods (Bitcoin, Ethereum, USDT, Solana, Litecoin)
+  - Withdrawals with method selection
+  - Manual approval system
+- **Account Settings**:
+  - Personal profile management
+  - Account records (investments, earnings, referrals)
+  - Password change functionality
+  - Avatar upload
 - **Admin Panel**: User management, deposit/withdrawal approvals, market settings, audit logs
+- **UI Enhancements**:
+  - Investment notification popups
+  - WhatsApp chat button
+  - Language selector
+  - Responsive sidebar navigation
 
 ## Default Credentials
 - **Admin**: admin@tradepro.com / password
@@ -54,15 +75,16 @@ PostgreSQL with the following main tables:
 
 ## Recent Changes
 - December 2024: Initial build with complete trading platform
-- Exness-style dark UI with yellow (#FFCF00) accent color
-- Full MVC architecture with proper separation of concerns
-- December 2024: Security enhancements:
-  - Login rate limiting (5 attempts per 15 minutes)
-  - Enhanced file upload validation (MIME type + extension checks, 5MB limit)
-  - Admin middleware with database role verification
-  - Withdrawal balance verification before approval
-- December 2024: Email verification for registration:
-  - 6-digit verification codes sent via Brevo API
-  - Verification required before login is allowed
-  - Code expiration after 15 minutes
-  - Resend verification code functionality
+- December 2024: Security enhancements (rate limiting, file validation, admin middleware)
+- December 2024: Email verification for registration
+- December 2024: UI/UX Redesign:
+  - New dark blue theme matching TradeFlow Globalex design
+  - Market ticker bar with live price updates
+  - Enhanced dashboard with comprehensive stats cards
+  - TradingView chart integration
+  - Leverage selection grid (1x-100x)
+  - Multiple crypto deposit methods
+  - Account settings with profile/records/settings tabs
+  - Investment notification popups
+  - WhatsApp chat integration
+  - Rebranded to "TradeFlow Globalex"
