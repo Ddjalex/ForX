@@ -46,6 +46,7 @@ Router::post('/trade/close', [TradingController::class, 'closePosition'], [AuthM
 Router::post('/trade/cancel', [TradingController::class, 'cancelOrder'], [AuthMiddleware::class]);
 Router::get('/positions', [TradingController::class, 'positions'], [AuthMiddleware::class]);
 Router::get('/orders', [TradingController::class, 'orders'], [AuthMiddleware::class]);
+Router::get('/trades/history', [TradingController::class, 'history'], [AuthMiddleware::class]);
 
 Router::get('/admin', [AdminController::class, 'dashboard'], [AdminMiddleware::class]);
 Router::get('/admin/users', [AdminController::class, 'users'], [AdminMiddleware::class]);

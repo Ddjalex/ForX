@@ -101,6 +101,7 @@ class TradingController
         $price = filter_input(INPUT_POST, 'price', FILTER_VALIDATE_FLOAT);
         $stopLoss = filter_input(INPUT_POST, 'stop_loss', FILTER_VALIDATE_FLOAT);
         $takeProfit = filter_input(INPUT_POST, 'take_profit', FILTER_VALIDATE_FLOAT);
+        $duration = filter_input(INPUT_POST, 'duration', FILTER_VALIDATE_INT) ?: 1;
 
         if (!$marketId || !$orderType || !$side || !$amount) {
             Session::flash('error', 'Please fill in all required fields.');
@@ -148,6 +149,9 @@ class TradingController
             $spread = $market['spread'] ?? 0;
             $executionPrice = $side === 'buy' ? $entryPrice * (1 + $spread) : $entryPrice * (1 - $spread);
 
+            $createdAt = date('Y-m-d H:i:s');
+            $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
+
             $positionId = Database::insert('positions', [
                 'user_id' => $userId,
                 'market_id' => $marketId,
@@ -159,7 +163,9 @@ class TradingController
                 'stop_loss' => $stopLoss ?: null,
                 'take_profit' => $takeProfit ?: null,
                 'status' => 'open',
-                'created_at' => date('Y-m-d H:i:s'),
+                'duration' => $duration,
+                'expires_at' => $expiresAt,
+                'created_at' => $createdAt,
             ]);
 
             Database::update('wallets', [
@@ -185,7 +191,9 @@ class TradingController
                 'leverage' => $leverage,
             ]);
 
-            Session::flash('success', 'Position opened successfully.');
+            Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
+            Router::redirect('/trades/history');
+            return;
         } else {
             Database::insert('orders', [
                 'user_id' => $userId,
@@ -382,6 +390,27 @@ class TradingController
             'pendingOrders' => $pendingOrders,
             'orderHistory' => $orderHistory,
             'csrf_token' => Session::generateCsrfToken(),
+        ]);
+    }
+
+    public function history(): void
+    {
+        $userId = Auth::id();
+
+        $positions = Database::fetchAll(
+            "SELECT p.*, m.symbol, m.name as market_name 
+             FROM positions p 
+             JOIN markets m ON p.market_id = m.id 
+             WHERE p.user_id = ?
+             ORDER BY p.created_at DESC",
+            [$userId]
+        );
+
+        echo Router::render('trading/history', [
+            'positions' => $positions,
+            'csrf_token' => Session::generateCsrfToken(),
+            'success' => Session::getFlash('success'),
+            'error' => Session::getFlash('error'),
         ]);
     }
 }
