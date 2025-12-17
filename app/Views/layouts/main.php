@@ -126,13 +126,19 @@
         
         function showInvestmentPopup() {
             const popup = document.getElementById('investmentPopup');
+            const countryEl = document.getElementById('popupCountry');
+            const amountEl = document.getElementById('popupAmount');
+            
+            if (!popup || !countryEl || !amountEl) return;
+            
             const country = countries[Math.floor(Math.random() * countries.length)];
             const action = actions[Math.floor(Math.random() * actions.length)];
             const amount = (Math.floor(Math.random() * 50) + 1) * 1000;
             
-            document.getElementById('popupCountry').textContent = country;
-            document.getElementById('popupAmount').textContent = '$' + amount.toLocaleString();
-            popup.querySelector('.content p').innerHTML = `Someone from <strong>${country}</strong> has ${action}`;
+            countryEl.textContent = country;
+            amountEl.textContent = '$' + amount.toLocaleString();
+            const contentP = popup.querySelector('.content p');
+            if (contentP) contentP.innerHTML = `Someone from <strong>${country}</strong> has ${action}`;
             
             popup.style.display = 'flex';
             

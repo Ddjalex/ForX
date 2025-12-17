@@ -88,3 +88,9 @@ PostgreSQL with the following main tables:
   - Investment notification popups
   - WhatsApp chat integration
   - Rebranded to "TradeFlow Globalex"
+- December 2024: Enhanced Real-Time Market Data & Admin Controls:
+  - TradingView Ticker Tape widget with real-time scrolling market data (S&P 500, Nasdaq, EUR/USD, BTC/USD, ETH/USD, Gold, GBP/USD, USD/JPY)
+  - Admin dashboard quick actions for deposit/withdrawal approvals with reject modal
+  - Admin navigation bar for easy access to all management sections
+  - Recent users display on admin dashboard
+  - Clickable stat cards for quick navigation
