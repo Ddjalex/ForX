@@ -204,51 +204,58 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
             </div>
         </div>
         <div class="card-body market-widget-container">
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
+            <div class="market-list">
+                <?php if (empty($cryptoMarkets)): ?>
+                    <div class="text-center text-muted p-4">No cryptocurrency data available</div>
+                <?php else: ?>
+                    <?php foreach ($cryptoMarkets as $market): ?>
+                        <a href="/trade/<?= htmlspecialchars($market['symbol']) ?>" class="market-item">
+                            <div class="market-info">
+                                <span class="market-symbol"><?= htmlspecialchars($market['symbol']) ?></span>
+                                <span class="market-name"><?= htmlspecialchars($market['name']) ?></span>
+                            </div>
+                            <div class="market-price">
+                                <span class="price">$<?= number_format($market['price'] ?? 0, 2) ?></span>
+                                <span class="change <?= ($market['change_24h'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
+                                    <?= ($market['change_24h'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($market['change_24h'] ?? 0, 2) ?>%
+                                </span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-            {
-                "width": "100%",
-                "height": 280,
-                "defaultColumn": "overview",
-                "screener_type": "crypto_mkt",
-                "displayCurrency": "USD",
-                "colorTheme": "dark",
-                "locale": "en",
-                "isTransparent": true
-            }
-            </script>
         </div>
     </div>
 
     <div class="card market-data-card">
         <div class="card-header">
-            <h3 class="card-title">Stock Market Data</h3>
+            <h3 class="card-title">Forex Market Data</h3>
             <div class="card-actions">
                 <button class="icon-btn expand-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
                 <button class="icon-btn collapse-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
             </div>
         </div>
         <div class="card-body market-widget-container">
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
+            <div class="market-list">
+                <?php if (empty($stockMarkets)): ?>
+                    <div class="text-center text-muted p-4">No forex data available</div>
+                <?php else: ?>
+                    <?php foreach ($stockMarkets as $market): ?>
+                        <a href="/trade/<?= htmlspecialchars($market['symbol']) ?>" class="market-item">
+                            <div class="market-info">
+                                <span class="market-symbol"><?= htmlspecialchars($market['symbol']) ?></span>
+                                <span class="market-name"><?= htmlspecialchars($market['name']) ?></span>
+                            </div>
+                            <div class="market-price">
+                                <span class="price">$<?= number_format($market['price'] ?? 0, 4) ?></span>
+                                <span class="change <?= ($market['change_24h'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
+                                    <?= ($market['change_24h'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($market['change_24h'] ?? 0, 2) ?>%
+                                </span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async>
-            {
-                "colorTheme": "dark",
-                "dateRange": "12M",
-                "exchange": "US",
-                "showChart": false,
-                "locale": "en",
-                "largeChartUrl": "",
-                "isTransparent": true,
-                "showSymbolLogo": true,
-                "showFloatingTooltip": false,
-                "width": "100%",
-                "height": 280
-            }
-            </script>
         </div>
     </div>
 </div>
@@ -349,6 +356,63 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
 }
 .confirm-cancel:hover {
     background: #5a6268;
+}
+.market-list {
+    max-height: 280px;
+    overflow-y: auto;
+}
+.market-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.market-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.market-item:last-child {
+    border-bottom: none;
+}
+.market-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.market-symbol {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+.market-name {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.market-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+.market-price .price {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+.market-price .change {
+    font-size: 12px;
+    font-weight: 500;
+}
+.market-price .change.positive {
+    color: var(--accent-primary);
+}
+.market-price .change.negative {
+    color: #dc3545;
+}
+.p-4 {
+    padding: 20px;
 }
 </style>
 

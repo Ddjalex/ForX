@@ -68,6 +68,22 @@ class DashboardController
             'win_loss_ratio' => $winLossRatio,
         ];
 
+        $cryptoMarkets = Database::fetchAll(
+            "SELECT m.*, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h 
+             FROM markets m 
+             LEFT JOIN prices p ON m.id = p.market_id 
+             WHERE m.type = 'crypto' AND m.status = 'active'
+             ORDER BY p.volume_24h DESC"
+        );
+
+        $stockMarkets = Database::fetchAll(
+            "SELECT m.*, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h 
+             FROM markets m 
+             LEFT JOIN prices p ON m.id = p.market_id 
+             WHERE m.type IN ('forex', 'stocks', 'indices') AND m.status = 'active'
+             ORDER BY m.symbol"
+        );
+
         echo Router::render('user/dashboard', [
             'user' => $user,
             'wallet' => $wallet,
@@ -76,6 +92,8 @@ class DashboardController
             'recentTransactions' => $recentTransactions,
             'totalPnL' => $totalPnL,
             'stats' => $stats,
+            'cryptoMarkets' => $cryptoMarkets,
+            'stockMarkets' => $stockMarkets,
             'csrf_token' => Session::generateCsrfToken(),
         ]);
     }
