@@ -548,7 +548,7 @@ function confirmTrade() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = '/trades/history?success=1';
+            window.location.href = '/dashboard/trades/history?success=1';
         } else {
             alert(data.message || 'Trade failed. Please try again.');
         }
