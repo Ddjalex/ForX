@@ -1570,6 +1570,19 @@ select.form-control {
     padding: 16px 0;
 }
 
+.top-header-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.top-header-link:hover {
+    opacity: 0.8;
+    transform: translateX(4px);
+}
+
 .top-header-content {
     max-width: 100%;
     padding: 0 24px;
