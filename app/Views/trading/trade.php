@@ -100,8 +100,8 @@ $totalBalance = $wallet['balance'] ?? 0;
                 <label class="form-label">Leverage</label>
                 <div class="leverage-grid">
                     <?php 
-                    $leverages = [5, 2, 3, 4, 5, 10, 25, 30, 40, 50, 60, 70, 80, 90, 100];
-                    foreach (array_slice($leverages, 0, 10) as $lev): 
+                    $leverages = [5, 2, 3, 4, 10, 25, 30, 40, 50, 100];
+                    foreach ($leverages as $lev): 
                     ?>
                         <button type="button" class="leverage-btn <?= $lev === 5 ? 'active' : '' ?>" data-leverage="<?= $lev ?>" onclick="setLeverage(<?= $lev ?>)"><?= $lev ?>x</button>
                     <?php endforeach; ?>

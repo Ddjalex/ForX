@@ -331,13 +331,13 @@ function closeExpiredAndRedirect() {
     .then(response => response.json())
     .then(data => {
         setTimeout(() => {
-            window.location.href = '/dashboard';
+            window.location.href = '/dashboard/trade';
         }, 1500);
     })
     .catch(err => {
         console.error('Error closing positions:', err);
         setTimeout(() => {
-            window.location.href = '/dashboard';
+            window.location.href = '/dashboard/trade';
         }, 1500);
     });
 }
