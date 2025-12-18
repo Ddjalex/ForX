@@ -646,21 +646,18 @@ function closeConfirmModal() {
     document.getElementById('tradeConfirmModal').style.display = 'none';
 }
 
+let globalSubmitting = false;
+
 document.getElementById('confirmTradeBtn').addEventListener('click', function() {
-    document.getElementById('orderSide').value = currentTradeAction;
-    submitTradeForm();
-});
-
-let isSubmitting = false;
-
-function submitTradeForm() {
-    if (isSubmitting) return;
-    isSubmitting = true;
+    if (globalSubmitting) return;
+    globalSubmitting = true;
     
+    document.getElementById('orderSide').value = currentTradeAction;
     const form = document.getElementById('tradeForm');
     const confirmBtn = document.getElementById('confirmTradeBtn');
     confirmBtn.disabled = true;
     confirmBtn.textContent = 'Processing...';
+    closeConfirmModal();
     
     const formData = new FormData(form);
     
@@ -669,24 +666,23 @@ function submitTradeForm() {
         body: formData
     })
     .then(response => {
-        if (response.ok) {
-            window.location.href = '/dashboard/trades/history';
+        if (response.status === 302 || response.ok) {
+            setTimeout(() => {
+                window.location.href = '/dashboard/trades/history';
+            }, 100);
         } else {
-            return response.text().then(text => {
-                throw new Error('Request failed: ' + text);
-            });
+            globalSubmitting = false;
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Error - Try again';
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        isSubmitting = false;
+        globalSubmitting = false;
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Error - Try again';
-        setTimeout(() => location.reload(), 2000);
     });
-    
-    closeConfirmModal();
-}
+});
 
 // Countdown timer for open trades
 let expiredPositions = new Set();
