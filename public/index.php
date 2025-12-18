@@ -28,8 +28,20 @@ spl_autoload_register(function ($class) {
 
 use App\Services\Session;
 use App\Services\Router;
+use App\Services\Translation;
 
 Session::start();
+
+// Global translation helper function
+if (!function_exists('t')) {
+    function t($key, $default = '') {
+        return Translation::translate($key, $default);
+    }
+}
+
+// Set language from request or session
+$lang = $_GET['lang'] ?? $_COOKIE['language'] ?? 'en';
+Translation::setLanguage($lang);
 
 require ROOT_PATH . '/routes/web.php';
 

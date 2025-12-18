@@ -14,63 +14,63 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-value">$<?= number_format($totalBalance, 2) ?></div>
-        <div class="stat-label">Total Balance</div>
+        <div class="stat-label"><?= t('total_balance') ?></div>
     </div>
     <div class="stat-card">
         <div class="stat-value">$<?= number_format($profit, 2) ?></div>
-        <div class="stat-label">Profit</div>
+        <div class="stat-label"><?= t('profit') ?></div>
     </div>
     <div class="stat-card">
         <div class="stat-value">$<?= number_format($bonus, 2) ?></div>
-        <div class="stat-label">Total Bonus</div>
+        <div class="stat-label"><?= t('total_bonus') ?></div>
     </div>
     <div class="stat-card <?= !$isVerified ? 'danger' : '' ?>">
         <div class="stat-value" style="font-size: 16px; <?= $isVerified ? 'color: var(--success)' : 'color: var(--danger)' ?>">
-            <?= $isVerified ? 'VERIFIED' : 'UNVERIFIED' ?>
+            <?= $isVerified ? t('verified') : t('not_verified') ?>
         </div>
-        <div class="stat-label">Account Status</div>
+        <div class="stat-label"><?= t('account_status') ?></div>
     </div>
 </div>
 
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-value"><?= $totalTrades ?></div>
-        <div class="stat-label">Total Trades</div>
+        <div class="stat-label"><?= t('total_trades') ?></div>
     </div>
     <div class="stat-card">
         <div class="stat-value"><?= $openTrades ?></div>
-        <div class="stat-label">Open Trades</div>
+        <div class="stat-label"><?= t('open_trades') ?></div>
     </div>
     <div class="stat-card">
         <div class="stat-value"><?= $closedTrades ?></div>
-        <div class="stat-label">Closed Trades</div>
+        <div class="stat-label"><?= t('closed_trades') ?></div>
     </div>
     <div class="stat-card">
         <div class="stat-value"><?= $winLossRatio ?></div>
-        <div class="stat-label">Win/Loss Ratio</div>
+        <div class="stat-label"><?= t('win_loss_ratio') ?></div>
     </div>
 </div>
 
 <div class="action-buttons">
     <a href="/accounts" class="action-btn account">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        Account
+        <?= t('account') ?>
     </a>
     <a href="/wallet/deposit" class="action-btn deposit">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        Make Deposit $
+        <?= t('make_deposit') ?> $
     </a>
     <a href="/wallet/withdraw" class="action-btn withdraw">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 19 19 12"></polyline></svg>
-        Withdraw Funds
+        <?= t('withdraw_funds') ?>
     </a>
     <a href="mailto:support@tradeflowglobalex.com" class="action-btn mail">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-        Mail Us
+        <?= t('mail_us') ?>
     </a>
     <a href="/accounts?tab=settings" class="action-btn settings">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        Settings
+        <?= t('settings') ?>
     </a>
 </div>
 
@@ -81,7 +81,7 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                 </svg>
-                Live Trading Chart
+                <?= t('live_trading_chart') ?>
             </h3>
             <div class="card-actions">
                 <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
@@ -101,10 +101,10 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
-                Live Trading
+                <?= t('live_trading') ?>
             </h3>
             <div class="card-actions">
-                <span class="balance-display">Balance: <strong>$<?= number_format($totalBalance, 2) ?></strong></span>
+                <span class="balance-display"><?= t('balance') ?>: <strong>$<?= number_format($totalBalance, 2) ?></strong></span>
                 <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
                 <svg class="collapse-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
