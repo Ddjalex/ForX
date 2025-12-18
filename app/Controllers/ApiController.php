@@ -142,7 +142,7 @@ class ApiController
 
         $userId = Auth::id();
         $assetType = $_POST['asset_type'] ?? 'crypto';
-        $assetName = $_POST['asset_name'] ?? '';
+        $marketId = $_POST['market_id'] ?? '';
         $side = $_POST['side'] ?? '';
         $amount = (float) ($_POST['amount'] ?? 0);
         $leverage = (int) ($_POST['leverage'] ?? 5);
@@ -150,13 +150,22 @@ class ApiController
         $takeProfit = (float) ($_POST['take_profit'] ?? 0);
         $stopLoss = (float) ($_POST['stop_loss'] ?? 0);
 
-        if (empty($assetName) || empty($side) || $amount <= 0) {
+        if (empty($marketId) || empty($side) || $amount <= 0) {
             Router::json(['success' => false, 'message' => 'Invalid trade parameters']);
             return;
         }
 
         if (!in_array($side, ['buy', 'sell'])) {
             Router::json(['success' => false, 'message' => 'Invalid trade side']);
+            return;
+        }
+
+        $market = Database::fetch("SELECT * FROM markets WHERE id = ?", [$marketId]);
+        if (!$market) {
+            $market = Database::fetch("SELECT * FROM markets WHERE symbol = ?", [$marketId]);
+        }
+        if (!$market) {
+            Router::json(['success' => false, 'message' => 'Invalid asset selected']);
             return;
         }
 
@@ -179,21 +188,11 @@ class ApiController
             return;
         }
 
-        $market = Database::fetch("SELECT * FROM markets WHERE symbol = ?", [$assetName]);
-        if (!$market) {
-            Database::insert('markets', [
-                'symbol' => $assetName,
-                'name' => $assetName,
-                'type' => $assetType,
-                'status' => 'active',
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-            $market = Database::fetch("SELECT * FROM markets WHERE symbol = ?", [$assetName]);
-        }
-
-        $entryPrice = $this->getAssetPrice($assetName) ?? 0;
-        if ($entryPrice <= 0) {
-            $entryPrice = $this->getDefaultPrice($assetName);
+        $assetService = new AssetService();
+        try {
+            $entryPrice = $assetService->getEntryPrice((int)$market['id']);
+        } catch (\Exception $e) {
+            $entryPrice = $this->getDefaultPrice($market['symbol']);
         }
 
         $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
@@ -227,7 +226,7 @@ class ApiController
             'success' => true,
             'message' => ucfirst($side) . ' order executed successfully',
             'data' => [
-                'asset' => $assetName,
+                'asset' => $market['symbol'],
                 'side' => $side,
                 'amount' => $amount,
                 'leverage' => $leverage,
