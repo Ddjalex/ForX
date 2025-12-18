@@ -526,47 +526,7 @@
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
     </div>
 
-    <div class="investment-popup" id="investmentPopup" style="display: none;">
-        <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-        <div class="content">
-            <p>Someone from <strong id="popupCountry">South Africa</strong> just invested</p>
-            <div class="amount" id="popupAmount">$10,000</div>
-        </div>
-    </div>
-
     <script src="/assets/js/app.js"></script>
-    <script>
-        const countries = ['South Africa', 'United Kingdom', 'Germany', 'Canada', 'Australia', 'Mexico', 'Cyprus', 'Netherlands', 'France', 'Spain'];
-        const actions = ['invested', 'withdrawn'];
-        
-        function showInvestmentPopup() {
-            const popup = document.getElementById('investmentPopup');
-            const countryEl = document.getElementById('popupCountry');
-            const amountEl = document.getElementById('popupAmount');
-            
-            if (!popup || !countryEl || !amountEl) return;
-            
-            const country = countries[Math.floor(Math.random() * countries.length)];
-            const action = actions[Math.floor(Math.random() * actions.length)];
-            const amount = (Math.floor(Math.random() * 50) + 1) * 1000;
-            
-            countryEl.textContent = country;
-            amountEl.textContent = '$' + amount.toLocaleString();
-            const contentP = popup.querySelector('.content p');
-            if (contentP) contentP.innerHTML = `Someone from <strong>${country}</strong> has ${action}`;
-            
-            popup.style.display = 'flex';
-            
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 5000);
-        }
-        
-        setInterval(showInvestmentPopup, 15000);
-        setTimeout(showInvestmentPopup, 3000);
-    </script>
     
     <?php
     // Load Tawk.to settings safely
