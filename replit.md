@@ -1,7 +1,7 @@
-# Trade Flow Globalex - Professional Trading Platform
+# Alpha Core Markets - Professional Trading Platform
 
 ## Overview
-A full-featured trading platform built with PHP 8.2 featuring Forex, Crypto, Stocks, and Indices trading, user management, wallet system with manual approvals, and comprehensive admin controls. The UI is styled with a dark blue theme (#0a1628) matching the TradeFlow Globalex design with teal (#00D4AA) accent colors.
+A full-featured trading platform built with PHP 8.2 featuring Forex, Crypto, Stocks, and Indices trading, copy trading, market news, NFT marketplace, trading signals, crypto loans, referral program, and live market analysis. The UI is styled with a dark blue theme (#0a1628) with cyan/turquoise (#00D4AA) gradient accents using the Inter font family.
 
 ## Tech Stack
 - **Backend**: PHP 8.2 (vanilla MVC architecture)
@@ -50,6 +50,12 @@ A full-featured trading platform built with PHP 8.2 featuring Forex, Crypto, Sto
   - Password change functionality
   - Avatar upload
 - **Admin Panel**: User management, deposit/withdrawal approvals, market settings, audit logs
+- **News**: Real-time market news from Finnhub API with category filtering
+- **NFT Marketplace**: Top NFT collections from CoinGecko API with floor prices and volume
+- **Trading Signals**: Technical analysis signals from TAAPI.IO (RSI, MACD, EMA, Bollinger Bands)
+- **Crypto Loans**: Collateralized loan system with multiple plans and interest rates
+- **Referral Program**: Multi-tier referral system with earnings tracking and bonuses
+- **Live Analysis**: Combined view of trading signals and market news
 - **UI Enhancements**:
   - Investment notification popups
   - WhatsApp chat button
@@ -72,8 +78,19 @@ PostgreSQL with the following main tables:
 - markets, prices, prices_history
 - orders, positions, trades
 - audit_logs, login_logs, settings
+- loan_plans, loans
+- referral_links, referral_earnings
 
 ## Recent Changes
+- December 2024: New Features Implementation:
+  - Added NewsService with Finnhub API integration for market news
+  - Added NFTService with CoinGecko API for NFT marketplace data
+  - Added SignalService with TAAPI.IO for trading signals
+  - Added LoanService for crypto collateralized loans
+  - Added ReferralService with multi-tier referral system
+  - Created FeatureController with routes: /news, /nfts, /signals, /loans, /referrals, /live-analysis
+  - Added loan_plans and loans database tables
+  - Security: CSRF validation on loan applications, sanitized referral link hosts
 - December 2024: Real-Time Market Data Integration:
   - Replaced Binance API (blocked from server location) with CoinGecko API for crypto prices
   - Added exchangerate-api.com integration for real forex rates
