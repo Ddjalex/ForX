@@ -44,7 +44,7 @@ function t($key, $default = '') {
                 </div>
                 <div class="sidebar-user-info">
                     <span class="sidebar-user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
-                    <span class="sidebar-user-status"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? t('verified') : t('not_verified') ?></span>
+                    <span class="sidebar-user-status" data-i18n="<?= ($user['kyc_status'] ?? 'pending') === 'approved' ? 'verified' : 'not_verified' ?>"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? t('verified') : t('not_verified') ?></span>
                 </div>
             </div>
             <button class="sidebar-close" id="sidebarClose">
@@ -57,67 +57,67 @@ function t($key, $default = '') {
         
         <nav class="sidebar-nav-scroll">
             <ul class="sidebar-nav">
-                <li><a href="/accounts" class="<?= ($_SERVER['REQUEST_URI'] === '/accounts') ? 'active' : '' ?>">
+                <li><a href="/accounts" class="<?= ($_SERVER['REQUEST_URI'] === '/accounts') ? 'active' : '' ?>" data-i18n="account_settings">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     <?= t('account_settings') ?>
                 </a></li>
                 
-                <li><a href="/wallet/deposit" class="<?= ($_SERVER['REQUEST_URI'] === '/wallet/deposit') ? 'active' : '' ?>">
+                <li><a href="/wallet/deposit" class="<?= ($_SERVER['REQUEST_URI'] === '/wallet/deposit') ? 'active' : '' ?>" data-i18n="deposit">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                     <?= t('deposit') ?>
                 </a></li>
                 
-                <li><a href="/wallet/withdraw" class="<?= ($_SERVER['REQUEST_URI'] === '/wallet/withdraw') ? 'active' : '' ?>">
+                <li><a href="/wallet/withdraw" class="<?= ($_SERVER['REQUEST_URI'] === '/wallet/withdraw') ? 'active' : '' ?>" data-i18n="withdraw">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="12" x2="18" y2="12"></line></svg>
                     <?= t('withdraw') ?>
                 </a></li>
                 
-                <li><a href="/dashboard/trade" class="<?= (strpos($_SERVER['REQUEST_URI'], '/markets') === 0 || strpos($_SERVER['REQUEST_URI'], '/dashboard/trade') === 0) ? 'active' : '' ?>">
+                <li><a href="/dashboard/trade" class="<?= (strpos($_SERVER['REQUEST_URI'], '/markets') === 0 || strpos($_SERVER['REQUEST_URI'], '/dashboard/trade') === 0) ? 'active' : '' ?>" data-i18n="trade">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
                     <?= t('trade') ?>
                 </a></li>
                 
-                <li><a href="/copy-experts" class="<?= ($_SERVER['REQUEST_URI'] === '/copy-experts') ? 'active' : '' ?>">
+                <li><a href="/copy-experts" class="<?= ($_SERVER['REQUEST_URI'] === '/copy-experts') ? 'active' : '' ?>" data-i18n="copy_experts">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     <?= t('copy_experts') ?>
                 </a></li>
                 
-                <li><a href="/news" class="<?= ($_SERVER['REQUEST_URI'] === '/news') ? 'active' : '' ?>">
+                <li><a href="/news" class="<?= ($_SERVER['REQUEST_URI'] === '/news') ? 'active' : '' ?>" data-i18n="news">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
                     <?= t('news') ?>
                 </a></li>
                 
-                <li><a href="/nfts" class="<?= ($_SERVER['REQUEST_URI'] === '/nfts') ? 'active' : '' ?>">
+                <li><a href="/nfts" class="<?= ($_SERVER['REQUEST_URI'] === '/nfts') ? 'active' : '' ?>" data-i18n="nfts">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
                     <?= t('nfts') ?>
                 </a></li>
                 
-                <li><a href="/signals" class="<?= ($_SERVER['REQUEST_URI'] === '/signals') ? 'active' : '' ?>">
+                <li><a href="/signals" class="<?= ($_SERVER['REQUEST_URI'] === '/signals') ? 'active' : '' ?>" data-i18n="signals">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01"></path><path d="M7 20v-4"></path><path d="M12 20v-8"></path><path d="M17 20V8"></path><path d="M22 4v16"></path></svg>
                     <?= t('signals') ?>
                 </a></li>
                 
-                <li><a href="/loans" class="<?= ($_SERVER['REQUEST_URI'] === '/loans') ? 'active' : '' ?>">
+                <li><a href="/loans" class="<?= ($_SERVER['REQUEST_URI'] === '/loans') ? 'active' : '' ?>" data-i18n="loans">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"></path><path d="M2 9v1c0 1.1.9 2 2 2h1"></path><path d="M16 11h0"></path></svg>
                     <?= t('loans') ?>
                 </a></li>
                 
-                <li><a href="/dashboard/trades/history" class="<?= (strpos($_SERVER['REQUEST_URI'], '/dashboard/trades/history') === 0) ? 'active' : '' ?>">
+                <li><a href="/dashboard/trades/history" class="<?= (strpos($_SERVER['REQUEST_URI'], '/dashboard/trades/history') === 0) ? 'active' : '' ?>" data-i18n="trade_history">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     <?= t('trade_history') ?>
                 </a></li>
                 
-                <li><a href="/dashboard/trades/history" class="<?= ($_SERVER['REQUEST_URI'] === '/dashboard/trades/history') ? 'active' : '' ?>">
+                <li><a href="/dashboard/trades/history" class="<?= ($_SERVER['REQUEST_URI'] === '/dashboard/trades/history') ? 'active' : '' ?>" data-i18n="transactions">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
                     <?= t('transactions') ?>
                 </a></li>
                 
-                <li><a href="/referrals" class="<?= ($_SERVER['REQUEST_URI'] === '/referrals') ? 'active' : '' ?>">
+                <li><a href="/referrals" class="<?= ($_SERVER['REQUEST_URI'] === '/referrals') ? 'active' : '' ?>" data-i18n="referrals">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <?= t('referrals') ?>
                 </a></li>
                 
-                <li><a href="/logout" class="logout-link">
+                <li><a href="/logout" class="logout-link" data-i18n="logout">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                     <?= t('logout') ?>
                 </a></li>
@@ -129,9 +129,9 @@ function t($key, $default = '') {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="sidebar-dropdown-content" id="liveAnalysisContent">
-                    <a href="/analysis/forex">Forex Analysis</a>
-                    <a href="/analysis/crypto">Crypto Analysis</a>
-                    <a href="/analysis/stocks">Stock Analysis</a>
+                    <a href="/analysis/forex" data-i18n="forex_analysis">Forex Analysis</a>
+                    <a href="/analysis/crypto" data-i18n="crypto_analysis">Crypto Analysis</a>
+                    <a href="/analysis/stocks" data-i18n="stock_analysis">Stock Analysis</a>
                 </div>
             </div>
         </nav>
