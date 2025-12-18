@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Trade Flow Globalex</title>
+    <title>Register - Alpha Core Markets</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,7 +56,7 @@
     <div class="auth-container">
         <div class="auth-box auth-box-wide">
             <div class="auth-logo">
-                <h1>TradeFlow</h1>
+                <h1>Alpha Core Markets</h1>
             </div>
             
             <h2 class="auth-title">Sign Up for Free</h2>
