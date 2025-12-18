@@ -32,14 +32,7 @@ use App\Services\Translation;
 
 Session::start();
 
-// Global translation helper function
-if (!function_exists('t')) {
-    function t($key, $default = '') {
-        return Translation::translate($key, $default);
-    }
-}
-
-// Set language from request or session
+// Set language from request or session (before layout loads)
 $lang = $_GET['lang'] ?? $_COOKIE['language'] ?? 'en';
 Translation::setLanguage($lang);
 
