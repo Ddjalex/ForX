@@ -228,6 +228,22 @@ class TradingController
             $createdAt = date('Y-m-d H:i:s');
             $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
 
+            // Check for duplicate position created in the last 2 seconds
+            $recentDuplicate = Database::fetch(
+                "SELECT id FROM positions 
+                 WHERE user_id = ? AND market_id = ? AND side = ? AND amount = ? AND leverage = ? 
+                 AND created_at > DATE_SUB(NOW(), INTERVAL 2 SECOND)
+                 ORDER BY id DESC LIMIT 1",
+                [$userId, $marketId, $side, $amount, $leverage]
+            );
+            
+            if ($recentDuplicate) {
+                // Skip duplicate insertion
+                Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
+                Router::redirect('/dashboard/trades/history');
+                return;
+            }
+
             $positionId = Database::insert('positions', [
                 'user_id' => $userId,
                 'market_id' => $marketId,
