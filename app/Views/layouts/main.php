@@ -36,8 +36,8 @@ function t($key, $default = '') {
         <div class="sidebar-header">
             <div class="sidebar-user">
                 <div class="sidebar-user-avatar">
-                    <?php if (!empty($user['avatar']) && file_exists(ROOT_PATH . '/public' . $user['avatar'])): ?>
-                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <?php if (!empty($user['avatar'])): ?>
+                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($user['name'] ?? 'User') ?>&background=00D4AA&color=0a1628'">
                     <?php else: ?>
                         <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['name'] ?? 'User') ?>&background=00D4AA&color=0a1628" alt="User">
                     <?php endif; ?>
@@ -64,17 +64,17 @@ function t($key, $default = '') {
                 
                 <li><a href="/wallet/deposit" class="<?= ($_SERVER['REQUEST_URI'] === '/wallet/deposit') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                    Deposit
+                    <?= t('deposit') ?>
                 </a></li>
                 
                 <li><a href="/wallet/withdraw" class="<?= ($_SERVER['REQUEST_URI'] === '/wallet/withdraw') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="12" x2="18" y2="12"></line></svg>
-                    Withdraw
+                    <?= t('withdraw') ?>
                 </a></li>
                 
                 <li><a href="/dashboard/trade" class="<?= (strpos($_SERVER['REQUEST_URI'], '/markets') === 0 || strpos($_SERVER['REQUEST_URI'], '/dashboard/trade') === 0) ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
-                    Trade
+                    <?= t('trade') ?>
                 </a></li>
                 
                 <li><a href="/copy-experts" class="<?= ($_SERVER['REQUEST_URI'] === '/copy-experts') ? 'active' : '' ?>">
@@ -89,7 +89,7 @@ function t($key, $default = '') {
                 
                 <li><a href="/nfts" class="<?= ($_SERVER['REQUEST_URI'] === '/nfts') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-                    NFTS
+                    <?= t('nfts') ?>
                 </a></li>
                 
                 <li><a href="/signals" class="<?= ($_SERVER['REQUEST_URI'] === '/signals') ? 'active' : '' ?>">
@@ -119,13 +119,13 @@ function t($key, $default = '') {
                 
                 <li><a href="/logout" class="logout-link">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    Logout
+                    <?= t('logout') ?>
                 </a></li>
             </ul>
             
             <div class="sidebar-dropdown">
                 <div class="sidebar-dropdown-header" id="liveAnalysisToggle">
-                    <span>Live Analysis</span>
+                    <span><?= t('live_analysis') ?></span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="sidebar-dropdown-content" id="liveAnalysisContent">

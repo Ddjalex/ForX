@@ -6,9 +6,14 @@ class Translation
 {
     private static $language = 'en';
     private static $translations = [];
+    private static $supportedLanguages = ['en', 'es', 'fr', 'de', 'zh', 'ar', 'pt', 'ru'];
 
     public static function setLanguage($lang)
     {
+        $lang = strtolower(trim($lang));
+        if (!in_array($lang, self::$supportedLanguages)) {
+            $lang = 'en';
+        }
         self::$language = $lang;
         self::loadTranslations();
     }
