@@ -5,7 +5,64 @@ document.addEventListener('DOMContentLoaded', function() {
     checkExpiredPositions();
     
     initSidebar();
+    initLanguageToggle();
 });
+
+function initLanguageToggle() {
+    const languageSelector = document.querySelector('.language-selector');
+    if (!languageSelector) return;
+    
+    const languages = [
+        { code: 'en', name: 'English' },
+        { code: 'es', name: 'Español' },
+        { code: 'fr', name: 'Français' },
+        { code: 'de', name: 'Deutsch' },
+        { code: 'zh', name: '中文' },
+        { code: 'ar', name: 'العربية' },
+        { code: 'pt', name: 'Português' },
+        { code: 'ru', name: 'Русский' }
+    ];
+    
+    languageSelector.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const dropdown = this.querySelector('.language-dropdown');
+        
+        if (!dropdown) {
+            const menu = document.createElement('div');
+            menu.className = 'language-dropdown';
+            menu.innerHTML = languages.map(lang => 
+                `<div class="language-option" data-lang="${lang.code}">${lang.name}</div>`
+            ).join('');
+            
+            this.appendChild(menu);
+            
+            menu.querySelectorAll('.language-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    setLanguage(lang);
+                    languageSelector.classList.remove('open');
+                });
+            });
+        }
+        
+        this.classList.toggle('open');
+    });
+    
+    document.addEventListener('click', function() {
+        languageSelector.classList.remove('open');
+    });
+}
+
+function setLanguage(lang) {
+    localStorage.setItem('language', lang);
+    const langSpan = document.querySelector('.language-selector span');
+    if (langSpan) {
+        langSpan.textContent = lang.toUpperCase();
+    }
+    
+    // Optionally reload page or update content
+    console.log('Language changed to:', lang);
+}
 
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
