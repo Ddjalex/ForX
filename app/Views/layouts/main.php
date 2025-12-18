@@ -25,11 +25,11 @@
         <div class="sidebar-header">
             <div class="sidebar-user">
                 <div class="sidebar-user-avatar">
-                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['user']['name'] ?? 'User') ?>&background=00D4AA&color=0a1628" alt="User">
+                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['name'] ?? 'User') ?>&background=00D4AA&color=0a1628" alt="User">
                 </div>
                 <div class="sidebar-user-info">
-                    <span class="sidebar-user-name"><?= htmlspecialchars($_SESSION['user']['name'] ?? 'User') ?></span>
-                    <span class="sidebar-user-status"><?= ($_SESSION['user']['kyc_status'] ?? 'pending') === 'approved' ? 'Verified' : 'Not Verified' ?></span>
+                    <span class="sidebar-user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
+                    <span class="sidebar-user-status"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? 'Verified' : 'Not Verified' ?></span>
                 </div>
             </div>
             <button class="sidebar-close" id="sidebarClose">
