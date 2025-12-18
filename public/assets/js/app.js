@@ -60,8 +60,8 @@ function setLanguage(lang) {
         langSpan.textContent = lang.toUpperCase();
     }
     
-    // Optionally reload page or update content
-    console.log('Language changed to:', lang);
+    // Reload page to apply new language
+    window.location.reload();
 }
 
 function initSidebar() {

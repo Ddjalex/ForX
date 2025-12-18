@@ -1,5 +1,16 @@
+<?php
+use App\Services\Translation;
+
+$currentLanguage = $_COOKIE['language'] ?? $_GET['lang'] ?? 'en';
+Translation::setLanguage($currentLanguage);
+setcookie('language', $currentLanguage, time() + (365 * 24 * 60 * 60), '/');
+
+function t($key, $default = '') {
+    return Translation::t($key, $default);
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= $currentLanguage ?>"><?php // Changed from "en" ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +40,7 @@
                 </div>
                 <div class="sidebar-user-info">
                     <span class="sidebar-user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
-                    <span class="sidebar-user-status"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? 'Verified' : 'Not Verified' ?></span>
+                    <span class="sidebar-user-status"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? t('verified') : t('not_verified') ?></span>
                 </div>
             </div>
             <button class="sidebar-close" id="sidebarClose">
