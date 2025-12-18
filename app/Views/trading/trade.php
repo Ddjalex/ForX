@@ -165,10 +165,90 @@ $totalBalance = $wallet['balance'] ?? 0;
                     <button class="chart-control-btn" onclick="changeInterval('60')">1h</button>
                 </div>
             </div>
-            <div class="tradingview-widget-container" id="tradingview_chart"></div>
+            <div class="tradingview-widget-container">
+                <div id="tradingview_chart"></div>
+            </div>
         </div>
     </div>
 </div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+let tvChart = null;
+let currentSymbol = 'BINANCE:BTCUSDT';
+
+document.addEventListener('DOMContentLoaded', function() {
+    initTradingViewChart();
+    
+    const assetSelect = document.getElementById('assetName');
+    if (assetSelect) {
+        assetSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
+            if (tradingViewSymbol) {
+                currentSymbol = tradingViewSymbol;
+                updateTradingViewChart();
+            }
+        });
+    }
+});
+
+function initTradingViewChart() {
+    // Only initialize once
+    if (!tvChart) {
+        createTradingViewWidget();
+    }
+}
+
+function createTradingViewWidget() {
+    try {
+        if (typeof TradingView === 'undefined') {
+            console.log('TradingView library not loaded yet');
+            setTimeout(createTradingViewWidget, 500);
+            return;
+        }
+        
+        tvChart = new TradingView.widget({
+            "autosize": true,
+            "symbol": currentSymbol,
+            "interval": "1",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#1a2332",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart",
+            "hide_side_toolbar": false,
+            "studies": ["MASimple@tv-basicstudies", "RSI@tv-basicstudies"],
+            "show_popup_button": true,
+            "popup_width": "1000",
+            "popup_height": "650"
+        });
+    } catch (e) {
+        console.log('TradingView widget creation error:', e);
+    }
+}
+
+function updateTradingViewChart() {
+    // Remove old chart
+    const container = document.getElementById('tradingview_chart');
+    if (container) {
+        container.innerHTML = '';
+    }
+    tvChart = null;
+    
+    // Create new chart with new symbol
+    setTimeout(createTradingViewWidget, 100);
+}
+
+// Override the existing updateTradingViewChart from app.js
+const originalUpdateChart = window.updateTradingViewChart;
+window.updateTradingViewChart = function() {
+    updateTradingViewChart();
+};
+</script>
 
 <div class="transactions-section">
     <div class="card-header collapsible">

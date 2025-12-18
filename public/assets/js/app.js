@@ -5,11 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     checkExpiredPositions();
     
     initSidebar();
-    
-    // Initialize TradingView chart on page load
-    if (document.getElementById('tradingview_chart')) {
-        updateTradingViewChart();
-    }
 });
 
 function initSidebar() {
@@ -174,89 +169,8 @@ function showTradeNotification(message, type = 'info') {
     }, 3000);
 }
 
-// TradingView Chart Integration
-let tradingViewChart = null;
-let currentInterval = '30';
-
-function updateTradingViewChart() {
-    const assetSelect = document.getElementById('assetName');
-    if (!assetSelect) return;
-    
-    const selectedOption = assetSelect.options[assetSelect.selectedIndex];
-    const symbol = selectedOption.getAttribute('data-tradingview') || selectedOption.getAttribute('data-symbol');
-    
-    if (!symbol) return;
-    
-    // Remove existing chart if any
-    const container = document.getElementById('tradingview_chart');
-    if (container) {
-        container.innerHTML = '';
-    }
-    
-    // Load TradingView library if not already loaded
-    if (typeof TradingView === 'undefined') {
-        loadTradingViewLibrary(() => {
-            initTradingViewChart(symbol);
-        });
-    } else {
-        initTradingViewChart(symbol);
-    }
-}
-
-function loadTradingViewLibrary(callback) {
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/tv.js';
-    script.async = true;
-    script.onload = callback;
-    document.head.appendChild(script);
-}
-
-function initTradingViewChart(symbol) {
-    const container = document.getElementById('tradingview_chart');
-    if (!container) return;
-    
-    // Map internal intervals to TradingView intervals
-    const intervalMap = {
-        '1': '1',
-        '30': '30',
-        '60': '60'
-    };
-    
-    const tvInterval = intervalMap[currentInterval] || '30';
-    
-    new TradingView.widget({
-        'autosize': true,
-        'symbol': symbol,
-        'interval': tvInterval,
-        'timezone': 'Etc/UTC',
-        'theme': 'dark',
-        'style': '1',
-        'locale': 'en',
-        'toolbar_bg': '#1a3a5c',
-        'enable_publishing': false,
-        'allow_symbol_change': true,
-        'container_id': 'tradingview_chart',
-        'studies': ['MACD@tv-basicstudies', 'RSI@tv-basicstudies'],
-        'overrides': {
-            'mainSeriesProperties.style': 1,
-            'mainSeriesProperties.candleStyle.wickUpColor': '#00D4AA',
-            'mainSeriesProperties.candleStyle.wickDownColor': '#FF6B6B'
-        }
-    });
-}
-
-function changeInterval(interval) {
-    currentInterval = interval;
-    
-    // Update button active state
-    document.querySelectorAll('.chart-control-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    // Reload chart with new interval
-    updateTradingViewChart();
-}
+// TradingView Chart functions are now implemented in trade.php
+// These functions are kept for compatibility with other pages
 
 function setLeverage(leverage) {
     document.getElementById('leverageValue').value = leverage;
