@@ -133,6 +133,18 @@
     </aside>
 
     <main class="main-content">
+        <div class="top-header">
+            <div class="top-header-content">
+                <div class="top-header-logo">
+                    <img src="/assets/logo.png" alt="Alpha Core Markets Logo" class="header-logo-img">
+                    <div class="header-text">
+                        <h1 class="header-title">Alpha Core Markets</h1>
+                        <p class="header-subtitle">Professional Trading Platform</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="pro-ticker-wrapper">
             <div class="pro-ticker-track">
                 <div class="pro-ticker-content">
