@@ -648,39 +648,47 @@ function closeConfirmModal() {
 
 let globalSubmitting = false;
 
-document.getElementById('confirmTradeBtn').addEventListener('click', function() {
-    if (globalSubmitting) return;
-    globalSubmitting = true;
-    
-    document.getElementById('orderSide').value = currentTradeAction;
-    const form = document.getElementById('tradeForm');
+document.addEventListener('DOMContentLoaded', function() {
     const confirmBtn = document.getElementById('confirmTradeBtn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Processing...';
-    closeConfirmModal();
+    if (!confirmBtn) return;
     
-    const formData = new FormData(form);
-    
-    fetch(form.action, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.status === 302 || response.ok) {
-            setTimeout(() => {
-                window.location.href = '/dashboard/trades/history';
-            }, 100);
-        } else {
+    confirmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (globalSubmitting) return;
+        globalSubmitting = true;
+        
+        document.getElementById('orderSide').value = currentTradeAction;
+        const form = document.getElementById('tradeForm');
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+        closeConfirmModal();
+        
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.status === 302 || response.ok) {
+                globalSubmitting = false;
+                setTimeout(() => {
+                    window.location.href = '/dashboard/trades/history';
+                }, 100);
+            } else {
+                globalSubmitting = false;
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Error - Try again';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
             globalSubmitting = false;
             confirmBtn.disabled = false;
             confirmBtn.textContent = 'Error - Try again';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        globalSubmitting = false;
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Error - Try again';
+        });
     });
 });
 
