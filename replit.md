@@ -82,6 +82,13 @@ PostgreSQL with the following main tables:
   - New API endpoints: GET /api/prices/refresh, GET /api/prices/live/{symbol}
   - Prices now match real market data from major trading platforms
   - Price history is properly recorded for all asset types
+- December 2024: Automated Asset Sync System:
+  - AssetSyncService now auto-syncs 30 crypto assets from Binance API with TLS verification
+  - Includes 20 major forex pairs and 30 US stocks with proper TradingView symbols
+  - Crypto symbols stored as API format (BTCUSDT) with display_name (USDT/BTC) for UI
+  - syncAllAssets() automatically cleans legacy slash-formatted records and deduplicates
+  - Fallback list ensures sync works even when Binance API is unreachable
+  - Run `php public/sync-assets.php` to refresh assets from live market sources
 - December 2024: Assets Module Implementation:
   - Added asset_types table with 3 categories: Crypto, Forex, Stock
   - Enhanced markets table with display_name, symbol_api, symbol_tradingview columns
