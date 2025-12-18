@@ -1,0 +1,108 @@
+C) ADMIN PROFIT CONTROL SYSTEM (-10% to +100%) (main required feature)
+
+C1) Profit Control Purpose
+
+Function: admin can control trade profit results using a percentage between -10% and +100%
+
+The profit control percentage is applied ONLY when a trade closes
+
+C2) Profit Control Formula
+
+Use this formula:
+adjusted_profit = original_profit × (1 + profit_control_percent / 100)
+
+C3) Profit Control Levels (Priority Order)
+
+User + Market override
+
+User override
+
+Market override
+
+Global default profit control
+
+C4) Admin Settings for Profit Control
+
+Function: admin can set:
+
+Global profit control percent (-10 to 100)
+
+Per-user profit control percent (-10 to 100)
+
+Per-market profit control percent (-10 to 100)
+
+Per-user-per-market profit control percent (-10 to 100)
+
+C5) Profit Control Validation Rules
+
+Profit control percent must be strictly within -10 and 100
+
+Prevent applying profit control twice to the same trade
+
+Store these values on trade close:
+
+pnl_original
+
+pnl_control_percent
+
+pnl_adjusted
+
+Trades become immutable after finalization
+
+C6) Admin Profit Control Dashboard
+
+Function: admin can view:
+
+closed trades list with pnl_original vs pnl_adjusted
+
+filters by date range, user, market
+
+summary totals: total original PnL vs total adjusted PnL
+
+C7) Audit Logging for Profit Control
+
+Function: log every profit control related event:
+
+admin_id, user_id, trade_id
+
+original profit, adjusted profit
+
+percent used
+
+timestamp and IP
+
+D) CRON JOBS (server automation)
+
+Add cron scripts in /cron folder:
+
+update_prices.php (every 1 minute) fetch API prices and store in DB
+
+trigger_orders.php (every 1 minute) check limit/SL/TP triggers and execute
+
+liquidation.php (every 1 minute) check margin and liquidate if needed
+
+E) SECURITY REQUIREMENTS
+
+CSRF protection for all forms
+
+Prepared statements everywhere
+
+Server-side validation only
+
+Secure session settings (HttpOnly, SameSite)
+
+Rate limit login attempts (basic)
+
+F) DELIVERABLES REQUIRED
+
+Full source code with MVC folders
+
+database.sql schema (all tables)
+
+Seed admin creation (admin user)
+
+.env example
+
+cPanel deployment steps
+
+All code must be complete and runnable
