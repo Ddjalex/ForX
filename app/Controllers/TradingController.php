@@ -522,10 +522,8 @@ class TradingController
 
     public function copyExperts(): void
     {
-        $traders = Database::fetchAll(
-            "SELECT * FROM traders WHERE status = 'active' ORDER BY profit_share DESC",
-            []
-        );
+        $copyTradingService = new \App\Services\CopyTradingService();
+        $traders = $copyTradingService->getTopTraders(12);
 
         echo Router::render('trading/copy-experts', [
             'traders' => $traders,

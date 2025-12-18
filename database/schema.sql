@@ -210,3 +210,24 @@ CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_prices_history_market ON prices_history(market_id);
+
+-- Copy Traders table
+CREATE TABLE IF NOT EXISTS copy_traders (
+    id SERIAL PRIMARY KEY,
+    api_id VARCHAR(100),
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255),
+    bio TEXT,
+    profile_image VARCHAR(500),
+    win_rate DECIMAL(10, 2) DEFAULT 50,
+    profit_share DECIMAL(10, 2) DEFAULT 50,
+    minimum_capital DECIMAL(20, 2) DEFAULT 100,
+    total_followers INTEGER DEFAULT 0,
+    monthly_return DECIMAL(10, 2) DEFAULT 0,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_copy_traders_status ON copy_traders(status);
+CREATE INDEX IF NOT EXISTS idx_copy_traders_profit ON copy_traders(profit_share DESC);
