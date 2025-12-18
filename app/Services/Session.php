@@ -51,9 +51,7 @@ class Session
 
     public static function generateCsrfToken(): string
     {
-        if (!self::has('_csrf_token')) {
-            self::set('_csrf_token', bin2hex(random_bytes(32)));
-        }
+        self::set('_csrf_token', bin2hex(random_bytes(32)));
         return self::get('_csrf_token');
     }
 

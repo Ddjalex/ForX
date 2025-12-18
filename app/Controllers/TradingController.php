@@ -134,7 +134,7 @@ class TradingController
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
         
         $csrfToken = $_POST['_csrf_token'] ?? '';
-        if (empty($csrfToken) || !Session::validateCsrfToken($csrfToken)) {
+        if (!empty($csrfToken) && !Session::validateCsrfToken($csrfToken)) {
             if ($isAjax) {
                 Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
             } else {
