@@ -126,8 +126,45 @@ async function checkExpiredPositions() {
         
         if (data.success && data.closed_count > 0) {
             console.log(`Auto-closed ${data.closed_count} expired position(s)`);
+            
+            // Show notification to user
+            if (data.positions && data.positions.length > 0) {
+                const firstSymbol = data.positions[0].symbol;
+                showTradeNotification(`${data.closed_count} trade(s) closed! Redirecting to view results...`, 'success');
+                
+                // Redirect to trade page to show transaction history after 2 seconds
+                setTimeout(() => {
+                    window.location.href = `/dashboard/trade/${firstSymbol}`;
+                }, 2000);
+            }
         }
     } catch (e) {
         console.log('Expired positions check failed:', e);
     }
+}
+
+function showTradeNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        padding: 16px 20px;
+        background: ${type === 'success' ? '#00C853' : '#3742FA'};
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }

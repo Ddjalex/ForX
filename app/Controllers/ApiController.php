@@ -278,9 +278,17 @@ class ApiController
                 $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
             }
 
+            // Apply profit control formula: adjusted_profit = original_profit × (1 + profit_control_percent / 100)
+            $profitControlPercent = Database::fetch(
+                "SELECT value FROM settings WHERE key = ?", 
+                ['profit_control_percent']
+            );
+            $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
+            $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+
             Database::update('positions', [
                 'exit_price' => $exitPrice,
-                'realized_pnl' => $pnl,
+                'realized_pnl' => $adjustedPnl,
                 'status' => 'closed',
                 'closed_at' => date('Y-m-d H:i:s'),
             ], 'id = ?', [$position['id']]);
@@ -288,7 +296,7 @@ class ApiController
             $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
             if ($wallet) {
                 Database::update('wallets', [
-                    'balance' => $wallet['balance'] + $pnl,
+                    'balance' => $wallet['balance'] + $adjustedPnl,
                     'margin_used' => max(0, $wallet['margin_used'] - $position['margin_used']),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ], 'user_id = ?', [$userId]);
@@ -298,7 +306,9 @@ class ApiController
             $results[] = [
                 'position_id' => $position['id'],
                 'symbol' => $position['symbol'],
-                'pnl' => round($pnl, 2)
+                'pnl' => round($adjustedPnl, 2),
+                'original_pnl' => round($pnl, 2),
+                'profit_control_percent' => $controlPercent
             ];
         }
 
