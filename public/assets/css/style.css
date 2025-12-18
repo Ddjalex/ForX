@@ -1283,8 +1283,26 @@ select.form-control {
     margin-bottom: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     min-width: 160px;
-    overflow: hidden;
+    max-height: 320px;
+    overflow-y: auto;
     display: none;
+}
+
+.language-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.language-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.language-dropdown::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.language-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }
 
 .language-selector.open .language-dropdown {

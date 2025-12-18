@@ -42,7 +42,8 @@ function initLanguageToggle() {
         { code: 'cs', name: 'Čeština' },
         { code: 'hu', name: 'Magyar' },
         { code: 'ro', name: 'Română' },
-        { code: 'sk', name: 'Slovenčina' }
+        { code: 'sk', name: 'Slovenčina' },
+        { code: 'am', name: 'አማርኛ' }
     ];
     
     // Create dropdown on init

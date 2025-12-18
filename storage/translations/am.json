@@ -1,0 +1,21 @@
+{
+  "account_settings": "계정 ቅንጅቶች",
+  "deposit": "ሠዋ ያተኩሩ",
+  "withdraw": "ሠዋ ያውጡ",
+  "trade": "ንግድ",
+  "copy_experts": "ባለሙያዎች ቅዳ",
+  "news": "ዜናዎች",
+  "nfts": "NFT",
+  "signals": "ምልክቶች",
+  "loans": "ብድር",
+  "trade_history": "ንግድ ታሪክ",
+  "transactions": "ግብይቶች",
+  "referrals": "ማሳመጫዎች",
+  "logout": "ውጪ ይሂዱ",
+  "live_analysis": "ቀጥታ ትንታኔ",
+  "forex_analysis": "Forex ትንታኔ",
+  "crypto_analysis": "Crypto ትንታኔ",
+  "stock_analysis": "ክንውን ትንታኔ",
+  "verified": "ተረጋግጧል",
+  "not_verified": "ያልተረጋገጠ"
+}
