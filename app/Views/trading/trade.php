@@ -666,27 +666,23 @@ function submitTradeForm() {
     
     fetch(form.action, {
         method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            isSubmitting = false;
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = data.error;
-            setTimeout(() => location.reload(), 2000);
-        } else if (data.success) {
-            location.reload();
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '/dashboard/trades/history';
+        } else {
+            return response.text().then(text => {
+                throw new Error('Request failed: ' + text);
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
         isSubmitting = false;
         confirmBtn.disabled = false;
-        location.reload();
+        confirmBtn.textContent = 'Error - Try again';
+        setTimeout(() => location.reload(), 2000);
     });
     
     closeConfirmModal();

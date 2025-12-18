@@ -267,12 +267,6 @@ class TradingController
                 'leverage' => $leverage,
             ]);
 
-            // Return JSON for AJAX requests, redirect for regular form submissions
-            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {
-                Router::json(['success' => true, 'message' => 'Trade executed successfully']);
-                return;
-            }
-            
             Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
             Router::redirect('/dashboard/trades/history');
             return;
