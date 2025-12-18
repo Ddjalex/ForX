@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', function() {
     checkExpiredPositions();
     
     initSidebar();
+    
+    // Initialize TradingView chart on page load
+    if (document.getElementById('tradingview_chart')) {
+        updateTradingViewChart();
+    }
 });
 
 function initSidebar() {
@@ -168,3 +173,146 @@ function showTradeNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
+// TradingView Chart Integration
+let tradingViewChart = null;
+let currentInterval = '30';
+
+function updateTradingViewChart() {
+    const assetSelect = document.getElementById('assetName');
+    if (!assetSelect) return;
+    
+    const selectedOption = assetSelect.options[assetSelect.selectedIndex];
+    const symbol = selectedOption.getAttribute('data-tradingview') || selectedOption.getAttribute('data-symbol');
+    
+    if (!symbol) return;
+    
+    // Remove existing chart if any
+    const container = document.getElementById('tradingview_chart');
+    if (container) {
+        container.innerHTML = '';
+    }
+    
+    // Load TradingView library if not already loaded
+    if (typeof TradingView === 'undefined') {
+        loadTradingViewLibrary(() => {
+            initTradingViewChart(symbol);
+        });
+    } else {
+        initTradingViewChart(symbol);
+    }
+}
+
+function loadTradingViewLibrary(callback) {
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/tv.js';
+    script.async = true;
+    script.onload = callback;
+    document.head.appendChild(script);
+}
+
+function initTradingViewChart(symbol) {
+    const container = document.getElementById('tradingview_chart');
+    if (!container) return;
+    
+    // Map internal intervals to TradingView intervals
+    const intervalMap = {
+        '1': '1',
+        '30': '30',
+        '60': '60'
+    };
+    
+    const tvInterval = intervalMap[currentInterval] || '30';
+    
+    new TradingView.widget({
+        'autosize': true,
+        'symbol': symbol,
+        'interval': tvInterval,
+        'timezone': 'Etc/UTC',
+        'theme': 'dark',
+        'style': '1',
+        'locale': 'en',
+        'toolbar_bg': '#1a3a5c',
+        'enable_publishing': false,
+        'allow_symbol_change': true,
+        'container_id': 'tradingview_chart',
+        'studies': ['MACD@tv-basicstudies', 'RSI@tv-basicstudies'],
+        'overrides': {
+            'mainSeriesProperties.style': 1,
+            'mainSeriesProperties.candleStyle.wickUpColor': '#00D4AA',
+            'mainSeriesProperties.candleStyle.wickDownColor': '#FF6B6B'
+        }
+    });
+}
+
+function changeInterval(interval) {
+    currentInterval = interval;
+    
+    // Update button active state
+    document.querySelectorAll('.chart-control-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Reload chart with new interval
+    updateTradingViewChart();
+}
+
+function setLeverage(leverage) {
+    document.getElementById('leverageValue').value = leverage;
+    document.getElementById('leverageSlider').value = leverage;
+    document.querySelectorAll('.leverage-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function updateLeverageFromSlider(value) {
+    document.getElementById('leverageValue').value = value;
+    document.querySelectorAll('.leverage-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const targetBtn = document.querySelector(`[data-leverage="${value}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+}
+
+function updateAssetNames() {
+    const assetType = document.getElementById('assetType').value;
+    const assetNameSelect = document.getElementById('assetName');
+    
+    // Hide all options first
+    Array.from(assetNameSelect.options).forEach(option => {
+        option.style.display = option.getAttribute('data-type') === assetType ? 'block' : 'none';
+    });
+    
+    // Select first visible option
+    const firstVisible = Array.from(assetNameSelect.options).find(option => option.style.display !== 'none');
+    if (firstVisible) {
+        assetNameSelect.value = firstVisible.value;
+        updateTradingViewChart();
+    }
+}
+
+function showConfirmModal(side) {
+    const modal = document.getElementById('tradeConfirmModal');
+    const title = document.getElementById('confirmModalTitle');
+    const confirmBtn = document.getElementById('confirmTradeBtn');
+    
+    title.textContent = `Confirm ${side.toUpperCase()} Trade`;
+    confirmBtn.className = `btn btn-${side}`;
+    confirmBtn.textContent = `Yes, ${side.toUpperCase()} Now`;
+    
+    document.getElementById('orderSide').value = side;
+    document.getElementById('orderType').value = 'market';
+    
+    modal.style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    const modal = document.getElementById('tradeConfirmModal');
+    modal.style.display = 'none';
+}
+
+document.getElementById('confirmTradeBtn')?.addEventListener('click', function() {
+    document.getElementById('tradeForm').submit();
+});
