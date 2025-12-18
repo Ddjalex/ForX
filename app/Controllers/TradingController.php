@@ -232,7 +232,7 @@ class TradingController
             $recentDuplicate = Database::fetch(
                 "SELECT id FROM positions 
                  WHERE user_id = ? AND market_id = ? AND side = ? AND amount = ? AND leverage = ? 
-                 AND created_at > DATE_SUB(NOW(), INTERVAL 2 SECOND)
+                 AND created_at > NOW() - INTERVAL '2 seconds'
                  ORDER BY id DESC LIMIT 1",
                 [$userId, $marketId, $side, $amount, $leverage]
             );
