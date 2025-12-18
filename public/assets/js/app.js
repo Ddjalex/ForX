@@ -23,28 +23,25 @@ function initLanguageToggle() {
         { code: 'ru', name: 'Русский' }
     ];
     
+    // Create dropdown on init
+    const menu = document.createElement('div');
+    menu.className = 'language-dropdown';
+    menu.innerHTML = languages.map(lang => 
+        `<div class="language-option" data-lang="${lang.code}">${lang.name}</div>`
+    ).join('');
+    
+    languageSelector.appendChild(menu);
+    
+    menu.querySelectorAll('.language-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const lang = this.getAttribute('data-lang');
+            setLanguage(lang);
+        });
+    });
+    
     languageSelector.addEventListener('click', function(e) {
         e.stopPropagation();
-        const dropdown = this.querySelector('.language-dropdown');
-        
-        if (!dropdown) {
-            const menu = document.createElement('div');
-            menu.className = 'language-dropdown';
-            menu.innerHTML = languages.map(lang => 
-                `<div class="language-option" data-lang="${lang.code}">${lang.name}</div>`
-            ).join('');
-            
-            this.appendChild(menu);
-            
-            menu.querySelectorAll('.language-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    setLanguage(lang);
-                    languageSelector.classList.remove('open');
-                });
-            });
-        }
-        
         this.classList.toggle('open');
     });
     
@@ -60,8 +57,10 @@ function setLanguage(lang) {
         langSpan.textContent = lang.toUpperCase();
     }
     
-    // Reload page to apply new language
-    window.location.reload();
+    // Redirect to current page with language parameter
+    const currentPath = window.location.pathname + window.location.search;
+    const separator = window.location.search ? '&' : '?';
+    window.location.href = currentPath + separator + 'lang=' + lang;
 }
 
 function initSidebar() {
