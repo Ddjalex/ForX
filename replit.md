@@ -74,6 +74,14 @@ PostgreSQL with the following main tables:
 - audit_logs, login_logs, settings
 
 ## Recent Changes
+- December 2024: Real-Time Market Data Integration:
+  - Replaced Binance API (blocked from server location) with CoinGecko API for crypto prices
+  - Added exchangerate-api.com integration for real forex rates
+  - Added coingecko_id column to markets table for crypto asset mapping
+  - Implemented price caching (10s for crypto, 60s for forex) to respect API rate limits
+  - New API endpoints: GET /api/prices/refresh, GET /api/prices/live/{symbol}
+  - Prices now match real market data from major trading platforms
+  - Price history is properly recorded for all asset types
 - December 2024: Assets Module Implementation:
   - Added asset_types table with 3 categories: Crypto, Forex, Stock
   - Enhanced markets table with display_name, symbol_api, symbol_tradingview columns
