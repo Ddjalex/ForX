@@ -1,0 +1,115 @@
+Update the Admin/System Controller to act as the single source of truth for asset selection and price execution in the Live Trading system.
+
+1) Asset Authority (Critical)
+
+The system controller must strictly control which asset is used when a trade is created.
+
+When a user clicks BUY / SELL, the backend must:
+
+Read the selected asset_id from the request
+
+Validate that the asset_id exists and is active
+
+Reject the trade if asset_id is missing or invalid
+
+The system must never use a default asset (e.g. GBPUSD).
+
+The system must never override the selected asset based on admin rules, session values, or fallback logic.
+
+2) Asset Lock on Trade Creation
+
+Once a trade is created:
+
+The asset_id is locked
+
+Admin cannot change asset name, symbol, or type
+
+Trade history must always reference the locked asset_id
+
+3) Price Source Control (System-Level)
+
+TradingView must be used only for chart display
+
+The system controller must fetch prices from official market-data APIs server-side
+
+Prices must be:
+
+Stored in DB
+
+Timestamped
+
+All trade entry and exit prices must come only from DB prices
+
+4) Trade Entry Control
+
+On BUY / SELL:
+
+Load latest DB price for the selected asset_id
+
+If price is stale, refresh from API and update DB
+
+Use that price as entry_price
+
+Do not allow admin to modify entry_price manually
+
+5) Trade Exit Control
+
+On trade close (duration expiry, TP, SL):
+
+Load latest DB price for the same locked asset_id
+
+Save as exit_price
+
+Admin cannot change exit_price or asset after close
+
+6) Trade History Consistency (Fix mismatch issue)
+
+Trade history must display asset name by:
+
+Joining trades.asset_id → assets.display_name
+
+Do NOT store asset name as text inside trades
+
+Do NOT read asset name from session or UI cache
+
+7) Admin Permissions (Restricted)
+
+Admin is allowed to:
+
+View trades
+
+View asset and price source
+
+Pause trading globally or per asset
+
+Admin is NOT allowed to:
+
+Change trade asset
+
+Change entry_price or exit_price
+
+Force trade result
+
+8) Audit Enforcement
+
+Log every trade creation and closure with:
+
+asset_id
+
+entry_price / exit_price
+
+price source timestamp
+
+Any attempt to create a trade without asset_id must be logged and blocked
+
+Goal of This Controller
+
+Ensure:
+
+The asset chosen by the user is the asset traded
+
+Prices are real, consistent, and verifiable
+
+No hidden admin/system override can change asset or price
+
+Trade history always matches user selection and chart symbol
