@@ -37,8 +37,8 @@ $totalEarnings = $wallet['profit'] ?? 0;
         <?= strtoupper(substr($user['name'] ?? 'U', 0, 1)) ?>
     </div>
     <div class="profile-info">
-        <div class="verification-status <?= ($user['email_verified'] ?? false) ? 'verified' : 'unverified' ?>">
-            <?= ($user['email_verified'] ?? false) ? 'VERIFIED' : 'NOT VERIFIED' ?>
+        <div class="verification-status <?= ($user['kyc_status'] ?? 'pending') === 'approved' ? 'verified' : 'unverified' ?>">
+            <?= ($user['kyc_status'] ?? 'pending') === 'approved' ? 'VERIFIED' : 'NOT VERIFIED' ?>
         </div>
         <h2><?= htmlspecialchars($user['name'] ?? 'User') ?></h2>
         <p><?= htmlspecialchars($user['email'] ?? '') ?></p>
