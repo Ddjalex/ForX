@@ -15,6 +15,7 @@
     <div class="auth-container">
         <div class="auth-box">
             <div class="auth-logo">
+                <img src="/assets/logo.png" alt="Alpha Core Markets Logo" class="auth-logo-img">
                 <h1>Alpha Core Markets</h1>
             </div>
             
