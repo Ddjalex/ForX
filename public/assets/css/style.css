@@ -1284,6 +1284,11 @@ select.form-control {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     min-width: 160px;
     overflow: hidden;
+    display: none;
+}
+
+.language-selector.open .language-dropdown {
+    display: block;
 }
 
 .language-option {
