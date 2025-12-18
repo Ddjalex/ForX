@@ -320,10 +320,14 @@ class TradingController
         
         if ($pnl >= 0) {
             // Winning trade: positive control increases profit
-            $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+            // Win Multiplier: 1 + (control% / 100)
+            $winMultiplier = 1 + ($controlPercent / 100);
+            $adjustedPnl = $pnl * $winMultiplier;
         } else {
             // Losing trade: positive control reduces loss (negative × smaller multiplier = smaller loss)
-            $adjustedPnl = $pnl * (1 - $controlPercent / 100);
+            // Loss Multiplier: 1 - (control% / 100)
+            $lossMultiplier = 1 - ($controlPercent / 100);
+            $adjustedPnl = $pnl * $lossMultiplier;
         }
 
         Database::update('positions', [
