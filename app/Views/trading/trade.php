@@ -544,13 +544,45 @@ function closeExpiredPosition() {
     .then(response => response.json())
     .then(data => {
         if (data.success && data.closed_count > 0) {
+            // Show notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                padding: 16px 20px;
+                background: #00C853;
+                color: white;
+                border-radius: 8px;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            notification.textContent = `${data.closed_count} trade(s) closed! Loading results...`;
+            document.body.appendChild(notification);
+            
+            // Reload page after short delay
             setTimeout(() => {
-                window.location.reload();
+                window.location.href = window.location.pathname + '#transactions';
             }, 1500);
         }
     })
     .catch(err => console.error('Error closing expired positions:', err));
 }
+
+// Handle hash navigation to transactions section
+window.addEventListener('load', function() {
+    if (window.location.hash === '#transactions') {
+        setTimeout(() => {
+            const transactionsSection = document.querySelector('.transactions-section');
+            if (transactionsSection) {
+                transactionsSection.scrollIntoView({ behavior: 'smooth' });
+                // Switch to Closed tab
+                showTab('closed');
+            }
+        }, 500);
+    }
+});
 
 setInterval(updateCountdowns, 1000);
 setInterval(closeExpiredPosition, 5000);
