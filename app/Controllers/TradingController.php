@@ -519,4 +519,17 @@ class TradingController
             'error' => Session::getFlash('error'),
         ]);
     }
+
+    public function copyExperts(): void
+    {
+        $traders = Database::fetchAll(
+            "SELECT * FROM traders WHERE status = 'active' ORDER BY profit_share DESC",
+            []
+        );
+
+        echo Router::render('trading/copy-experts', [
+            'traders' => $traders,
+            'csrf_token' => Session::generateCsrfToken(),
+        ]);
+    }
 }

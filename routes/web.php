@@ -48,6 +48,7 @@ Router::post('/dashboard/trade/cancel', [TradingController::class, 'cancelOrder'
 Router::get('/positions', [TradingController::class, 'positions'], [AuthMiddleware::class]);
 Router::get('/orders', [TradingController::class, 'orders'], [AuthMiddleware::class]);
 Router::get('/dashboard/trades/history', [TradingController::class, 'history'], [AuthMiddleware::class]);
+Router::get('/copy-experts', [TradingController::class, 'copyExperts'], [AuthMiddleware::class]);
 
 Router::get('/admin', [AdminController::class, 'dashboard'], [AdminMiddleware::class]);
 Router::get('/admin/users', [AdminController::class, 'users'], [AdminMiddleware::class]);
