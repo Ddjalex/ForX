@@ -655,8 +655,17 @@ document.getElementById('confirmTradeBtn').addEventListener('click', function() 
     submitTradeForm();
 });
 
+let isSubmitting = false;
+
 function submitTradeForm() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
     const form = document.getElementById('tradeForm');
+    const confirmBtn = document.getElementById('confirmTradeBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Processing...';
+    
     const formData = new FormData(form);
     
     fetch(form.action, {
@@ -669,16 +678,19 @@ function submitTradeForm() {
     .then(response => response.json())
     .then(data => {
         if (data.error) {
-            alert('Error: ' + data.error);
-            location.reload();
+            isSubmitting = false;
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = data.error;
+            setTimeout(() => location.reload(), 2000);
         } else if (data.success) {
-            alert('Trade executed successfully!');
-            setTimeout(() => location.reload(), 1000);
+            location.reload();
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while submitting the trade');
+        isSubmitting = false;
+        confirmBtn.disabled = false;
+        location.reload();
     });
     
     closeConfirmModal();
