@@ -51,16 +51,19 @@ function initLanguageToggle() {
 }
 
 function setLanguage(lang) {
+    // Create language cookie
+    document.cookie = "language=" + lang + ";path=/;max-age=" + (365 * 24 * 60 * 60);
     localStorage.setItem('language', lang);
     const langSpan = document.querySelector('.language-selector span');
     if (langSpan) {
         langSpan.textContent = lang.toUpperCase();
     }
     
-    // Redirect to current page with language parameter
-    const currentPath = window.location.pathname + window.location.search;
-    const separator = window.location.search ? '&' : '?';
-    window.location.href = currentPath + separator + 'lang=' + lang;
+    // Redirect to current page with language parameter (replace lang, don't append)
+    let url = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    params.set('lang', lang);
+    window.location.href = url + '?' + params.toString();
 }
 
 function initSidebar() {

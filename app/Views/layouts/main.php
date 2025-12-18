@@ -36,11 +36,7 @@ function t($key, $default = '') {
         <div class="sidebar-header">
             <div class="sidebar-user">
                 <div class="sidebar-user-avatar">
-                    <?php if (!empty($user['avatar'])): ?>
-                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                    <?php else: ?>
-                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['name'] ?? 'User') ?>&background=00D4AA&color=0a1628" alt="User">
-                    <?php endif; ?>
+                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['name'] ?? 'User') ?>&background=00D4AA&color=0a1628" alt="User">
                 </div>
                 <div class="sidebar-user-info">
                     <span class="sidebar-user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
@@ -115,11 +111,6 @@ function t($key, $default = '') {
                 <li><a href="/referrals" class="<?= ($_SERVER['REQUEST_URI'] === '/referrals') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <?= t('referrals') ?>
-                </a></li>
-                
-                <li><a href="/referrals" class="<?= ($_SERVER['REQUEST_URI'] === '/referrals') ? 'active' : '' ?>">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    Referrals
                 </a></li>
                 
                 <li><a href="/logout" class="logout-link">
