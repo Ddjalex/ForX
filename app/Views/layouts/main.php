@@ -67,9 +67,9 @@
                     Copy Experts
                 </a></li>
                 
-                <li><a href="/subscribe" class="<?= ($_SERVER['REQUEST_URI'] === '/subscribe') ? 'active' : '' ?>">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    Subscribe
+                <li><a href="/news" class="<?= ($_SERVER['REQUEST_URI'] === '/news') ? 'active' : '' ?>">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
+                    News
                 </a></li>
                 
                 <li><a href="/nfts" class="<?= ($_SERVER['REQUEST_URI'] === '/nfts') ? 'active' : '' ?>">
@@ -77,12 +77,12 @@
                     NFTS
                 </a></li>
                 
-                <li><a href="/signal" class="<?= ($_SERVER['REQUEST_URI'] === '/signal') ? 'active' : '' ?>">
+                <li><a href="/signals" class="<?= ($_SERVER['REQUEST_URI'] === '/signals') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01"></path><path d="M7 20v-4"></path><path d="M12 20v-8"></path><path d="M17 20V8"></path><path d="M22 4v16"></path></svg>
                     Signal
                 </a></li>
                 
-                <li><a href="/loan" class="<?= ($_SERVER['REQUEST_URI'] === '/loan') ? 'active' : '' ?>">
+                <li><a href="/loans" class="<?= ($_SERVER['REQUEST_URI'] === '/loans') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"></path><path d="M2 9v1c0 1.1.9 2 2 2h1"></path><path d="M16 11h0"></path></svg>
                     Loan
                 </a></li>
@@ -92,14 +92,9 @@
                     Trade History
                 </a></li>
                 
-                <li><a href="/transactions" class="<?= ($_SERVER['REQUEST_URI'] === '/transactions') ? 'active' : '' ?>">
+                <li><a href="/dashboard/trades/history" class="<?= ($_SERVER['REQUEST_URI'] === '/dashboard/trades/history') ? 'active' : '' ?>">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
                     Transactions
-                </a></li>
-                
-                <li><a href="/news" class="<?= ($_SERVER['REQUEST_URI'] === '/news') ? 'active' : '' ?>">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
-                    News
                 </a></li>
                 
                 <li><a href="/settings" class="<?= ($_SERVER['REQUEST_URI'] === '/settings') ? 'active' : '' ?>">
