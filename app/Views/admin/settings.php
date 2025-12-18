@@ -134,9 +134,31 @@ ob_start();
             
             <div class="form-group">
                 <label class="form-label">Profit Control Percentage (%)</label>
-                <input type="number" name="profit_control_percent" class="form-control" step="0.01" min="-10" max="100" value="<?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>" placeholder="Range: -10% to +100%">
-                <small class="form-text text-muted">Adjust profit when trades close. Formula: adjusted_profit = original_profit × (1 + percent/100). Range: -10% to +100%</small>
+                <div class="slider-container" style="margin-top: 12px;">
+                    <input type="range" name="profit_control_percent" class="profit-slider" id="profitSlider" min="-10" max="100" step="0.01" value="<?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>">
+                    <div class="slider-value-display" id="sliderValue"><?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>%</div>
+                </div>
+                <small class="form-text text-muted" style="display: block; margin-top: 8px;">Adjust profit when trades close. Formula: adjusted_profit = original_profit × (1 + percent/100). Range: -10% to +100%</small>
             </div>
+            
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const slider = document.getElementById('profitSlider');
+                const display = document.getElementById('sliderValue');
+                
+                function updateDisplay() {
+                    const value = parseFloat(slider.value);
+                    display.textContent = value.toFixed(2) + '%';
+                    
+                    // Update background gradient based on position
+                    const percentage = (value + 10) / 110 * 100;
+                    slider.style.background = `linear-gradient(to right, #00D4AA 0%, #00D4AA ${percentage}%, #1a3a5c ${percentage}%, #1a3a5c 100%)`;
+                }
+                
+                slider.addEventListener('input', updateDisplay);
+                updateDisplay();
+            });
+            </script>
             
             <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>

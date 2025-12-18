@@ -1830,6 +1830,78 @@ select.form-control {
     color: var(--bg-dark);
 }
 
+/* Profit Control Slider Styles */
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.profit-slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #00D4AA 50%, #1a3a5c 50%);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.profit-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #00D4AA;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
+    border: 2px solid var(--bg-input);
+    transition: all 0.2s ease;
+}
+
+.profit-slider::-webkit-slider-thumb:hover {
+    width: 24px;
+    height: 24px;
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.6);
+}
+
+.profit-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #00D4AA;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
+    border: 2px solid var(--bg-input);
+    transition: all 0.2s ease;
+}
+
+.profit-slider::-moz-range-thumb:hover {
+    width: 24px;
+    height: 24px;
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.6);
+}
+
+.profit-slider::-moz-range-track {
+    background: transparent;
+    border: none;
+}
+
+.slider-value-display {
+    min-width: 60px;
+    padding: 8px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 14px;
+}
+
 @media (max-width: 768px) {
     .trade-action-bar {
         flex-direction: column;
