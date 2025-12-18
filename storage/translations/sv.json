@@ -1,0 +1,21 @@
+{
+  "account_settings": "Kontoinställningar",
+  "deposit": "Insättning",
+  "withdraw": "Uttag",
+  "trade": "Handel",
+  "copy_experts": "Kopiera Experter",
+  "news": "Nyheter",
+  "nfts": "NFT",
+  "signals": "Signaler",
+  "loans": "Lån",
+  "trade_history": "Handelshistorik",
+  "transactions": "Transaktioner",
+  "referrals": "Hänvisningar",
+  "logout": "Logga ut",
+  "live_analysis": "Liveanalys",
+  "forex_analysis": "Forex-analys",
+  "crypto_analysis": "Kryptoanalys",
+  "stock_analysis": "Aktieanalys",
+  "verified": "Verifierad",
+  "not_verified": "Overifierad"
+}

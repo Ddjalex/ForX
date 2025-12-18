@@ -1,0 +1,21 @@
+{
+  "account_settings": "Kontoindstillinger",
+  "deposit": "Indskud",
+  "withdraw": "Hævning",
+  "trade": "Handel",
+  "copy_experts": "Kopier Eksperter",
+  "news": "Nyheder",
+  "nfts": "NFT",
+  "signals": "Signaler",
+  "loans": "Lån",
+  "trade_history": "Handelshistorik",
+  "transactions": "Transaktioner",
+  "referrals": "Referrals",
+  "logout": "Log ud",
+  "live_analysis": "Live Analyse",
+  "forex_analysis": "Forex Analyse",
+  "crypto_analysis": "Crypto Analyse",
+  "stock_analysis": "Aktie Analyse",
+  "verified": "Bekræftet",
+  "not_verified": "Ubekræftet"
+}

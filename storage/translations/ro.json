@@ -1,0 +1,21 @@
+{
+  "account_settings": "Setări cont",
+  "deposit": "Depozit",
+  "withdraw": "Retragere",
+  "trade": "Tranzacţionare",
+  "copy_experts": "Copiază Experți",
+  "news": "Știri",
+  "nfts": "NFT",
+  "signals": "Semnale",
+  "loans": "Credite",
+  "trade_history": "Istoricul tranzacțiilor",
+  "transactions": "Tranzacții",
+  "referrals": "Referințe",
+  "logout": "Ieșire",
+  "live_analysis": "Analiză în direct",
+  "forex_analysis": "Analiza Forex",
+  "crypto_analysis": "Analiza Crypto",
+  "stock_analysis": "Analiza acțiunilor",
+  "verified": "Verificat",
+  "not_verified": "Neverificat"
+}

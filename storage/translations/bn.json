@@ -1,0 +1,21 @@
+{
+  "account_settings": "অ্যাকাউন্ট সেটিংস",
+  "deposit": "জমা",
+  "withdraw": "উত্তোলন",
+  "trade": "বাণিজ্য",
+  "copy_experts": "বিশেষজ্ঞদের অনুলিপি করুন",
+  "news": "সংবাদ",
+  "nfts": "NFT",
+  "signals": "সংকেত",
+  "loans": "ঋণ",
+  "trade_history": "বাণিজ্য ইতিহাস",
+  "transactions": "লেনদেন",
+  "referrals": "রেফারেল",
+  "logout": "লগআউট",
+  "live_analysis": "লাইভ বিশ্লেষণ",
+  "forex_analysis": "Forex বিশ্লেষণ",
+  "crypto_analysis": "ক্রিপ্টো বিশ্লেষণ",
+  "stock_analysis": "স্টক বিশ্লেষণ",
+  "verified": "যাচাইকৃত",
+  "not_verified": "যাচাই করা হয়নি"
+}

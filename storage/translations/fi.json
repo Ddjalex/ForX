@@ -1,0 +1,21 @@
+{
+  "account_settings": "Tilin asetukset",
+  "deposit": "Talletus",
+  "withdraw": "Kotiuttaminen",
+  "trade": "Kaupankäynti",
+  "copy_experts": "Kopioi asiantuntijat",
+  "news": "Uutiset",
+  "nfts": "NFT",
+  "signals": "Signaalit",
+  "loans": "Lainat",
+  "trade_history": "Kaupankäyntihistoria",
+  "transactions": "Tapahtumat",
+  "referrals": "Suosittelut",
+  "logout": "Kirjaudu ulos",
+  "live_analysis": "Live-analyysi",
+  "forex_analysis": "Forex-analyysi",
+  "crypto_analysis": "Crypto-analyysi",
+  "stock_analysis": "Osakeanalyysi",
+  "verified": "Vahvistettu",
+  "not_verified": "Vahvistamaton"
+}

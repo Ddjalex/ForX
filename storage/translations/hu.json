@@ -1,0 +1,21 @@
+{
+  "account_settings": "Fiókbeállítások",
+  "deposit": "Befizetés",
+  "withdraw": "Kivonas",
+  "trade": "Kereskedelem",
+  "copy_experts": "Szakértők másolása",
+  "news": "Hírek",
+  "nfts": "NFT",
+  "signals": "Jelek",
+  "loans": "Kölcsönök",
+  "trade_history": "Kereskedési előzmények",
+  "transactions": "Tranzakciók",
+  "referrals": "Ajánlások",
+  "logout": "Kijelentkezés",
+  "live_analysis": "Élő elemzés",
+  "forex_analysis": "Forex elemzés",
+  "crypto_analysis": "Kripto elemzés",
+  "stock_analysis": "Részvény elemzés",
+  "verified": "Ellenőrzött",
+  "not_verified": "Nem ellenőrzött"
+}

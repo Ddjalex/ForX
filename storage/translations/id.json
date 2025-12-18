@@ -1,0 +1,21 @@
+{
+  "account_settings": "Pengaturan Akun",
+  "deposit": "Setor",
+  "withdraw": "Tarik",
+  "trade": "Perdagangan",
+  "copy_experts": "Salin Ahli",
+  "news": "Berita",
+  "nfts": "NFT",
+  "signals": "Sinyal",
+  "loans": "Pinjaman",
+  "trade_history": "Riwayat Perdagangan",
+  "transactions": "Transaksi",
+  "referrals": "Rujukan",
+  "logout": "Keluar",
+  "live_analysis": "Analisis Langsung",
+  "forex_analysis": "Analisis Forex",
+  "crypto_analysis": "Analisis Kripto",
+  "stock_analysis": "Analisis Saham",
+  "verified": "Diverifikasi",
+  "not_verified": "Belum Diverifikasi"
+}

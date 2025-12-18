@@ -1,0 +1,21 @@
+{
+  "account_settings": "खाता सेटिंग्स",
+  "deposit": "जमा",
+  "withdraw": "निकालें",
+  "trade": "व्यापार",
+  "copy_experts": "विशेषज्ञों की नकल करें",
+  "news": "समाचार",
+  "nfts": "NFT",
+  "signals": "संकेत",
+  "loans": "ऋण",
+  "trade_history": "व्यापार का इतिहास",
+  "transactions": "लेनदेन",
+  "referrals": "संदर्भ",
+  "logout": "लॉगआउट",
+  "live_analysis": "लाइव विश्लेषण",
+  "forex_analysis": "Forex विश्लेषण",
+  "crypto_analysis": "क्रिप्टो विश्लेषण",
+  "stock_analysis": "स्टॉक विश्लेषण",
+  "verified": "सत्यापित",
+  "not_verified": "अपूर्ण"
+}

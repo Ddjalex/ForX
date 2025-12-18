@@ -1,0 +1,21 @@
+{
+  "account_settings": "הגדרות חשבון",
+  "deposit": "הפקדה",
+  "withdraw": "משיכה",
+  "trade": "סחר",
+  "copy_experts": "העתק מומחים",
+  "news": "חדשות",
+  "nfts": "NFT",
+  "signals": "אותות",
+  "loans": "הלוואות",
+  "trade_history": "היסטוריית סחר",
+  "transactions": "עסקאות",
+  "referrals": "הפניות",
+  "logout": "התנתק",
+  "live_analysis": "ניתוח חי",
+  "forex_analysis": "ניתוח Forex",
+  "crypto_analysis": "ניתוח קריפטו",
+  "stock_analysis": "ניתוח מניות",
+  "verified": "מאומת",
+  "not_verified": "לא מאומת"
+}

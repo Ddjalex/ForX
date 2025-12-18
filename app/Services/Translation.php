@@ -6,7 +6,11 @@ class Translation
 {
     private static $language = 'en';
     private static $translations = [];
-    private static $supportedLanguages = ['en', 'es', 'fr', 'de', 'zh', 'ar', 'pt', 'ru'];
+    private static $supportedLanguages = [
+        'en', 'es', 'fr', 'de', 'it', 'pt', 'nl', 'pl', 'ru', 'uk', 'tr', 'ar',
+        'zh', 'ja', 'ko', 'th', 'vi', 'id', 'hi', 'bn', 'sv', 'da', 'no', 'fi',
+        'el', 'he', 'cs', 'hu', 'ro', 'sk', 'am'
+    ];
 
     public static function setLanguage($lang)
     {

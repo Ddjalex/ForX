@@ -1,0 +1,21 @@
+{
+  "account_settings": "Nastavenia účtu",
+  "deposit": "Vklad",
+  "withdraw": "Výber",
+  "trade": "Obchodovanie",
+  "copy_experts": "Kopírovať odborníkov",
+  "news": "Správy",
+  "nfts": "NFT",
+  "signals": "Signály",
+  "loans": "Pôžičky",
+  "trade_history": "História obchodov",
+  "transactions": "Transakcie",
+  "referrals": "Odporúčania",
+  "logout": "Odhlásiť sa",
+  "live_analysis": "Analýza v priamom čase",
+  "forex_analysis": "Analýza Forexu",
+  "crypto_analysis": "Analýza Crypto",
+  "stock_analysis": "Analýza akcií",
+  "verified": "Overené",
+  "not_verified": "Neoverené"
+}
