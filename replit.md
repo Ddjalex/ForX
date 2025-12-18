@@ -74,6 +74,15 @@ PostgreSQL with the following main tables:
 - audit_logs, login_logs, settings
 
 ## Recent Changes
+- December 2024: Customer Support Chat & Profit Control Enhancements:
+  - Added Tawk.to customer support chat widget integration (configurable in Admin Settings)
+  - Implemented asymmetric profit control formula for fair win/loss adjustments
+  - Admin can set profit control from -10% to +100%
+  - Positive % = users profit MORE on wins, lose LESS on losses
+  - Negative % = users profit LESS on wins, lose MORE on losses
+  - Enhanced admin UI with live example calculations and quick guide
+  - Auto-redirect to transactions panel when trades expire
+  - Smooth scroll and auto-switch to "Closed" tab after trade closes
 - December 2024: Trade Auto-Close and Security Improvements:
   - Added secure `/api/positions/close-expired` endpoint with AuthMiddleware protection
   - Implemented automatic position closing when trade duration countdown expires
