@@ -130,6 +130,20 @@ ob_start();
                 <input type="number" name="max_position_size" class="form-control" step="0.01" value="<?= htmlspecialchars($settings['max_position_size'] ?? '100000') ?>">
             </div>
             
+            <h4 style="margin: 24px 0 16px; color: var(--text-secondary);">Customer Support Settings</h4>
+            
+            <div class="form-group">
+                <label class="form-label">Tawk.to Property ID</label>
+                <input type="text" name="tawkto_property_id" class="form-control" value="<?= htmlspecialchars($settings['tawkto_property_id'] ?? '') ?>" placeholder="e.g., 5f4bc7e47d0ed2170c4a68bc">
+                <small class="form-text text-muted">Get this from Tawk.to Dashboard > Administration > Chat Widget</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tawk.to Widget ID</label>
+                <input type="text" name="tawkto_widget_id" class="form-control" value="<?= htmlspecialchars($settings['tawkto_widget_id'] ?? '') ?>" placeholder="e.g., 1e2abc3d4">
+                <small class="form-text text-muted">Found in the same widget code from Tawk.to Dashboard</small>
+            </div>
+            
             <h4 style="margin: 24px 0 16px; color: var(--text-secondary);">Profit Control Settings</h4>
             
             <div class="form-group">
@@ -138,13 +152,28 @@ ob_start();
                     <input type="range" name="profit_control_percent" class="profit-slider" id="profitSlider" min="-10" max="100" step="0.01" value="<?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>">
                     <div class="slider-value-display" id="sliderValue"><?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>%</div>
                 </div>
-                <small class="form-text text-muted" style="display: block; margin-top: 8px;">Adjust profit when trades close. Formula: adjusted_profit = original_profit × (1 + percent/100). Range: -10% to +100%</small>
+                
+                <div id="profitExplanation" style="margin-top: 12px; padding: 12px; border-radius: 8px; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3);">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #00D4AA;">How it works:</div>
+                    <div id="exampleCalc" style="font-size: 13px; color: var(--text-secondary);"></div>
+                </div>
+                
+                <div style="margin-top: 16px; padding: 12px; border-radius: 8px; background: rgba(26,58,92,0.5); border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Quick Guide:</div>
+                    <ul style="font-size: 13px; color: var(--text-secondary); margin: 0; padding-left: 20px;">
+                        <li><strong style="color: #00D4AA;">Positive % (1-100):</strong> Users profit MORE on wins, lose LESS on losses</li>
+                        <li><strong style="color: #f59e0b;">0%:</strong> No adjustment - natural market results</li>
+                        <li><strong style="color: #ef4444;">Negative % (-10 to 0):</strong> Users profit LESS on wins, lose MORE on losses</li>
+                    </ul>
+                </div>
             </div>
             
             <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const slider = document.getElementById('profitSlider');
                 const display = document.getElementById('sliderValue');
+                const exampleDiv = document.getElementById('exampleCalc');
+                const explanationBox = document.getElementById('profitExplanation');
                 
                 function updateDisplay() {
                     const value = parseFloat(slider.value);
@@ -153,6 +182,33 @@ ob_start();
                     // Update background gradient based on position
                     const percentage = (value + 10) / 110 * 100;
                     slider.style.background = `linear-gradient(to right, #00D4AA 0%, #00D4AA ${percentage}%, #1a3a5c ${percentage}%, #1a3a5c 100%)`;
+                    
+                    // Calculate examples with asymmetric formula
+                    const winMultiplier = 1 + (value / 100);
+                    const lossMultiplier = 1 - (value / 100);
+                    const profit100 = (100 * winMultiplier).toFixed(2);
+                    const loss100Raw = -100 * lossMultiplier;
+                    const loss100Display = Math.abs(loss100Raw).toFixed(2);
+                    
+                    // Update explanation
+                    let color = '#00D4AA';
+                    let outcome = 'Users will PROFIT MORE';
+                    if (value < 0) {
+                        color = '#ef4444';
+                        outcome = 'Users will PROFIT LESS';
+                    } else if (value === 0) {
+                        color = '#f59e0b';
+                        outcome = 'Natural market results';
+                    }
+                    
+                    explanationBox.style.borderColor = color;
+                    explanationBox.style.background = `${color}15`;
+                    
+                    exampleDiv.innerHTML = `
+                        <div style="margin-bottom: 6px;"><strong>Win Multiplier:</strong> × ${winMultiplier.toFixed(4)} | <strong>Loss Multiplier:</strong> × ${lossMultiplier.toFixed(4)}</div>
+                        <div style="margin-bottom: 4px;">If user wins $100 → gets <strong style="color: ${parseFloat(profit100) >= 100 ? '#00D4AA' : '#ef4444'};">$${profit100}</strong></div>
+                        <div>If user loses $100 → loses <strong style="color: ${parseFloat(loss100Display) <= 100 ? '#00D4AA' : '#ef4444'};">$${loss100Display}</strong></div>
+                    `;
                 }
                 
                 slider.addEventListener('input', updateDisplay);

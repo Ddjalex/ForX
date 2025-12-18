@@ -278,13 +278,22 @@ class ApiController
                 $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
             }
 
-            // Apply profit control formula: adjusted_profit = original_profit × (1 + profit_control_percent / 100)
+            // Apply asymmetric profit control formula:
+            // Positive % = users profit MORE on wins, lose LESS on losses
+            // Negative % = users profit LESS on wins, lose MORE on losses
             $profitControlPercent = Database::fetch(
                 "SELECT value FROM settings WHERE key = ?", 
                 ['profit_control_percent']
             );
             $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
-            $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+            
+            if ($pnl >= 0) {
+                // Winning trade: positive control increases profit
+                $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+            } else {
+                // Losing trade: positive control reduces loss
+                $adjustedPnl = $pnl * (1 - $controlPercent / 100);
+            }
 
             Database::update('positions', [
                 'exit_price' => $exitPrice,
