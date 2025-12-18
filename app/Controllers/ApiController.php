@@ -5,9 +5,39 @@ namespace App\Controllers;
 use App\Services\Auth;
 use App\Services\Database;
 use App\Services\Router;
+use App\Services\AssetService;
 
 class ApiController
 {
+    public function assetTypes(): void
+    {
+        $assetService = new AssetService();
+        $types = $assetService->getAssetTypes();
+        
+        Router::json([
+            'success' => true,
+            'data' => $types
+        ]);
+    }
+    
+    public function assets(): void
+    {
+        $type = $_GET['type'] ?? null;
+        
+        $assetService = new AssetService();
+        
+        if ($type) {
+            $assets = $assetService->getAssetsByType($type);
+        } else {
+            $assets = $assetService->getAllAssets();
+        }
+        
+        Router::json([
+            'success' => true,
+            'data' => $assets
+        ]);
+    }
+    
     public function prices(): void
     {
         $prices = Database::fetchAll(

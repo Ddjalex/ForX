@@ -77,20 +77,27 @@ $totalBalance = $wallet['balance'] ?? 0;
 
             <div class="form-group">
                 <label class="form-label">Asset Type</label>
-                <select class="form-control" name="asset_type" id="assetType">
-                    <option value="crypto">Crypto</option>
-                    <option value="forex">Forex</option>
-                    <option value="stocks">Stocks</option>
-                    <option value="indices">Indices</option>
+                <select class="form-control" name="asset_type" id="assetType" onchange="updateAssetNames()">
+                    <?php foreach ($assetTypes ?? [] as $type): ?>
+                        <option value="<?= htmlspecialchars($type['name']) ?>" 
+                            data-type="<?= htmlspecialchars($type['name']) ?>"
+                            <?= ($market['type'] ?? '') === $type['name'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($type['display_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Asset Name</label>
-                <select class="form-control" name="market_id" id="assetName">
+                <select class="form-control" name="market_id" id="assetName" onchange="updateTradingViewChart()">
                     <?php foreach ($allMarkets ?? [] as $m): ?>
-                        <option value="<?= $m['id'] ?>" <?= $m['id'] == $market['id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($m['symbol']) ?>
+                        <option value="<?= $m['id'] ?>" 
+                            data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
+                            data-symbol="<?= htmlspecialchars($m['symbol']) ?>"
+                            data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>"
+                            <?= $m['id'] == $market['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -450,6 +457,74 @@ $totalBalance = $wallet['balance'] ?? 0;
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 let currentTradeAction = 'buy';
+let tvWidget = null;
+const initialSymbol = '<?= htmlspecialchars($market['symbol_tradingview'] ?? 'BINANCE:BTCUSDT') ?>';
+
+function updateAssetNames() {
+    const assetType = document.getElementById('assetType').value;
+    const assetNameSelect = document.getElementById('assetName');
+    const options = assetNameSelect.querySelectorAll('option');
+    
+    let firstVisible = null;
+    options.forEach(option => {
+        const optionType = option.dataset.type;
+        if (optionType === assetType) {
+            option.style.display = '';
+            if (!firstVisible) firstVisible = option;
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    
+    if (firstVisible) {
+        assetNameSelect.value = firstVisible.value;
+    }
+    
+    updateTradingViewChart();
+}
+
+function updateTradingViewChart() {
+    const assetNameSelect = document.getElementById('assetName');
+    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    const tradingviewSymbol = selectedOption.dataset.tradingview || 'BINANCE:BTCUSDT';
+    
+    document.querySelector('input[name="market_id"][type="hidden"]').value = selectedOption.value;
+    
+    if (tvWidget && tvWidget.iframe) {
+        try {
+            tvWidget.iframe.contentWindow.postMessage({
+                name: 'setSymbol',
+                data: { symbol: tradingviewSymbol }
+            }, '*');
+        } catch(e) {
+            initTradingViewWidget(tradingviewSymbol);
+        }
+    } else {
+        initTradingViewWidget(tradingviewSymbol);
+    }
+}
+
+function initTradingViewWidget(symbol) {
+    const container = document.getElementById('tradingview_chart');
+    container.innerHTML = '';
+    
+    tvWidget = new TradingView.widget({
+        "width": "100%",
+        "height": "100%",
+        "symbol": symbol,
+        "interval": "30",
+        "timezone": "Etc/UTC",
+        "theme": "dark",
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#0f2744",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies"],
+        "container_id": "tradingview_chart"
+    });
+}
 
 function setLeverage(value) {
     document.getElementById('leverageValue').value = value;
@@ -615,21 +690,9 @@ document.querySelectorAll('.close-position-btn').forEach(btn => {
     });
 });
 
-new TradingView.widget({
-    "width": "100%",
-    "height": "100%",
-    "symbol": "NASDAQ:AMZN",
-    "interval": "30",
-    "timezone": "Etc/UTC",
-    "theme": "dark",
-    "style": "1",
-    "locale": "en",
-    "toolbar_bg": "#0f2744",
-    "enable_publishing": false,
-    "hide_side_toolbar": false,
-    "allow_symbol_change": true,
-    "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies"],
-    "container_id": "tradingview_chart"
+document.addEventListener('DOMContentLoaded', function() {
+    updateAssetNames();
+    initTradingViewWidget(initialSymbol);
 });
 </script>
 

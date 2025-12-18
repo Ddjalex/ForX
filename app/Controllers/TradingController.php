@@ -7,6 +7,7 @@ use App\Services\Database;
 use App\Services\Router;
 use App\Services\Session;
 use App\Services\AuditLog;
+use App\Services\AssetService;
 
 class TradingController
 {
@@ -65,13 +66,29 @@ class TradingController
 
     private function renderTrade(array $market): void
     {
-
         $user = Auth::user();
         $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$user['id']]);
 
+        $assetService = new AssetService();
+        $assetTypes = $assetService->getAssetTypes();
+        
         $allMarkets = Database::fetchAll(
-            "SELECT m.*, p.price FROM markets m LEFT JOIN prices p ON m.id = p.market_id WHERE m.status = 'active' ORDER BY m.symbol"
+            "SELECT m.*, m.display_name, m.symbol_tradingview, p.price, at.name as asset_type 
+             FROM markets m 
+             LEFT JOIN prices p ON m.id = p.market_id 
+             LEFT JOIN asset_types at ON m.asset_type_id = at.id
+             WHERE m.status = 'active' 
+             ORDER BY at.sort_order, m.name"
         );
+        
+        $marketsByType = [];
+        foreach ($allMarkets as $m) {
+            $type = $m['asset_type'] ?? $m['type'];
+            if (!isset($marketsByType[$type])) {
+                $marketsByType[$type] = [];
+            }
+            $marketsByType[$type][] = $m;
+        }
 
         $openPositions = Database::fetchAll(
             "SELECT p.*, m.symbol FROM positions p JOIN markets m ON p.market_id = m.id WHERE p.user_id = ? AND p.status = 'open' ORDER BY p.created_at DESC",
@@ -100,6 +117,8 @@ class TradingController
             'market' => $market,
             'wallet' => $wallet,
             'allMarkets' => $allMarkets,
+            'assetTypes' => $assetTypes,
+            'marketsByType' => $marketsByType,
             'openPositions' => $openPositions,
             'closedPositions' => $closedPositions,
             'pendingOrders' => $pendingOrders,

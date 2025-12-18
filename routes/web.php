@@ -75,6 +75,8 @@ Router::post('/accounts/archive', [AccountsController::class, 'archive'], [AuthM
 Router::post('/accounts/restore', [AccountsController::class, 'restore'], [AuthMiddleware::class]);
 Router::get('/accounts/trade', [AccountsController::class, 'trade'], [AuthMiddleware::class]);
 
+Router::get('/api/asset-types', [ApiController::class, 'assetTypes']);
+Router::get('/api/assets', [ApiController::class, 'assets']);
 Router::get('/api/prices', [ApiController::class, 'prices']);
 Router::get('/api/prices/{symbol}', [ApiController::class, 'marketPrice']);
 Router::get('/api/prices/{symbol}/history', [ApiController::class, 'priceHistory']);
