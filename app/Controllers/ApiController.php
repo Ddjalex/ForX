@@ -40,14 +40,55 @@ class ApiController
     
     public function prices(): void
     {
+        $refresh = ($_GET['refresh'] ?? '0') === '1';
+        
+        if ($refresh) {
+            $assetService = new AssetService();
+            $assetService->refreshAllPrices();
+        }
+        
         $prices = Database::fetchAll(
-            "SELECT m.id, m.symbol, m.name, m.type, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h 
+            "SELECT m.id, m.symbol, m.name, m.type, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h, p.updated_at
              FROM markets m 
              LEFT JOIN prices p ON m.id = p.market_id 
              WHERE m.status = 'active'"
         );
 
         Router::json(['success' => true, 'data' => $prices]);
+    }
+    
+    public function refreshPrices(): void
+    {
+        $assetService = new AssetService();
+        $results = $assetService->refreshAllPrices();
+        
+        Router::json([
+            'success' => true,
+            'message' => 'Prices refreshed',
+            'updated' => $results
+        ]);
+    }
+    
+    public function getLivePrice(string $symbol): void
+    {
+        $assetService = new AssetService();
+        $market = $assetService->getAssetBySymbol($symbol);
+        
+        if (!$market) {
+            Router::json(['success' => false, 'error' => 'Market not found'], 404);
+            return;
+        }
+        
+        $price = $assetService->getCurrentPrice((int)$market['id']);
+        
+        Router::json([
+            'success' => true,
+            'data' => [
+                'symbol' => $symbol,
+                'price' => $price,
+                'timestamp' => time()
+            ]
+        ]);
     }
 
     public function marketPrice(string $symbol): void

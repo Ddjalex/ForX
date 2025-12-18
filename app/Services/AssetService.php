@@ -4,6 +4,11 @@ namespace App\Services;
 
 class AssetService
 {
+    private static $cryptoPriceCache = [];
+    private static $forexRateCache = [];
+    private static $lastCryptoUpdate = 0;
+    private static $lastForexUpdate = 0;
+    
     public function getAssetTypes(): array
     {
         return Database::fetchAll(
@@ -69,11 +74,16 @@ class AssetService
         );
         
         if (!$price) {
+            $newPrice = $this->fetchExternalPrice($marketId);
+            if ($newPrice !== null) {
+                $this->updatePrice($marketId, $newPrice);
+                return $newPrice;
+            }
             return null;
         }
         
         $lastUpdate = strtotime($price['updated_at']);
-        $maxAge = 60;
+        $maxAge = 30;
         
         if (time() - $lastUpdate > $maxAge) {
             $newPrice = $this->fetchExternalPrice($marketId);
@@ -93,61 +103,156 @@ class AssetService
             return null;
         }
         
-        $symbol = $market['symbol_api'] ?? $market['symbol'];
         $type = $market['type'];
         
         try {
             switch ($type) {
                 case 'crypto':
-                    return $this->fetchBinancePrice($symbol);
+                    return $this->fetchCoinGeckoPrice($market);
                 case 'forex':
-                    return $this->fetchForexPrice($symbol);
+                    return $this->fetchRealForexPrice($market['symbol']);
                 case 'stock':
-                    return $this->fetchStockPrice($symbol);
+                    return $this->fetchStockPrice($market['symbol']);
                 default:
                     return null;
             }
         } catch (\Exception $e) {
-            error_log("Error fetching external price for {$symbol}: " . $e->getMessage());
+            error_log("Error fetching external price for {$market['symbol']}: " . $e->getMessage());
             return null;
         }
     }
     
-    private function fetchBinancePrice(string $symbol): ?float
+    private function fetchCoinGeckoPrice(array $market): ?float
     {
-        $url = "https://api.binance.com/api/v3/ticker/price?symbol=" . urlencode($symbol);
+        $coingeckoId = $market['coingecko_id'] ?? null;
+        if (!$coingeckoId) {
+            return null;
+        }
+        
+        if (time() - self::$lastCryptoUpdate < 10 && isset(self::$cryptoPriceCache[$coingeckoId])) {
+            return self::$cryptoPriceCache[$coingeckoId];
+        }
+        
+        $allCryptoMarkets = Database::fetchAll(
+            "SELECT id, coingecko_id FROM markets WHERE type = 'crypto' AND coingecko_id IS NOT NULL"
+        );
+        
+        $ids = array_filter(array_column($allCryptoMarkets, 'coingecko_id'));
+        if (empty($ids)) {
+            return null;
+        }
+        
+        $url = "https://api.coingecko.com/api/v3/simple/price?ids=" . urlencode(implode(',', $ids)) . "&vs_currencies=usd&include_24hr_change=true";
         
         $context = stream_context_create([
             'http' => [
-                'timeout' => 5,
-                'ignore_errors' => true
+                'timeout' => 10,
+                'ignore_errors' => true,
+                'header' => "User-Agent: TradeFlow/1.0\r\n"
             ]
         ]);
         
         $response = @file_get_contents($url, false, $context);
         if ($response === false) {
-            return null;
+            error_log("CoinGecko API request failed");
+            return self::$cryptoPriceCache[$coingeckoId] ?? null;
         }
         
         $data = json_decode($response, true);
-        if (isset($data['price'])) {
-            return (float) $data['price'];
+        if (!$data || isset($data['error'])) {
+            error_log("CoinGecko API error: " . ($data['error'] ?? 'Unknown'));
+            return self::$cryptoPriceCache[$coingeckoId] ?? null;
         }
         
-        return null;
+        self::$lastCryptoUpdate = time();
+        
+        foreach ($data as $id => $priceData) {
+            if (isset($priceData['usd'])) {
+                self::$cryptoPriceCache[$id] = (float) $priceData['usd'];
+                
+                $marketRow = Database::fetch(
+                    "SELECT id FROM markets WHERE coingecko_id = ?",
+                    [$id]
+                );
+                if ($marketRow) {
+                    $this->updatePriceWithChange($marketRow['id'], $priceData['usd'], $priceData['usd_24h_change'] ?? 0);
+                }
+            }
+        }
+        
+        return self::$cryptoPriceCache[$coingeckoId] ?? null;
     }
     
-    private function fetchForexPrice(string $symbol): ?float
+    private function fetchRealForexPrice(string $symbol): ?float
     {
-        $price = Database::fetch(
-            "SELECT price FROM prices WHERE market_id = (SELECT id FROM markets WHERE symbol = ?)",
-            [$symbol]
+        if (time() - self::$lastForexUpdate < 60 && !empty(self::$forexRateCache)) {
+            return $this->calculateForexRate($symbol, self::$forexRateCache);
+        }
+        
+        $url = "https://open.er-api.com/v6/latest/USD";
+        
+        $context = stream_context_create([
+            'http' => [
+                'timeout' => 10,
+                'ignore_errors' => true,
+                'header' => "User-Agent: TradeFlow/1.0\r\n"
+            ]
+        ]);
+        
+        $response = @file_get_contents($url, false, $context);
+        if ($response === false) {
+            error_log("Forex API request failed");
+            return $this->calculateForexRate($symbol, self::$forexRateCache);
+        }
+        
+        $data = json_decode($response, true);
+        if (!$data || $data['result'] !== 'success') {
+            error_log("Forex API error");
+            return $this->calculateForexRate($symbol, self::$forexRateCache);
+        }
+        
+        self::$forexRateCache = $data['rates'];
+        self::$lastForexUpdate = time();
+        
+        $allForexMarkets = Database::fetchAll(
+            "SELECT id, symbol FROM markets WHERE type = 'forex'"
         );
         
-        if ($price) {
-            $basePrice = (float) $price['price'];
-            $variation = (mt_rand(-10, 10) / 10000);
-            return round($basePrice * (1 + $variation), 5);
+        foreach ($allForexMarkets as $forexMarket) {
+            $rate = $this->calculateForexRate($forexMarket['symbol'], self::$forexRateCache);
+            if ($rate !== null) {
+                $this->updatePrice($forexMarket['id'], $rate);
+            }
+        }
+        
+        return $this->calculateForexRate($symbol, self::$forexRateCache);
+    }
+    
+    private function calculateForexRate(string $symbol, array $rates): ?float
+    {
+        if (empty($rates)) {
+            return null;
+        }
+        
+        $symbol = strtoupper(str_replace(['/', '-', '_'], '', $symbol));
+        
+        if (strlen($symbol) !== 6) {
+            return null;
+        }
+        
+        $base = substr($symbol, 0, 3);
+        $quote = substr($symbol, 3, 3);
+        
+        if ($base === 'USD') {
+            return isset($rates[$quote]) ? round($rates[$quote], 5) : null;
+        }
+        
+        if ($quote === 'USD') {
+            return isset($rates[$base]) ? round(1 / $rates[$base], 5) : null;
+        }
+        
+        if (isset($rates[$base]) && isset($rates[$quote])) {
+            return round($rates[$quote] / $rates[$base], 5);
         }
         
         return null;
@@ -162,7 +267,7 @@ class AssetService
         
         if ($price) {
             $basePrice = (float) $price['price'];
-            $variation = (mt_rand(-50, 50) / 10000);
+            $variation = (mt_rand(-20, 20) / 10000);
             return round($basePrice * (1 + $variation), 2);
         }
         
@@ -196,6 +301,38 @@ class AssetService
         return true;
     }
     
+    public function updatePriceWithChange(int $marketId, float $price, float $change24h): bool
+    {
+        $existing = Database::fetch("SELECT id FROM prices WHERE market_id = ?", [$marketId]);
+        
+        if ($existing) {
+            Database::update('prices', 
+                [
+                    'price' => $price, 
+                    'change_24h' => $change24h,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ],
+                'market_id = ?',
+                [$marketId]
+            );
+        } else {
+            Database::insert('prices', [
+                'market_id' => $marketId,
+                'price' => $price,
+                'change_24h' => $change24h,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+        
+        Database::insert('prices_history', [
+            'market_id' => $marketId,
+            'price' => $price,
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+        
+        return true;
+    }
+    
     public function getEntryPrice(int $marketId): float
     {
         $price = $this->getCurrentPrice($marketId);
@@ -214,5 +351,32 @@ class AssetService
         }
         
         return $price;
+    }
+    
+    public function refreshAllPrices(): array
+    {
+        $results = ['crypto' => 0, 'forex' => 0, 'stock' => 0, 'errors' => []];
+        
+        $cryptoMarket = Database::fetch("SELECT id FROM markets WHERE type = 'crypto' AND coingecko_id IS NOT NULL LIMIT 1");
+        if ($cryptoMarket) {
+            try {
+                $this->fetchCoinGeckoPrice($this->getAssetById($cryptoMarket['id']));
+                $results['crypto'] = Database::fetch("SELECT COUNT(*) as cnt FROM markets WHERE type = 'crypto' AND coingecko_id IS NOT NULL")['cnt'] ?? 0;
+            } catch (\Exception $e) {
+                $results['errors'][] = "Crypto: " . $e->getMessage();
+            }
+        }
+        
+        $forexMarket = Database::fetch("SELECT id, symbol FROM markets WHERE type = 'forex' LIMIT 1");
+        if ($forexMarket) {
+            try {
+                $this->fetchRealForexPrice($forexMarket['symbol']);
+                $results['forex'] = Database::fetch("SELECT COUNT(*) as cnt FROM markets WHERE type = 'forex'")['cnt'] ?? 0;
+            } catch (\Exception $e) {
+                $results['errors'][] = "Forex: " . $e->getMessage();
+            }
+        }
+        
+        return $results;
     }
 }
