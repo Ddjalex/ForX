@@ -290,16 +290,24 @@ class TradingController
             $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
         }
 
+        // Apply profit control formula: adjusted_profit = original_profit × (1 + profit_control_percent / 100)
+        $profitControlPercent = Database::fetch(
+            "SELECT value FROM settings WHERE key = ?", 
+            ['profit_control_percent']
+        );
+        $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
+        $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+
         Database::update('positions', [
             'exit_price' => $exitPrice,
-            'realized_pnl' => $pnl,
+            'realized_pnl' => $adjustedPnl,
             'status' => 'closed',
             'closed_at' => date('Y-m-d H:i:s'),
         ], 'id = ?', [$positionId]);
 
         $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
         Database::update('wallets', [
-            'balance' => $wallet['balance'] + $pnl,
+            'balance' => $wallet['balance'] + $adjustedPnl,
             'margin_used' => $wallet['margin_used'] - $position['margin_used'],
         ], 'user_id = ?', [$userId]);
 
@@ -316,11 +324,13 @@ class TradingController
 
         AuditLog::log('close_position', 'position', $positionId, [
             'market' => $position['symbol'],
-            'pnl' => $pnl,
+            'original_pnl' => $pnl,
+            'adjusted_pnl' => $adjustedPnl,
+            'profit_control_percent' => $controlPercent,
             'exit_price' => $exitPrice,
         ]);
 
-        Session::flash('success', 'Position closed. PnL: $' . number_format($pnl, 2));
+        Session::flash('success', 'Position closed. PnL: $' . number_format($adjustedPnl, 2));
         Router::redirect("/dashboard/trade/{$position['symbol']}");
     }
 

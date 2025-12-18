@@ -130,6 +130,14 @@ ob_start();
                 <input type="number" name="max_position_size" class="form-control" step="0.01" value="<?= htmlspecialchars($settings['max_position_size'] ?? '100000') ?>">
             </div>
             
+            <h4 style="margin: 24px 0 16px; color: var(--text-secondary);">Profit Control Settings</h4>
+            
+            <div class="form-group">
+                <label class="form-label">Profit Control Percentage (%)</label>
+                <input type="number" name="profit_control_percent" class="form-control" step="0.01" min="-10" max="100" value="<?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>" placeholder="Range: -10% to +100%">
+                <small class="form-text text-muted">Adjust profit when trades close. Formula: adjusted_profit = original_profit × (1 + percent/100). Range: -10% to +100%</small>
+            </div>
+            
             <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>
     </div>
