@@ -182,8 +182,7 @@ class ApiController
         }
 
         $userId = Auth::id();
-        $assetType = $_POST['asset_type'] ?? 'crypto';
-        $marketId = $_POST['market_id'] ?? '';
+        $marketId = $_POST['market_id'] ?? null;
         $side = $_POST['side'] ?? '';
         $amount = (float) ($_POST['amount'] ?? 0);
         $leverage = (int) ($_POST['leverage'] ?? 5);
@@ -192,9 +191,11 @@ class ApiController
         $stopLoss = (float) ($_POST['stop_loss'] ?? 0);
 
         if (empty($marketId) || empty($side) || $amount <= 0) {
-            Router::json(['success' => false, 'message' => 'Invalid trade parameters']);
+            Router::json(['success' => false, 'message' => 'Market ID is required. Please select an asset to trade.']);
             return;
         }
+
+        $marketId = (int) $marketId;
 
         if (!in_array($side, ['buy', 'sell'])) {
             Router::json(['success' => false, 'message' => 'Invalid trade side']);

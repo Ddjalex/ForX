@@ -71,7 +71,6 @@ $totalBalance = $wallet['balance'] ?? 0;
 
         <form method="POST" action="/dashboard/trade/order" id="tradeForm">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-            <input type="hidden" name="market_id" value="<?= $market['id'] ?>">
             <input type="hidden" name="side" id="orderSide" value="buy">
             <input type="hidden" name="order_type" id="orderType" value="market">
 
