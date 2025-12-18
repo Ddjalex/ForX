@@ -78,8 +78,6 @@ Router::get('/accounts/trade', [AccountsController::class, 'trade'], [AuthMiddle
 Router::get('/api/asset-types', [ApiController::class, 'assetTypes']);
 Router::get('/api/assets', [ApiController::class, 'assets']);
 Router::get('/api/prices', [ApiController::class, 'prices']);
-Router::get('/api/prices/refresh', [ApiController::class, 'refreshPrices']);
-Router::get('/api/prices/live/{symbol}', [ApiController::class, 'getLivePrice']);
 Router::get('/api/prices/{symbol}', [ApiController::class, 'marketPrice']);
 Router::get('/api/prices/{symbol}/history', [ApiController::class, 'priceHistory']);
 Router::get('/api/positions', [ApiController::class, 'userPositions']);
