@@ -1,0 +1,21 @@
+{
+  "account_settings": "การตั้งค่าบัญชี",
+  "deposit": "ฝากเงิน",
+  "withdraw": "ถอนเงิน",
+  "trade": "เทรด",
+  "copy_experts": "คัดลอกผู้เชี่ยวชาญ",
+  "news": "ข่าวสาร",
+  "nfts": "NFT",
+  "signals": "สัญญาณ",
+  "loans": "สินเชื่อ",
+  "trade_history": "ประวัติการเทรด",
+  "transactions": "ธุรกรรม",
+  "referrals": "อ้างอิง",
+  "logout": "ออกจากระบบ",
+  "live_analysis": "การวิเคราะห์สด",
+  "forex_analysis": "การวิเคราะห์ Forex",
+  "crypto_analysis": "การวิเคราะห์ Crypto",
+  "stock_analysis": "การวิเคราะห์หุ้น",
+  "verified": "ยืนยันแล้ว",
+  "not_verified": "ยังไม่ยืนยัน"
+}

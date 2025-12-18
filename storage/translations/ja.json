@@ -1,0 +1,21 @@
+{
+  "account_settings": "アカウント設定",
+  "deposit": "入金",
+  "withdraw": "出金",
+  "trade": "トレード",
+  "copy_experts": "エキスパートをコピー",
+  "news": "ニュース",
+  "nfts": "NFT",
+  "signals": "シグナル",
+  "loans": "ローン",
+  "trade_history": "取引履歴",
+  "transactions": "取引",
+  "referrals": "紹介",
+  "logout": "ログアウト",
+  "live_analysis": "ライブ分析",
+  "forex_analysis": "外国為替分析",
+  "crypto_analysis": "暗号分析",
+  "stock_analysis": "株式分析",
+  "verified": "確認済み",
+  "not_verified": "未確認"
+}

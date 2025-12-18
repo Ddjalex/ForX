@@ -1,0 +1,21 @@
+{
+  "account_settings": "Accountinstellingen",
+  "deposit": "Storten",
+  "withdraw": "Opnemen",
+  "trade": "Handelen",
+  "copy_experts": "Experts Kopiëren",
+  "news": "Nieuws",
+  "nfts": "NFT's",
+  "signals": "Signalen",
+  "loans": "Leningen",
+  "trade_history": "Handelsgeschiedenis",
+  "transactions": "Transacties",
+  "referrals": "Verwijzingen",
+  "logout": "Afmelden",
+  "live_analysis": "Live Analyse",
+  "forex_analysis": "Forex Analyse",
+  "crypto_analysis": "Crypto Analyse",
+  "stock_analysis": "Aandelen Analyse",
+  "verified": "Geverifieerd",
+  "not_verified": "Niet Geverifieerd"
+}

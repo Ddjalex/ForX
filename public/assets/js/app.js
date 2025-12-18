@@ -17,10 +17,32 @@ function initLanguageToggle() {
         { code: 'es', name: 'Español' },
         { code: 'fr', name: 'Français' },
         { code: 'de', name: 'Deutsch' },
-        { code: 'zh', name: '中文' },
-        { code: 'ar', name: 'العربية' },
+        { code: 'it', name: 'Italiano' },
         { code: 'pt', name: 'Português' },
-        { code: 'ru', name: 'Русский' }
+        { code: 'nl', name: 'Nederlands' },
+        { code: 'pl', name: 'Polski' },
+        { code: 'ru', name: 'Русский' },
+        { code: 'uk', name: 'Українська' },
+        { code: 'tr', name: 'Türkçe' },
+        { code: 'ar', name: 'العربية' },
+        { code: 'zh', name: '中文' },
+        { code: 'ja', name: '日本語' },
+        { code: 'ko', name: '한국어' },
+        { code: 'th', name: 'ไทย' },
+        { code: 'vi', name: 'Tiếng Việt' },
+        { code: 'id', name: 'Bahasa Indonesia' },
+        { code: 'hi', name: 'हिन्दी' },
+        { code: 'bn', name: 'বাংলা' },
+        { code: 'sv', name: 'Svenska' },
+        { code: 'da', name: 'Dansk' },
+        { code: 'no', name: 'Norsk' },
+        { code: 'fi', name: 'Suomi' },
+        { code: 'el', name: 'Ελληνικά' },
+        { code: 'he', name: 'עברית' },
+        { code: 'cs', name: 'Čeština' },
+        { code: 'hu', name: 'Magyar' },
+        { code: 'ro', name: 'Română' },
+        { code: 'sk', name: 'Slovenčina' }
     ];
     
     // Create dropdown on init
@@ -51,15 +73,12 @@ function initLanguageToggle() {
 }
 
 function setLanguage(lang) {
-    // Save language to cookie
+    // Save language to cookie first
     document.cookie = "language=" + lang + ";path=/;max-age=" + (365 * 24 * 60 * 60);
     localStorage.setItem('language', lang);
     
-    // Reload page with language parameter to update entire website
-    let url = window.location.pathname;
-    const params = new URLSearchParams(window.location.search);
-    params.set('lang', lang);
-    window.location.href = url + '?' + params.toString();
+    // Clear cache and reload page to show new language
+    window.location.href = window.location.pathname + '?lang=' + lang + '&t=' + Date.now();
 }
 
 

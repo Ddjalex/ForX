@@ -1,0 +1,21 @@
+{
+  "account_settings": "Hesap Ayarları",
+  "deposit": "Para Yatırma",
+  "withdraw": "Para Çekme",
+  "trade": "İşlem Yap",
+  "copy_experts": "Uzmanları Kopyala",
+  "news": "Haberler",
+  "nfts": "NFT",
+  "signals": "Sinyaller",
+  "loans": "Krediler",
+  "trade_history": "İşlem Geçmişi",
+  "transactions": "İşlemler",
+  "referrals": "Referanslar",
+  "logout": "Çıkış Yap",
+  "live_analysis": "Canlı Analiz",
+  "forex_analysis": "Forex Analizi",
+  "crypto_analysis": "Kripto Analizi",
+  "stock_analysis": "Hisse Analizi",
+  "verified": "Doğrulanmış",
+  "not_verified": "Doğrulanmamış"
+}

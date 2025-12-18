@@ -1,0 +1,21 @@
+{
+  "account_settings": "계정 설정",
+  "deposit": "입금",
+  "withdraw": "출금",
+  "trade": "거래",
+  "copy_experts": "전문가 복사",
+  "news": "뉴스",
+  "nfts": "NFT",
+  "signals": "신호",
+  "loans": "대출",
+  "trade_history": "거래 내역",
+  "transactions": "거래",
+  "referrals": "추천",
+  "logout": "로그아웃",
+  "live_analysis": "실시간 분석",
+  "forex_analysis": "외환 분석",
+  "crypto_analysis": "암호 분석",
+  "stock_analysis": "주식 분석",
+  "verified": "검증됨",
+  "not_verified": "검증 안 됨"
+}
