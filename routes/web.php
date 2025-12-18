@@ -8,6 +8,7 @@ use App\Controllers\TradingController;
 use App\Controllers\AdminController;
 use App\Controllers\ApiController;
 use App\Controllers\AccountsController;
+use App\Controllers\FeatureController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\GuestMiddleware;
@@ -49,6 +50,14 @@ Router::get('/positions', [TradingController::class, 'positions'], [AuthMiddlewa
 Router::get('/orders', [TradingController::class, 'orders'], [AuthMiddleware::class]);
 Router::get('/dashboard/trades/history', [TradingController::class, 'history'], [AuthMiddleware::class]);
 Router::get('/copy-experts', [TradingController::class, 'copyExperts'], [AuthMiddleware::class]);
+
+Router::get('/news', [FeatureController::class, 'news'], [AuthMiddleware::class]);
+Router::get('/nfts', [FeatureController::class, 'nfts'], [AuthMiddleware::class]);
+Router::get('/signals', [FeatureController::class, 'signals'], [AuthMiddleware::class]);
+Router::get('/loans', [FeatureController::class, 'loans'], [AuthMiddleware::class]);
+Router::post('/loans/apply', [FeatureController::class, 'applyLoan'], [AuthMiddleware::class]);
+Router::get('/referrals', [FeatureController::class, 'referrals'], [AuthMiddleware::class]);
+Router::get('/live-analysis', [FeatureController::class, 'liveAnalysis'], [AuthMiddleware::class]);
 
 Router::get('/admin', [AdminController::class, 'dashboard'], [AdminMiddleware::class]);
 Router::get('/admin/users', [AdminController::class, 'users'], [AdminMiddleware::class]);

@@ -231,3 +231,39 @@ CREATE TABLE IF NOT EXISTS copy_traders (
 
 CREATE INDEX IF NOT EXISTS idx_copy_traders_status ON copy_traders(status);
 CREATE INDEX IF NOT EXISTS idx_copy_traders_profit ON copy_traders(profit_share DESC);
+
+-- Loan Plans table
+CREATE TABLE IF NOT EXISTS loan_plans (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    min_amount DECIMAL(20, 2) NOT NULL DEFAULT 100,
+    max_amount DECIMAL(20, 2) NOT NULL DEFAULT 10000,
+    interest_rate DECIMAL(5, 2) NOT NULL DEFAULT 5.0,
+    duration_days INTEGER NOT NULL DEFAULT 30,
+    collateral_ratio INTEGER NOT NULL DEFAULT 150,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Loans table
+CREATE TABLE IF NOT EXISTS loans (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    plan_id INTEGER REFERENCES loan_plans(id) ON DELETE SET NULL,
+    amount DECIMAL(20, 2) NOT NULL,
+    interest_rate DECIMAL(5, 2) NOT NULL,
+    interest_amount DECIMAL(20, 2) NOT NULL,
+    total_repayment DECIMAL(20, 2) NOT NULL,
+    collateral_type VARCHAR(50) DEFAULT 'BTC',
+    collateral_amount DECIMAL(20, 8) NOT NULL,
+    duration_days INTEGER NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    approved_at TIMESTAMP,
+    repaid_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_loans_user ON loans(user_id);
+CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status);
