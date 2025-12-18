@@ -131,9 +131,15 @@ class TradingController
 
     public function placeOrder(): void
     {
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+        
         $csrfToken = $_POST['_csrf_token'] ?? '';
         if (empty($csrfToken) || !Session::validateCsrfToken($csrfToken)) {
-            Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
+            if ($isAjax) {
+                Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
+            } else {
+                Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
+            }
             return;
         }
 
@@ -149,27 +155,47 @@ class TradingController
         $duration = filter_input(INPUT_POST, 'duration', FILTER_VALIDATE_INT) ?: 1;
 
         if (!$marketId || !$orderType || !$side || !$amount) {
-            Session::flash('error', 'Please fill in all required fields.');
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            $error = 'Please fill in all required fields.';
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
             return;
         }
 
         $market = Database::fetch("SELECT * FROM markets WHERE id = ? AND status = 'active'", [$marketId]);
         if (!$market) {
-            Session::flash('error', 'Invalid market.');
-            Router::redirect('/dashboard/trade');
+            $error = 'Invalid market.';
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect('/dashboard/trade');
+            }
             return;
         }
 
         if ($leverage > $market['max_leverage']) {
-            Session::flash('error', "Maximum leverage for this market is {$market['max_leverage']}x.");
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            $error = "Maximum leverage for this market is {$market['max_leverage']}x.";
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
             return;
         }
 
         if ($amount < $market['min_trade_size']) {
-            Session::flash('error', "Minimum trade size is {$market['min_trade_size']}.");
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            $error = "Minimum trade size is {$market['min_trade_size']}.";
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
             return;
         }
 
@@ -185,8 +211,13 @@ class TradingController
         $availableBalance = $wallet['balance'] - $wallet['margin_used'];
 
         if ($marginRequired > $availableBalance) {
-            Session::flash('error', 'Insufficient margin. Required: $' . number_format($marginRequired, 2));
-            Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            $error = 'Insufficient margin. Required: $' . number_format($marginRequired, 2);
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
             return;
         }
 
@@ -236,6 +267,12 @@ class TradingController
                 'leverage' => $leverage,
             ]);
 
+            // Return JSON for AJAX requests, redirect for regular form submissions
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {
+                Router::json(['success' => true, 'message' => 'Trade executed successfully']);
+                return;
+            }
+            
             Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
             Router::redirect('/dashboard/trades/history');
             return;

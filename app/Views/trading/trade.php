@@ -652,8 +652,37 @@ function closeConfirmModal() {
 
 document.getElementById('confirmTradeBtn').addEventListener('click', function() {
     document.getElementById('orderSide').value = currentTradeAction;
-    document.getElementById('tradeForm').submit();
+    submitTradeForm();
 });
+
+function submitTradeForm() {
+    const form = document.getElementById('tradeForm');
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            location.reload();
+        } else if (data.success) {
+            alert('Trade executed successfully!');
+            setTimeout(() => location.reload(), 1000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the trade');
+    });
+    
+    closeConfirmModal();
+}
 
 // Countdown timer for open trades
 let expiredPositions = new Set();
