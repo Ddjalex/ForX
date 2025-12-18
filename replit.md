@@ -74,6 +74,16 @@ PostgreSQL with the following main tables:
 - audit_logs, login_logs, settings
 
 ## Recent Changes
+- December 2024: Assets Module Implementation:
+  - Added asset_types table with 3 categories: Crypto, Forex, Stock
+  - Enhanced markets table with display_name, symbol_api, symbol_tradingview columns
+  - Seeded 45 assets: 15 crypto (Binance), 16 forex, 14 stocks with proper TradingView symbols
+  - Created AssetService for asset management and real-time price fetching
+  - New API endpoints: GET /api/asset-types, GET /api/assets?type={type}
+  - Trading form now has dynamic Asset Type/Name dropdowns that filter assets
+  - TradingView charts auto-update based on selected asset (BINANCE:BTCUSDT, FX:EURUSD, NASDAQ:AAPL)
+  - Server-side entry price fetching from database for BUY/SELL trades
+  - Real-time price fetch from Binance API for crypto assets
 - December 2024: Customer Support Chat & Profit Control Enhancements:
   - Added Tawk.to customer support chat widget integration (configurable in Admin Settings)
   - Implemented asymmetric profit control formula for fair win/loss adjustments
