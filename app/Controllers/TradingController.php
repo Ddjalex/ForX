@@ -131,8 +131,9 @@ class TradingController
 
     public function placeOrder(): void
     {
-        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
-            Router::json(['error' => 'Invalid request'], 403);
+        $csrfToken = $_POST['_csrf_token'] ?? '';
+        if (empty($csrfToken) || !Session::validateCsrfToken($csrfToken)) {
+            Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
             return;
         }
 
@@ -274,8 +275,9 @@ class TradingController
 
     public function closePosition(): void
     {
-        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
-            Router::json(['error' => 'Invalid request'], 403);
+        $csrfToken = $_POST['_csrf_token'] ?? '';
+        if (empty($csrfToken) || !Session::validateCsrfToken($csrfToken)) {
+            Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
             return;
         }
 
@@ -368,8 +370,9 @@ class TradingController
 
     public function cancelOrder(): void
     {
-        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
-            Router::json(['error' => 'Invalid request'], 403);
+        $csrfToken = $_POST['_csrf_token'] ?? '';
+        if (empty($csrfToken) || !Session::validateCsrfToken($csrfToken)) {
+            Router::json(['error' => 'Invalid request. Please reload and try again.'], 403);
             return;
         }
 
