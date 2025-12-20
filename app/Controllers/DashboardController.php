@@ -6,6 +6,7 @@ use App\Services\Auth;
 use App\Services\Database;
 use App\Services\Router;
 use App\Services\Session;
+use App\Services\AssetService;
 
 class DashboardController
 {
@@ -84,6 +85,18 @@ class DashboardController
              ORDER BY m.symbol"
         );
 
+        $assetService = new AssetService();
+        $assetTypes = $assetService->getAssetTypes();
+        
+        $allMarkets = Database::fetchAll(
+            "SELECT m.*, m.display_name, m.symbol_tradingview, p.price, at.name as asset_type 
+             FROM markets m 
+             LEFT JOIN prices p ON m.id = p.market_id 
+             LEFT JOIN asset_types at ON m.asset_type_id = at.id
+             WHERE m.status = 'active' 
+             ORDER BY at.sort_order, m.name"
+        );
+
         echo Router::render('user/dashboard', [
             'user' => $user,
             'wallet' => $wallet,
@@ -94,6 +107,8 @@ class DashboardController
             'stats' => $stats,
             'cryptoMarkets' => $cryptoMarkets,
             'stockMarkets' => $stockMarkets,
+            'assetTypes' => $assetTypes,
+            'allMarkets' => $allMarkets,
             'csrf_token' => Session::generateCsrfToken(),
         ]);
     }

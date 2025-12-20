@@ -110,50 +110,48 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
             </div>
         </div>
         <div class="card-body" id="tradingCard">
-            <form id="tradeForm" class="trading-form">
+            <form method="POST" action="/dashboard/trade/order" id="tradeForm" class="trading-form">
                 <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
+                <input type="hidden" name="side" id="orderSide" value="buy">
+                <input type="hidden" name="order_type" id="orderType" value="market">
                 
                 <div class="form-group">
                     <label>Asset Type</label>
-                    <select name="asset_type" id="assetType" class="form-control">
-                        <option value="crypto">Crypto</option>
-                        <option value="forex">Forex</option>
-                        <option value="stocks">Stocks</option>
-                        <option value="commodities">Commodities</option>
+                    <select name="asset_type" id="assetType" class="form-control" onchange="updateAssetNames()">
+                        <?php foreach ($assetTypes ?? [] as $type): ?>
+                            <option value="<?= htmlspecialchars($type['name']) ?>" 
+                                data-type="<?= htmlspecialchars($type['name']) ?>">
+                                <?= htmlspecialchars($type['display_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Asset Name</label>
-                    <select name="asset_name" id="assetName" class="form-control">
-                        <option value="BTCUSD">BTC/USD</option>
-                        <option value="ETHUSD">ETH/USD</option>
-                        <option value="XRPUSD">XRP/USD</option>
-                        <option value="SOLUSD">SOL/USD</option>
-                        <option value="BNBUSD">BNB/USD</option>
+                    <select name="market_id" id="assetName" class="form-control" onchange="updateTradingViewChart()">
+                        <?php foreach ($allMarkets ?? [] as $m): ?>
+                            <option value="<?= $m['id'] ?>" 
+                                data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
+                                data-symbol="<?= htmlspecialchars($m['symbol']) ?>"
+                                data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>">
+                                <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Leverage:</label>
                     <div class="leverage-grid">
-                        <button type="button" class="leverage-btn active" data-leverage="5">5x</button>
-                        <button type="button" class="leverage-btn" data-leverage="2">2x</button>
-                        <button type="button" class="leverage-btn" data-leverage="3">3x</button>
-                        <button type="button" class="leverage-btn" data-leverage="4">4x</button>
-                        <button type="button" class="leverage-btn" data-leverage="5">5x</button>
-                        <button type="button" class="leverage-btn" data-leverage="10">10x</button>
-                        <button type="button" class="leverage-btn" data-leverage="25">25x</button>
-                        <button type="button" class="leverage-btn" data-leverage="30">30x</button>
-                        <button type="button" class="leverage-btn" data-leverage="40">40x</button>
-                        <button type="button" class="leverage-btn" data-leverage="50">50x</button>
-                        <button type="button" class="leverage-btn" data-leverage="60">60x</button>
-                        <button type="button" class="leverage-btn" data-leverage="70">70x</button>
-                        <button type="button" class="leverage-btn" data-leverage="80">80x</button>
-                        <button type="button" class="leverage-btn" data-leverage="90">90x</button>
-                        <button type="button" class="leverage-btn" data-leverage="100">100x</button>
+                        <?php 
+                        $leverages = [5, 2, 3, 4, 10, 25, 30, 40, 50, 100];
+                        foreach ($leverages as $lev): 
+                        ?>
+                            <button type="button" class="leverage-btn <?= $lev === 5 ? 'active' : '' ?>" data-leverage="<?= $lev ?>" onclick="setLeverage(<?= $lev ?>)"><?= $lev ?>x</button>
+                        <?php endforeach; ?>
                     </div>
-                    <input type="hidden" name="leverage" id="leverageInput" value="5">
+                    <input type="hidden" name="leverage" id="leverageValue" value="5">
                 </div>
 
                 <div class="form-group">
@@ -171,7 +169,7 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
 
                 <div class="form-group">
                     <label>Amount</label>
-                    <input type="number" name="amount" id="tradeAmount" class="form-control" placeholder="Enter trade amount" step="0.01" min="1" required>
+                    <input type="number" name="amount" id="tradeAmount" class="form-control" placeholder="Enter trade amount" step="0.01" min="10" required>
                 </div>
 
                 <div class="form-row">
@@ -186,8 +184,8 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
                 </div>
 
                 <div class="trade-buttons">
-                    <button type="button" class="trade-btn buy" onclick="executeTrade('buy')">Buy</button>
-                    <button type="button" class="trade-btn sell" onclick="executeTrade('sell')">Sell</button>
+                    <button type="button" class="trade-btn buy" onclick="showConfirmModal('buy')">Buy</button>
+                    <button type="button" class="trade-btn sell" onclick="showConfirmModal('sell')">Sell</button>
                 </div>
             </form>
         </div>
