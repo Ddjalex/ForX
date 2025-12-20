@@ -192,6 +192,19 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
     </div>
 </div>
 
+<script>
+// Update the modal button to submit the form instead of custom logic
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmBtn = document.getElementById('confirmTradeBtn');
+    if (confirmBtn) {
+        confirmBtn.onclick = function() {
+            const form = document.getElementById('tradeForm');
+            if (form) form.submit();
+        };
+    }
+});
+</script>
+
 <div class="grid-2">
     <div class="card market-data-card">
         <div class="card-header">
@@ -416,145 +429,78 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
+let tvChart = null;
+let currentSymbol = 'BINANCE:BTCUSDT';
+
 document.addEventListener('DOMContentLoaded', function() {
-    new TradingView.widget({
-        "autosize": true,
-        "symbol": "BINANCE:BTCUSDT",
-        "interval": "1",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#1a2332",
-        "enable_publishing": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_chart",
-        "hide_side_toolbar": false,
-        "studies": ["MASimple@tv-basicstudies", "RSI@tv-basicstudies"],
-        "show_popup_button": true,
-        "popup_width": "1000",
-        "popup_height": "650"
-    });
-
-    const assetType = document.getElementById('assetType');
-    const assetName = document.getElementById('assetName');
+    // Initialize TradingView chart
+    initTradingViewChart();
     
-    const assets = {
-        crypto: [
-            {value: 'BTCUSD', label: 'BTC/USD', symbol: 'BINANCE:BTCUSDT'},
-            {value: 'ETHUSD', label: 'ETH/USD', symbol: 'BINANCE:ETHUSDT'},
-            {value: 'XRPUSD', label: 'XRP/USD', symbol: 'BINANCE:XRPUSDT'},
-            {value: 'SOLUSD', label: 'SOL/USD', symbol: 'BINANCE:SOLUSDT'},
-            {value: 'BNBUSD', label: 'BNB/USD', symbol: 'BINANCE:BNBUSDT'}
-        ],
-        forex: [
-            {value: 'EURUSD', label: 'EUR/USD', symbol: 'FX:EURUSD'},
-            {value: 'GBPUSD', label: 'GBP/USD', symbol: 'FX:GBPUSD'},
-            {value: 'USDJPY', label: 'USD/JPY', symbol: 'FX:USDJPY'},
-            {value: 'AUDUSD', label: 'AUD/USD', symbol: 'FX:AUDUSD'}
-        ],
-        stocks: [
-            {value: 'AAPL', label: 'Apple Inc.', symbol: 'NASDAQ:AAPL'},
-            {value: 'GOOGL', label: 'Alphabet Inc.', symbol: 'NASDAQ:GOOGL'},
-            {value: 'AMZN', label: 'Amazon.com', symbol: 'NASDAQ:AMZN'},
-            {value: 'TSLA', label: 'Tesla Inc.', symbol: 'NASDAQ:TSLA'},
-            {value: 'MSFT', label: 'Microsoft', symbol: 'NASDAQ:MSFT'}
-        ],
-        commodities: [
-            {value: 'XAUUSD', label: 'Gold', symbol: 'TVC:GOLD'},
-            {value: 'XAGUSD', label: 'Silver', symbol: 'TVC:SILVER'},
-            {value: 'USOIL', label: 'Crude Oil', symbol: 'TVC:USOIL'}
-        ]
-    };
-
-    assetType.addEventListener('change', function() {
-        const type = this.value;
-        assetName.innerHTML = '';
-        assets[type].forEach(asset => {
-            const option = document.createElement('option');
-            option.value = asset.value;
-            option.textContent = asset.label;
-            option.dataset.symbol = asset.symbol;
-            assetName.appendChild(option);
+    // Update chart when asset name changes
+    const assetSelect = document.getElementById('assetName');
+    if (assetSelect) {
+        assetSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
+            if (tradingViewSymbol) {
+                currentSymbol = tradingViewSymbol;
+                updateTradingViewChart();
+            }
         });
-    });
-
-    document.querySelectorAll('.leverage-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.leverage-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById('leverageInput').value = this.dataset.leverage;
-        });
-    });
+    }
 });
+
+function initTradingViewChart() {
+    if (!tvChart) {
+        createTradingViewWidget();
+    }
+}
+
+function createTradingViewWidget() {
+    try {
+        if (typeof TradingView === 'undefined') {
+            console.log('TradingView library not loaded yet');
+            setTimeout(createTradingViewWidget, 500);
+            return;
+        }
+        
+        tvChart = new TradingView.widget({
+            "autosize": true,
+            "symbol": currentSymbol,
+            "interval": "1",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#1a2332",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart",
+            "hide_side_toolbar": false,
+            "studies": ["MASimple@tv-basicstudies", "RSI@tv-basicstudies"],
+            "show_popup_button": true,
+            "popup_width": "1000",
+            "popup_height": "650"
+        });
+    } catch (e) {
+        console.log('TradingView widget creation error:', e);
+    }
+}
+
+function updateTradingViewChart() {
+    const container = document.getElementById('tradingview_chart');
+    if (container) {
+        container.innerHTML = '';
+    }
+    tvChart = null;
+    setTimeout(createTradingViewWidget, 100);
+}
 
 function toggleCard(cardId) {
     const card = document.getElementById(cardId);
     const header = card.previousElementSibling;
     card.classList.toggle('collapsed');
     header.classList.toggle('collapsed');
-}
-
-let pendingTradeSide = null;
-
-function executeTrade(side) {
-    const amount = document.getElementById('tradeAmount').value;
-    if (!amount || parseFloat(amount) <= 0) {
-        alert('Please enter a valid trade amount');
-        return;
-    }
-
-    pendingTradeSide = side;
-    showConfirmModal(side);
-}
-
-function showConfirmModal(side) {
-    const modal = document.getElementById('tradeConfirmModal');
-    const sideText = document.getElementById('confirmSideText');
-    const confirmBtn = document.getElementById('confirmTradeBtn');
-    
-    sideText.textContent = side.toUpperCase();
-    confirmBtn.textContent = 'Yes, ' + side.toUpperCase() + ' Now';
-    
-    confirmBtn.className = 'trade-confirm-btn ' + (side === 'buy' ? 'confirm-buy' : 'confirm-sell');
-    
-    confirmBtn.onclick = function() {
-        confirmTrade();
-    };
-    
-    modal.style.display = 'flex';
-}
-
-function closeConfirmModal() {
-    document.getElementById('tradeConfirmModal').style.display = 'none';
-    pendingTradeSide = null;
-}
-
-function confirmTrade() {
-    if (!pendingTradeSide) return;
-    
-    const form = document.getElementById('tradeForm');
-    const formData = new FormData(form);
-    formData.append('side', pendingTradeSide);
-    
-    closeConfirmModal();
-
-    fetch('/api/trade', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = '/dashboard/trades/history?success=1';
-        } else {
-            alert(data.message || 'Trade failed. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-    });
 }
 </script>
 
