@@ -128,7 +128,9 @@ $totalBalance = $wallet['balance'] ?? 0;
 
             <div class="form-group">
                 <label class="form-label">Amount</label>
-                <input type="number" name="amount" id="tradeAmount" class="form-control" step="0.01" min="10" placeholder="Enter trade amount" required>
+                <input type="number" name="amount" id="tradeAmount" class="form-control" step="0.01" min="10" placeholder="Enter trade amount" required oninput="validateTradeAmount()">
+                <div id="balanceError" style="color: #ff4444; font-size: 13px; margin-top: 5px; display: none;"></div>
+                <div id="maxAmount" style="color: #00d4ff; font-size: 12px; margin-top: 5px; display: none;"></div>
             </div>
 
             <div class="input-row">
@@ -835,9 +837,73 @@ document.querySelectorAll('.close-position-btn').forEach(btn => {
     });
 });
 
+// Real-time balance validation
+const walletBalance = <?= $wallet['balance'] ?? 0 ?>;
+const marginUsed = <?= $wallet['margin_used'] ?? 0 ?>;
+
+function validateTradeAmount() {
+    const amountInput = document.getElementById('tradeAmount');
+    const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
+    const amount = parseFloat(amountInput.value) || 0;
+    const balanceErrorDiv = document.getElementById('balanceError');
+    const maxAmountDiv = document.getElementById('maxAmount');
+    
+    if (amount <= 0) {
+        balanceErrorDiv.style.display = 'none';
+        maxAmountDiv.style.display = 'none';
+        return;
+    }
+    
+    // Get current selected market price
+    const marketSelect = document.getElementById('assetName');
+    const selectedOption = marketSelect.options[marketSelect.selectedIndex];
+    const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
+    
+    // For now, we estimate based on leverage calculation
+    // In production, fetch real price from API
+    const availableBalance = walletBalance - marginUsed;
+    const maxTradeAmount = availableBalance * leverage;
+    
+    // Estimate entry price - use a reasonable assumption for validation
+    let estimatedPrice = 1; // Default to 1
+    if (symbol.includes('BTC')) estimatedPrice = 50000;
+    else if (symbol.includes('ETH')) estimatedPrice = 3000;
+    else if (symbol.includes('GOLD')) estimatedPrice = 2000;
+    else if (symbol.includes('OIL')) estimatedPrice = 100;
+    
+    const marginRequired = (amount * estimatedPrice) / leverage;
+    
+    if (marginRequired > availableBalance) {
+        balanceErrorDiv.textContent = '⚠ Insufficient balance! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+        balanceErrorDiv.style.display = 'block';
+        maxAmountDiv.style.display = 'block';
+        maxAmountDiv.textContent = '💡 Max trade amount: $' + maxTradeAmount.toFixed(2) + ' at ' + leverage + 'x leverage';
+    } else {
+        balanceErrorDiv.style.display = 'none';
+        maxAmountDiv.style.display = 'block';
+        maxAmountDiv.textContent = '✓ Max trade amount: $' + maxTradeAmount.toFixed(2) + ' at ' + leverage + 'x leverage';
+    }
+}
+
+// Validate when leverage changes
 document.addEventListener('DOMContentLoaded', function() {
     updateAssetNames();
     initTradingViewWidget(initialSymbol);
+    
+    // Add leverage change listeners
+    document.querySelectorAll('.leverage-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            setTimeout(validateTradeAmount, 50);
+        });
+    });
+    
+    // Add slider change listener
+    const slider = document.getElementById('leverageSlider');
+    if (slider) {
+        slider.addEventListener('input', function() {
+            setTimeout(validateTradeAmount, 50);
+        });
+    }
 });
 </script>
 
