@@ -47,7 +47,14 @@ $totalBalance = $wallet['balance'] ?? 0;
             </svg>
         </div>
         <h2 id="confirmModalTitle">Confirm BUY Trade</h2>
-        <p>Are you sure you want to execute this trade?</p>
+        <p>Review your trade details before execution.</p>
+        <div class="modal-guide">
+            <ul>
+                <li><strong>Amount:</strong> <span id="confirmAmountDisplay">$0.00</span></li>
+                <li><strong>Leverage:</strong> <span id="confirmLeverageDisplay">1x</span></li>
+                <li><strong>Duration:</strong> <span id="confirmDurationDisplay">1 min</span></li>
+            </ul>
+        </div>
         <div class="modal-buttons">
             <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">No, Cancel</button>
             <button type="button" id="confirmTradeBtn" class="btn btn-buy">Yes, BUY Now</button>
@@ -139,8 +146,8 @@ $totalBalance = $wallet['balance'] ?? 0;
             <div class="form-group">
                 <label class="form-label">Amount</label>
                 <input type="number" name="amount" id="tradeAmount" class="form-control" step="0.01" min="10" placeholder="Enter trade amount" required oninput="validateTradeAmount()">
-                <div id="balanceError" style="color: #ff4444; font-size: 13px; margin-top: 5px; display: none;"></div>
-                <div id="maxAmount" style="color: #00d4ff; font-size: 12px; margin-top: 5px; display: none;"></div>
+                <div id="balanceError" style="color: #ff4757; font-size: 13px; margin-top: 8px; font-weight: 500; display: none; padding: 10px; background: rgba(255, 71, 87, 0.1); border-radius: 6px; border: 1px solid rgba(255, 71, 87, 0.2);"></div>
+                <div id="maxAmount" style="color: #00d4ff; font-size: 12px; margin-top: 5px; opacity: 0.8; display: none;"></div>
             </div>
 
             <div class="input-row">
@@ -431,9 +438,29 @@ window.updateTradingViewChart = function() {
 }
 .modal-content p {
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 35px;
+    margin-bottom: 25px;
     font-size: 16px;
     line-height: 1.5;
+}
+.modal-guide {
+    background: rgba(0, 212, 170, 0.05);
+    border: 1px solid rgba(0, 212, 170, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+.modal-guide ul {
+    margin: 0;
+    padding-left: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+}
+.modal-guide li {
+    margin-bottom: 5px;
+}
+.modal-guide li strong {
+    color: #00D4AA;
 }
 .modal-buttons {
     display: flex;

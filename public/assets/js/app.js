@@ -325,6 +325,16 @@ function showConfirmModal(side) {
     const sideText = document.getElementById('confirmSideText');
     const orderSide = document.getElementById('orderSide');
     
+    // UI elements for guide
+    const confirmAmountDisplay = document.getElementById('confirmAmountDisplay');
+    const confirmLeverageDisplay = document.getElementById('confirmLeverageDisplay');
+    const confirmDurationDisplay = document.getElementById('confirmDurationDisplay');
+    
+    // Form values
+    const amount = document.getElementById('tradeAmount').value;
+    const leverage = document.getElementById('leverageValue').value;
+    const duration = document.getElementById('tradeDuration').value;
+    
     if (!modal || !confirmBtn) return;
     
     const sideUpper = side.toUpperCase();
@@ -335,7 +345,34 @@ function showConfirmModal(side) {
     
     if (orderSide) orderSide.value = side;
     
+    // Update guide display
+    if (confirmAmountDisplay) confirmAmountDisplay.textContent = '$' + parseFloat(amount || 0).toFixed(2);
+    if (confirmLeverageDisplay) confirmLeverageDisplay.textContent = leverage + 'x';
+    if (confirmDurationDisplay) confirmDurationDisplay.textContent = duration + ' min';
+    
     modal.style.display = 'flex';
+}
+
+function validateTradeAmount() {
+    const amountInput = document.getElementById('tradeAmount');
+    const errorDiv = document.getElementById('balanceError');
+    const balanceText = document.querySelector('.balance-value');
+    
+    if (!amountInput || !errorDiv || !balanceText) return;
+    
+    const amount = parseFloat(amountInput.value);
+    const balance = parseFloat(balanceText.textContent.replace('$', '').replace(',', ''));
+    const leverage = parseInt(document.getElementById('leverageValue').value) || 1;
+    const marginRequired = amount / leverage;
+    
+    if (marginRequired > balance) {
+        errorDiv.textContent = `Insufficient Balance! Required Margin: $${marginRequired.toFixed(2)}`;
+        errorDiv.style.display = 'block';
+        amountInput.style.borderColor = '#ff4757';
+    } else {
+        errorDiv.style.display = 'none';
+        amountInput.style.borderColor = '';
+    }
 }
 
 function closeConfirmModal() {
