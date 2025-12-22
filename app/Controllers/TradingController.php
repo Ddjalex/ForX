@@ -362,7 +362,7 @@ class TradingController
         // Positive % = users profit MORE on wins, lose MORE on losses (admin profit range)
         // Negative % = users profit LESS on wins, lose LESS on losses
         $profitControlPercent = Database::fetch(
-            "SELECT value FROM settings WHERE key = ?", 
+            "SELECT value FROM settings WHERE setting_key = ?", 
             ['profit_control_percent']
         );
         $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;

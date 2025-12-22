@@ -378,7 +378,7 @@ class AdminController
         $settings = Database::fetchAll("SELECT * FROM settings");
         $settingsArray = [];
         foreach ($settings as $setting) {
-            $settingsArray[$setting['key']] = $setting['value'];
+            $settingsArray[$setting['setting_key']] = $setting['value'];
         }
 
         echo Router::render('admin/settings', [
@@ -399,11 +399,11 @@ class AdminController
         unset($_POST['_csrf_token']);
 
         foreach ($_POST as $key => $value) {
-            $existing = Database::fetch("SELECT * FROM settings WHERE key = ?", [$key]);
+            $existing = Database::fetch("SELECT * FROM settings WHERE setting_key = ?", [$key]);
             if ($existing) {
-                Database::update('settings', ['value' => $value], "key = ?", [$key]);
+                Database::update('settings', ['value' => $value], "setting_key = ?", [$key]);
             } else {
-                Database::insert('settings', ['key' => $key, 'value' => $value]);
+                Database::insert('settings', ['setting_key' => $key, 'value' => $value]);
             }
         }
 

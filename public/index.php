@@ -36,6 +36,13 @@ Session::start();
 $lang = $_GET['lang'] ?? $_COOKIE['language'] ?? 'en';
 Translation::setLanguage($lang);
 
+// Global translation helper function
+if (!function_exists('t')) {
+    function t($key, $default = '') {
+        return Translation::t($key, $default);
+    }
+}
+
 require ROOT_PATH . '/routes/web.php';
 
 Router::dispatch();

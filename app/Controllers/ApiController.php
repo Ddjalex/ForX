@@ -315,7 +315,7 @@ class ApiController
                     }
 
                     $profitControlPercent = Database::fetch(
-                        "SELECT value FROM settings WHERE key = ?", 
+                        "SELECT value FROM settings WHERE setting_key = ?", 
                         ['profit_control_percent']
                     );
                     $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
@@ -406,7 +406,7 @@ class ApiController
 
         // Apply asymmetric profit control formula
         $profitControlPercent = Database::fetch(
-            "SELECT value FROM settings WHERE key = ?", 
+            "SELECT value FROM settings WHERE setting_key = ?", 
             ['profit_control_percent']
         );
         $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;

@@ -103,7 +103,7 @@ class ReferralService
             return false;
         }
         
-        $settings = Database::fetch("SELECT value FROM settings WHERE key = 'referral_bonus'");
+        $settings = Database::fetch("SELECT value FROM settings WHERE setting_key = 'referral_bonus'");
         $bonus = (float)($settings['value'] ?? 10);
         
         Database::insert('referral_earnings', [
