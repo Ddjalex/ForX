@@ -560,10 +560,17 @@ function updateAssetNames() {
 
 function updateTradingViewChart() {
     const assetNameSelect = document.getElementById('assetName');
+    if (!assetNameSelect) return;
+    
     const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    if (!selectedOption) return;
+    
     const tradingviewSymbol = selectedOption.dataset.tradingview || 'BINANCE:BTCUSDT';
     
-    document.querySelector('input[name="market_id"][type="hidden"]').value = selectedOption.value;
+    const hiddenInput = document.querySelector('input[name="market_id"][type="hidden"]');
+    if (hiddenInput) {
+        hiddenInput.value = selectedOption.value;
+    }
     
     if (tvWidget && tvWidget.iframe) {
         try {
