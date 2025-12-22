@@ -215,6 +215,13 @@ class AdminController
                 Database::update('wallets', [
                     'balance' => $wallet['balance'] + $deposit['amount'],
                 ], 'user_id = ?', [$deposit['user_id']]);
+            } else {
+                Database::insert('wallets', [
+                    'user_id' => $deposit['user_id'],
+                    'balance' => $deposit['amount'],
+                    'margin_used' => 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
             }
 
             AuditLog::log('approve_deposit', 'deposit', $depositId, [
