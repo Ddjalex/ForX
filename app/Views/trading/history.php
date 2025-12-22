@@ -109,9 +109,9 @@ if (empty($success) && $showSuccessModal) {
                             </td>
                             <td class="<?= $isWin ? 'pnl-positive' : 'pnl-negative' ?>">
                                 <?php if ($isOpen): ?>
-                                    -$<?= number_format(abs($pnl), 2) ?>
+                                    <?= $pnl >= 0 ? '+' : '' ?>$<?= number_format($pnl, 2) ?>
                                 <?php else: ?>
-                                    <?= $isWin ? '+' : '-' ?>$<?= number_format(abs($pnl), 2) ?>
+                                    <?= $isWin ? '+' : '' ?>$<?= number_format(abs($pnl), 2) ?>
                                 <?php endif; ?>
                             </td>
                             <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
