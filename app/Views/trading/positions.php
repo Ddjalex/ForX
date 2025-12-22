@@ -1,4 +1,9 @@
 <?php
+/**
+ * @var array $openPositions Open trade positions
+ * @var array $closedPositions Closed trade positions
+ * @var string $csrf_token CSRF token for forms
+ */
 ob_start();
 ?>
 
