@@ -169,7 +169,8 @@ $winLossRatio = $stats['win_loss_ratio'] ?? 0;
 
                 <div class="form-group">
                     <label>Amount</label>
-                    <input type="number" name="amount" id="tradeAmount" class="form-control" placeholder="Enter trade amount" step="0.01" min="10" required>
+                    <input type="number" name="amount" id="tradeAmount" class="form-control" placeholder="Enter trade amount" step="0.01" min="10" required oninput="validateTradeAmount()">
+                    <div id="balanceError" style="color: #ff4757; font-size: 13px; margin-top: 8px; font-weight: 500; display: none; padding: 10px; background: rgba(255, 71, 87, 0.1); border-radius: 6px; border: 1px solid rgba(255, 71, 87, 0.2);"></div>
                 </div>
 
                 <div class="form-row">
@@ -282,7 +283,14 @@ document.addEventListener('DOMContentLoaded', function() {
             </svg>
         </div>
         <h2 class="trade-confirm-title">Confirm <span id="confirmSideText">BUY</span> Trade</h2>
-        <p class="trade-confirm-message">Are you sure you want to execute this trade?</p>
+        <p class="trade-confirm-message">Review your trade details before execution.</p>
+        <div class="modal-guide" style="background: rgba(0, 212, 170, 0.05); border: 1px solid rgba(0, 212, 170, 0.1); border-radius: 8px; padding: 15px; margin-bottom: 25px; text-align: left;">
+            <ul style="margin: 0; padding-left: 20px; color: rgba(255, 255, 255, 0.6); font-size: 13px;">
+                <li style="margin-bottom: 5px;"><strong>Amount:</strong> <span id="confirmAmountDisplay" style="color: #00D4AA;">$0.00</span></li>
+                <li style="margin-bottom: 5px;"><strong>Leverage:</strong> <span id="confirmLeverageDisplay" style="color: #00D4AA;">1x</span></li>
+                <li style="margin-bottom: 0;"><strong>Duration:</strong> <span id="confirmDurationDisplay" style="color: #00D4AA;">1 min</span></li>
+            </ul>
+        </div>
         <div class="trade-confirm-buttons">
             <button type="button" onclick="closeConfirmModal()" class="trade-confirm-btn confirm-cancel">No, Cancel</button>
             <button type="button" id="confirmTradeBtn" class="trade-confirm-btn confirm-buy">Yes, BUY Now</button>
