@@ -81,7 +81,7 @@ class DashboardController
             "SELECT m.*, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h 
              FROM markets m 
              LEFT JOIN prices p ON m.id = p.market_id 
-             WHERE m.type IN ('forex', 'stocks', 'indices') AND m.status = 'active'
+             WHERE m.type IN ('forex', 'stock', 'indices') AND m.status = 'active'
              ORDER BY m.symbol"
         );
 

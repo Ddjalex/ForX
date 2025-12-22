@@ -219,10 +219,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <?php if (empty($cryptoMarkets)): ?>
                     <div class="text-center text-muted p-4">No cryptocurrency data available</div>
                 <?php else: ?>
-                    <?php foreach ($cryptoMarkets as $market): ?>
+                    <?php foreach (array_slice($cryptoMarkets, 0, 32) as $market): ?>
                         <a href="/trade/<?= htmlspecialchars($market['symbol']) ?>" class="market-item">
                             <div class="market-info">
-                                <span class="market-symbol"><?= htmlspecialchars($market['symbol']) ?></span>
+                                <span class="market-symbol"><?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?></span>
                                 <span class="market-name"><?= htmlspecialchars($market['name']) ?></span>
                             </div>
                             <div class="market-price">
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <?php foreach ($stockMarkets as $market): ?>
                         <a href="/trade/<?= htmlspecialchars($market['symbol']) ?>" class="market-item">
                             <div class="market-info">
-                                <span class="market-symbol"><?= htmlspecialchars($market['symbol']) ?></span>
+                                <span class="market-symbol"><?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?></span>
                                 <span class="market-name"><?= htmlspecialchars($market['name']) ?></span>
                             </div>
                             <div class="market-price">
