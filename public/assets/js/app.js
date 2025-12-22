@@ -249,16 +249,22 @@ function showTradeNotification(message, type = 'info') {
 // These functions are kept for compatibility with other pages
 
 function setLeverage(leverage) {
-    document.getElementById('leverageValue').value = leverage;
-    document.getElementById('leverageSlider').value = leverage;
+    const leverageInput = document.getElementById('leverageValue') || document.getElementById('leverageInput');
+    const slider = document.getElementById('leverageSlider');
+    
+    if (leverageInput) leverageInput.value = leverage;
+    if (slider) slider.value = leverage;
+    
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    event.target.classList.add('active');
+    if (event && event.target) event.target.classList.add('active');
 }
 
 function updateLeverageFromSlider(value) {
-    document.getElementById('leverageValue').value = value;
+    const leverageInput = document.getElementById('leverageValue') || document.getElementById('leverageInput');
+    if (leverageInput) leverageInput.value = value;
+    
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -267,8 +273,12 @@ function updateLeverageFromSlider(value) {
 }
 
 function updateAssetNames() {
-    const assetType = document.getElementById('assetType').value;
+    const assetTypeEl = document.getElementById('assetType');
     const assetNameSelect = document.getElementById('assetName');
+    
+    if (!assetTypeEl || !assetNameSelect) return;
+    
+    const assetType = assetTypeEl.value;
     
     // Hide all options first
     Array.from(assetNameSelect.options).forEach(option => {
@@ -279,7 +289,9 @@ function updateAssetNames() {
     const firstVisible = Array.from(assetNameSelect.options).find(option => option.style.display !== 'none');
     if (firstVisible) {
         assetNameSelect.value = firstVisible.value;
-        updateTradingViewChart();
+        if (typeof updateTradingViewChart === 'function') {
+            updateTradingViewChart();
+        }
     }
 }
 

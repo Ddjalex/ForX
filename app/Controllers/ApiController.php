@@ -275,87 +275,82 @@ class ApiController
 
     public function closeExpiredPositions(): void
     {
-        if (!Auth::check()) {
-            Router::json(['success' => false, 'error' => 'Unauthorized'], 401);
-            return;
-        }
-
-        $userId = Auth::id();
-
-        $expiredPositions = Database::fetchAll(
-            "SELECT p.*, m.symbol, m.spread 
-             FROM positions p 
-             JOIN markets m ON p.market_id = m.id 
-             WHERE p.status = 'open' AND p.expires_at IS NOT NULL AND p.expires_at <= NOW() AND p.user_id = ?",
-            [$userId]
-        );
-
-        $closedCount = 0;
-        $results = [];
-
-        foreach ($expiredPositions as $position) {
-            $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$position['market_id']]);
-            $exitPrice = $currentPrice['price'] ?? $position['entry_price'];
-
-            $spread = $position['spread'] ?? 0;
-            $exitPrice = $position['side'] === 'buy' 
-                ? $exitPrice * (1 - $spread) 
-                : $exitPrice * (1 + $spread);
-
-            if ($position['side'] === 'buy') {
-                $pnl = ($exitPrice - $position['entry_price']) * $position['amount'];
-            } else {
-                $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
+        try {
+            if (!Auth::check()) {
+                Router::json(['success' => false, 'error' => 'Unauthorized'], 401);
+                return;
             }
 
-            // Apply asymmetric profit control formula:
-            // Positive % = users profit MORE on wins, lose MORE on losses (admin profit range)
-            // Negative % = users profit LESS on wins, lose LESS on losses
-            $profitControlPercent = Database::fetch(
-                "SELECT value FROM settings WHERE key = ?", 
-                ['profit_control_percent']
+            $userId = Auth::id();
+
+            $expiredPositions = Database::fetchAll(
+                "SELECT p.*, m.symbol, m.spread 
+                 FROM positions p 
+                 JOIN markets m ON p.market_id = m.id 
+                 WHERE p.status = 'open' AND p.expires_at IS NOT NULL AND p.expires_at <= NOW() AND p.user_id = ?",
+                [$userId]
             );
-            $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
-            
-            if ($pnl >= 0) {
-                // Winning trade: positive control increases profit
+
+            $closedCount = 0;
+            $results = [];
+
+            foreach ($expiredPositions as $position) {
+                $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$position['market_id']]);
+                $exitPrice = $currentPrice['price'] ?? $position['entry_price'];
+
+                $spread = $position['spread'] ?? 0;
+                $exitPrice = $position['side'] === 'buy' 
+                    ? $exitPrice * (1 - $spread) 
+                    : $exitPrice * (1 + $spread);
+
+                if ($position['side'] === 'buy') {
+                    $pnl = ($exitPrice - $position['entry_price']) * $position['amount'];
+                } else {
+                    $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
+                }
+
+                $profitControlPercent = Database::fetch(
+                    "SELECT value FROM settings WHERE key = ?", 
+                    ['profit_control_percent']
+                );
+                $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
+                
                 $adjustedPnl = $pnl * (1 + $controlPercent / 100);
-            } else {
-                // Losing trade: positive control increases loss (makes user lose MORE)
-                $adjustedPnl = $pnl * (1 + $controlPercent / 100);
-            }
 
-            Database::update('positions', [
-                'exit_price' => $exitPrice,
-                'realized_pnl' => $adjustedPnl,
-                'status' => 'closed',
-                'closed_at' => date('Y-m-d H:i:s'),
-            ], 'id = ?', [$position['id']]);
+                Database::update('positions', [
+                    'exit_price' => $exitPrice,
+                    'realized_pnl' => $adjustedPnl,
+                    'status' => 'closed',
+                    'closed_at' => date('Y-m-d H:i:s'),
+                ], 'id = ?', [$position['id']]);
 
-            $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
-            if ($wallet) {
-                Database::update('wallets', [
-                    'balance' => $wallet['balance'] + $adjustedPnl,
-                    'margin_used' => max(0, $wallet['margin_used'] - $position['margin_used']),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ], 'user_id = ?', [$userId]);
-            }
+                $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
+                if ($wallet) {
+                    Database::update('wallets', [
+                        'balance' => $wallet['balance'] + $adjustedPnl,
+                        'margin_used' => max(0, $wallet['margin_used'] - $position['margin_used']),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ], 'user_id = ?', [$userId]);
+                }
 
-            $closedCount++;
-            $results[] = [
-                'position_id' => $position['id'],
-                'symbol' => $position['symbol'],
-                'pnl' => round($adjustedPnl, 2),
-                'original_pnl' => round($pnl, 2),
-                'profit_control_percent' => $controlPercent
+                $closedCount++;
+                $results[] = [
+                    'position_id' => $position['id'],
+                    'symbol' => $position['symbol'],
+                    'pnl' => round($adjustedPnl, 2),
+                    'original_pnl' => round($pnl, 2),
+                    'profit_control_percent' => $controlPercent
             ];
         }
 
-        Router::json([
-            'success' => true,
-            'closed_count' => $closedCount,
-            'positions' => $results
-        ]);
+            Router::json([
+                'success' => true,
+                'closed_count' => $closedCount,
+                'positions' => $results
+            ]);
+        } catch (\Exception $e) {
+            Router::json(['success' => false, 'error' => 'Server error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function closePosition(): void
