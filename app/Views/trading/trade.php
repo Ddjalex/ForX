@@ -73,11 +73,20 @@ $totalBalance = $wallet['balance'] ?? 0;
             <div class="form-group">
                 <label class="form-label">Asset Type</label>
                 <select class="form-control" name="asset_type" id="assetType" onchange="updateAssetNames()">
-                    <?php foreach ($assetTypes ?? [] as $type): ?>
-                        <option value="<?= htmlspecialchars($type['name']) ?>" 
-                            data-type="<?= htmlspecialchars($type['name']) ?>"
-                            <?= ($market['type'] ?? '') === $type['name'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($type['display_name']) ?>
+                    <?php
+                    $assetTypesByGroup = [];
+                    foreach ($allMarkets ?? [] as $m) {
+                        $type = $m['asset_type'] ?? $m['type'] ?? 'Other';
+                        if (!isset($assetTypesByGroup[$type])) {
+                            $assetTypesByGroup[$type] = [];
+                        }
+                    }
+                    foreach ($assetTypesByGroup as $type => $markets):
+                    ?>
+                        <option value="<?= htmlspecialchars($type) ?>" 
+                            data-type="<?= htmlspecialchars($type) ?>"
+                            <?= ($market['asset_type'] ?? $market['type'] ?? '') === $type ? 'selected' : '' ?>>
+                            <?= htmlspecialchars(ucfirst($type)) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -91,8 +100,9 @@ $totalBalance = $wallet['balance'] ?? 0;
                             data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
                             data-symbol="<?= htmlspecialchars($m['symbol']) ?>"
                             data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>"
+                            data-display="<?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>"
                             <?= $m['id'] == $market['id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>
+                            <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?> (<?= htmlspecialchars($m['symbol_tradingview'] ?? $m['symbol']) ?>)
                         </option>
                     <?php endforeach; ?>
                 </select>
