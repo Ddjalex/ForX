@@ -200,6 +200,18 @@ class TradingController
         }
 
         $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
+        
+        if (!$wallet) {
+            $error = 'Wallet not found. Please contact support.';
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
+            return;
+        }
+
         $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$marketId]);
         $entryPrice = $currentPrice['price'] ?? 0;
 
@@ -207,11 +219,37 @@ class TradingController
             $entryPrice = $price;
         }
 
+        // Strict validation: margin required cannot exceed total wallet balance (not just available)
         $marginRequired = ($amount * $entryPrice) / $leverage;
         $availableBalance = $wallet['balance'] - $wallet['margin_used'];
 
+        // Check 1: Must have enough available balance for margin
         if ($marginRequired > $availableBalance) {
             $error = 'Insufficient balance. Available: $' . number_format($availableBalance, 2) . ' | Required: $' . number_format($marginRequired, 2);
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
+            return;
+        }
+
+        // Check 2: Total balance must be positive (cannot trade with $0 balance)
+        if ($wallet['balance'] <= 0) {
+            $error = 'Your account balance is zero or negative. Please make a deposit.';
+            if ($isAjax) {
+                Router::json(['error' => $error], 400);
+            } else {
+                Session::flash('error', $error);
+                Router::redirect($_SERVER['HTTP_REFERER'] ?? '/dashboard/trade');
+            }
+            return;
+        }
+
+        // Check 3: Ensure amount doesn't exceed what's possible with available balance
+        if ($amount > ($availableBalance * $leverage)) {
+            $error = 'Trade amount too large for available balance with selected leverage. Max amount: $' . number_format(($availableBalance * $leverage), 2);
             if ($isAjax) {
                 Router::json(['error' => $error], 400);
             } else {
