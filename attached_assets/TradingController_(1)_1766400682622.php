@@ -229,13 +229,12 @@ class TradingController
             $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
 
             // Check for duplicate position created in the last 2 seconds
-            $twoSecondsAgo = date('Y-m-d H:i:s', time() - 2);
             $recentDuplicate = Database::fetch(
                 "SELECT id FROM positions 
                  WHERE user_id = ? AND market_id = ? AND side = ? AND amount = ? AND leverage = ? 
-                 AND created_at > ?
+                 AND created_at > NOW() - INTERVAL '2 seconds'
                  ORDER BY id DESC LIMIT 1",
-                [$userId, $marketId, $side, $amount, $leverage, $twoSecondsAgo]
+                [$userId, $marketId, $side, $amount, $leverage]
             );
             
             if ($recentDuplicate) {

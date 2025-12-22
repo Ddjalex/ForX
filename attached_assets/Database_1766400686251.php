@@ -1,0 +1,114 @@
+<?php
+
+namespace App\Services;
+
+use PDO;
+use PDOException;
+
+class Database
+{
+    private static ?PDO $instance = null;
+
+    public static function getInstance(): PDO
+    {
+        if (self::$instance === null) {
+            $config = require __DIR__ . '/../../config/database.php';
+            
+            try {
+                $driver = $config['driver'];
+                
+                if ($driver === 'pgsql') {
+                    $dsn = sprintf(
+                        'pgsql:host=%s;port=%s;dbname=%s',
+                        $config['host'],
+                        $config['port'],
+                        $config['database']
+                    );
+                } else {
+                    // MySQL
+                    $dsn = sprintf(
+                        'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
+                        $config['host'],
+                        $config['port'],
+                        $config['database']
+                    );
+                }
+                
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ];
+                
+                if ($driver === 'mysql') {
+                    $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8mb4";
+                }
+                
+                self::$instance = new PDO(
+                    $dsn,
+                    $config['username'],
+                    $config['password'],
+                    $options
+                );
+            } catch (PDOException $e) {
+                die('Database connection failed: ' . $e->getMessage());
+            }
+        }
+        
+        return self::$instance;
+    }
+
+    public static function query(string $sql, array $params = []): \PDOStatement
+    {
+        $stmt = self::getInstance()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+
+    public static function fetch(string $sql, array $params = []): ?array
+    {
+        $result = self::query($sql, $params)->fetch();
+        return $result ?: null;
+    }
+
+    public static function fetchAll(string $sql, array $params = []): array
+    {
+        return self::query($sql, $params)->fetchAll();
+    }
+
+    public static function insert(string $table, array $data): int
+    {
+        $data = self::convertBooleans($data);
+        $columns = implode(', ', array_keys($data));
+        $placeholders = implode(', ', array_fill(0, count($data), '?'));
+        
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+        self::query($sql, array_values($data));
+        
+        return (int) self::getInstance()->lastInsertId();
+    }
+
+    private static function convertBooleans(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_bool($value)) {
+                $data[$key] = $value ? 'true' : 'false';
+            }
+        }
+        return $data;
+    }
+
+    public static function update(string $table, array $data, string $where, array $whereParams = []): int
+    {
+        $set = implode(' = ?, ', array_keys($data)) . ' = ?';
+        $sql = "UPDATE {$table} SET {$set} WHERE {$where}";
+        
+        return self::query($sql, array_merge(array_values($data), $whereParams))->rowCount();
+    }
+
+    public static function delete(string $table, string $where, array $params = []): int
+    {
+        $sql = "DELETE FROM {$table} WHERE {$where}";
+        return self::query($sql, $params)->rowCount();
+    }
+}
