@@ -78,12 +78,16 @@ ob_start();
                         <th>Amount</th>
                         <th>Entry</th>
                         <th>Exit</th>
+                        <th>Result</th>
                         <th>PnL</th>
                         <th>Closed At</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($closedPositions as $position): ?>
+                    <?php foreach ($closedPositions as $position): 
+                        $pnl = $position['realized_pnl'] ?? 0;
+                        $isWin = $pnl >= 0;
+                    ?>
                         <tr>
                             <td><strong><?= htmlspecialchars($position['symbol']) ?></strong></td>
                             <td>
@@ -94,8 +98,13 @@ ob_start();
                             <td><?= number_format($position['amount'], 4) ?></td>
                             <td>$<?= number_format($position['entry_price'], 2) ?></td>
                             <td>$<?= number_format($position['exit_price'], 2) ?></td>
-                            <td class="<?= $position['realized_pnl'] >= 0 ? 'positive' : 'negative' ?>">
-                                <?= $position['realized_pnl'] >= 0 ? '+' : '' ?>$<?= number_format($position['realized_pnl'], 2) ?>
+                            <td>
+                                <span class="result-badge <?= $isWin ? 'result-win' : 'result-loss' ?>">
+                                    <?= $isWin ? 'WIN' : 'LOSS' ?>
+                                </span>
+                            </td>
+                            <td class="<?= $isWin ? 'positive' : 'negative' ?>">
+                                <?= $isWin ? '+' : '' ?>$<?= number_format(abs($pnl), 2) ?>
                             </td>
                             <td><?= date('M d, H:i', strtotime($position['closed_at'])) ?></td>
                         </tr>
@@ -105,6 +114,28 @@ ob_start();
         <?php endif; ?>
     </div>
 </div>
+
+<style>
+.result-badge {
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.result-win {
+    background: #1dd1a1;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(29, 209, 161, 0.3);
+}
+.result-loss {
+    background: #ff6b6b;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+</style>
 
 <script>
 function showTab(tab) {
