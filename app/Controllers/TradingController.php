@@ -406,16 +406,25 @@ class TradingController
         );
         $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
         
-        if ($pnl >= 0) {
-            // Winning trade: positive control increases profit
-            // Win Multiplier: 1 + (control% / 100)
-            $winMultiplier = 1 + ($controlPercent / 100);
-            $adjustedPnl = $pnl * $winMultiplier;
+        // If control percent is 0, use real market pnl
+        if ($controlPercent == 0) {
+            $adjustedPnl = $pnl;
         } else {
-            // Losing trade: positive control increases loss (makes user lose MORE)
-            // Loss Multiplier: 1 + (control% / 100) - same as winning to make losses bigger
-            $lossMultiplier = 1 + ($controlPercent / 100);
-            $adjustedPnl = $pnl * $lossMultiplier;
+            if ($pnl >= 0) {
+                // Winning trade: positive control increases profit
+                // Win Multiplier: 1 + (control% / 100)
+                $winMultiplier = 1 + ($controlPercent / 100);
+                $adjustedPnl = $pnl * $winMultiplier;
+            } else {
+                // Losing trade: positive control increases loss (makes user lose MORE)
+                $lossMultiplier = 1 + ($controlPercent / 100);
+                $adjustedPnl = $pnl * $lossMultiplier;
+            }
+        }
+
+        // Ensure we don't return 0 if there was actual movement
+        if ($adjustedPnl == 0 && $pnl != 0) {
+            $adjustedPnl = $pnl;
         }
 
         Database::update('positions', [

@@ -106,11 +106,37 @@ class ApiController
             $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$position['market_id']]);
             $price = $currentPrice['price'] ?? $position['entry_price'];
             
+            // Apply profit control formula
+            $profitControlPercent = Database::fetch(
+                "SELECT value FROM settings WHERE setting_key = ?", 
+                ['profit_control_percent']
+            );
+            $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
+            
             if ($position['side'] === 'buy') {
-                $position['unrealized_pnl'] = ($price - $position['entry_price']) * $position['amount'];
+                $pnl = ($price - $position['entry_price']) * $position['amount'];
             } else {
-                $position['unrealized_pnl'] = ($position['entry_price'] - $price) * $position['amount'];
+                $pnl = ($position['entry_price'] - $price) * $position['amount'];
             }
+
+            // If control percent is 0, use real market pnl
+            if ($controlPercent == 0) {
+                $position['unrealized_pnl'] = $pnl;
+            } else {
+                if ($pnl >= 0) {
+                    $winMultiplier = 1 + ($controlPercent / 100);
+                    $position['unrealized_pnl'] = $pnl * $winMultiplier;
+                } else {
+                    $lossMultiplier = 1 + ($controlPercent / 100);
+                    $position['unrealized_pnl'] = $pnl * $lossMultiplier;
+                }
+            }
+
+            // Fallback to real PnL if calculation results in 0 but there's a difference
+            if ($position['unrealized_pnl'] == 0 && $pnl != 0) {
+                $position['unrealized_pnl'] = $pnl;
+            }
+
             $position['current_price'] = $price;
         }
 
@@ -308,19 +334,36 @@ class ApiController
                         ? $exitPrice * (1 - $spread) 
                         : $exitPrice * (1 + $spread);
 
-                    if ($position['side'] === 'buy') {
-                        $pnl = ($exitPrice - $position['entry_price']) * $position['amount'];
-                    } else {
-                        $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
-                    }
-
+                    // Apply profit control formula
                     $profitControlPercent = Database::fetch(
                         "SELECT value FROM settings WHERE setting_key = ?", 
                         ['profit_control_percent']
                     );
                     $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
                     
-                    $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+                    if ($position['side'] === 'buy') {
+                        $pnl = ($exitPrice - $position['entry_price']) * $position['amount'];
+                    } else {
+                        $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
+                    }
+
+                    // If control percent is 0, use real market pnl
+                    if ($controlPercent == 0) {
+                        $adjustedPnl = $pnl;
+                    } else {
+                        if ($pnl >= 0) {
+                            $winMultiplier = 1 + ($controlPercent / 100);
+                            $adjustedPnl = $pnl * $winMultiplier;
+                        } else {
+                            $lossMultiplier = 1 + ($controlPercent / 100);
+                            $adjustedPnl = $pnl * $lossMultiplier;
+                        }
+                    }
+
+                    // Fallback to real PnL if calculation results in 0 but there's a difference
+                    if ($adjustedPnl == 0 && $pnl != 0) {
+                        $adjustedPnl = $pnl;
+                    }
 
                     Database::update('positions', [
                         'exit_price' => $exitPrice,
@@ -411,10 +454,22 @@ class ApiController
         );
         $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
         
-        if ($pnl >= 0) {
-            $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+        // If control percent is 0, use real market pnl
+        if ($controlPercent == 0) {
+            $adjustedPnl = $pnl;
         } else {
-            $adjustedPnl = $pnl * (1 + $controlPercent / 100);
+            if ($pnl >= 0) {
+                $winMultiplier = 1 + ($controlPercent / 100);
+                $adjustedPnl = $pnl * $winMultiplier;
+            } else {
+                $lossMultiplier = 1 + ($controlPercent / 100);
+                $adjustedPnl = $pnl * $lossMultiplier;
+            }
+        }
+
+        // Fallback to real PnL if calculation results in 0 but there's a difference
+        if ($adjustedPnl == 0 && $pnl != 0) {
+            $adjustedPnl = $pnl;
         }
 
         Database::update('positions', [
