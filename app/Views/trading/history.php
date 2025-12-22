@@ -242,29 +242,6 @@ $success = $success ?? '';
     background: #6c757d;
     color: #fff;
 }
-.result-badge {
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.result-pending {
-    background: #ffc107;
-    color: #000;
-}
-.result-win {
-    background: #1dd1a1;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(29, 209, 161, 0.3);
-}
-.result-loss {
-    background: #ff6b6b;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-}
 .pnl-positive {
     color: var(--accent-primary) !important;
     font-weight: 600;
