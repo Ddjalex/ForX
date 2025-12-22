@@ -483,22 +483,27 @@ window.updateTradingViewChart = function() {
     color: #fff;
 }
 .result-badge {
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 4px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 .result-pending {
     background: #ffc107;
     color: #000;
 }
 .result-win {
-    background: var(--accent-primary);
-    color: #000;
+    background: #1dd1a1;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(29, 209, 161, 0.3);
 }
 .result-loss {
-    background: #dc3545;
+    background: #ff6b6b;
     color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 .text-success {
     color: var(--accent-primary) !important;
