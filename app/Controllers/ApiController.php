@@ -340,8 +340,8 @@ class ApiController
                     'pnl' => round($adjustedPnl, 2),
                     'original_pnl' => round($pnl, 2),
                     'profit_control_percent' => $controlPercent
-            ];
-        }
+                ];
+            }
 
             Router::json([
                 'success' => true,
@@ -349,6 +349,7 @@ class ApiController
                 'positions' => $results
             ]);
         } catch (\Exception $e) {
+            error_log('closeExpiredPositions error: ' . $e->getMessage());
             Router::json(['success' => false, 'error' => 'Server error: ' . $e->getMessage()], 500);
         }
     }
