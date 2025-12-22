@@ -198,17 +198,21 @@ async function checkExpiredPositions() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
+        
+        if (!response.ok) {
+            console.log('API error:', response.status);
+            return;
+        }
+        
         const data = await response.json();
         
         if (data.success && data.closed_count > 0) {
             console.log(`Auto-closed ${data.closed_count} expired position(s)`);
             
-            // Show notification to user
-            if (data.positions && data.positions.length > 0) {
+            // Show notification only if showTradeNotification exists
+            if (typeof showTradeNotification === 'function' && data.positions && data.positions.length > 0) {
                 const firstSymbol = data.positions[0].symbol;
-                showTradeNotification(`${data.closed_count} trade(s) closed! Redirecting to view results...`, 'success');
-                
-                // Redirect to trade page to show transaction history after 2 seconds
+                showTradeNotification(`${data.closed_count} trade(s) closed!`, 'success');
                 setTimeout(() => {
                     window.location.href = `/dashboard/trade/${firstSymbol}`;
                 }, 2000);
@@ -299,22 +303,30 @@ function showConfirmModal(side) {
     const modal = document.getElementById('tradeConfirmModal');
     const title = document.getElementById('confirmModalTitle');
     const confirmBtn = document.getElementById('confirmTradeBtn');
+    const orderSide = document.getElementById('orderSide');
+    const orderType = document.getElementById('orderType');
+    
+    if (!modal || !title || !confirmBtn) return;
     
     title.textContent = `Confirm ${side.toUpperCase()} Trade`;
     confirmBtn.className = `btn btn-${side}`;
     confirmBtn.textContent = `Yes, ${side.toUpperCase()} Now`;
     
-    document.getElementById('orderSide').value = side;
-    document.getElementById('orderType').value = 'market';
+    if (orderSide) orderSide.value = side;
+    if (orderType) orderType.value = 'market';
     
     modal.style.display = 'flex';
 }
 
 function closeConfirmModal() {
     const modal = document.getElementById('tradeConfirmModal');
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
 }
 
-document.getElementById('confirmTradeBtn')?.addEventListener('click', function() {
-    document.getElementById('tradeForm').submit();
-});
+const confirmTradeBtn = document.getElementById('confirmTradeBtn');
+if (confirmTradeBtn) {
+    confirmTradeBtn.addEventListener('click', function() {
+        const tradeForm = document.getElementById('tradeForm');
+        if (tradeForm) tradeForm.submit();
+    });
+}
