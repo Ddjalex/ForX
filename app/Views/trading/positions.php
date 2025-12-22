@@ -131,18 +131,18 @@ ob_start();
     letter-spacing: 0.5px;
 }
 .result-pending {
-    background: #ffc107;
+    background: var(--warning);
     color: #000;
 }
 .result-win {
-    background: #1dd1a1;
+    background: var(--success);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(29, 209, 161, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 200, 83, 0.3);
 }
 .result-loss {
-    background: #ff6b6b;
+    background: var(--danger);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
 }
 </style>
 
