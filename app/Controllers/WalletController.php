@@ -41,7 +41,9 @@ class WalletController
         $allSettings = Database::fetchAll("SELECT * FROM settings");
         $settings = [];
         foreach ($allSettings as $setting) {
-            $settings[$setting['key']] = $setting['value'];
+            if (isset($setting['setting_key']) && isset($setting['value'])) {
+                $settings[$setting['setting_key']] = $setting['value'];
+            }
         }
         
         echo Router::render('user/deposit', [
