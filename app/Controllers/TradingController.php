@@ -211,7 +211,7 @@ class TradingController
         $availableBalance = $wallet['balance'] - $wallet['margin_used'];
 
         if ($marginRequired > $availableBalance) {
-            $error = 'Insufficient margin. Required: $' . number_format($marginRequired, 2);
+            $error = 'Insufficient balance. Available: $' . number_format($availableBalance, 2) . ' | Required: $' . number_format($marginRequired, 2);
             if ($isAjax) {
                 Router::json(['error' => $error], 400);
             } else {
