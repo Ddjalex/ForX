@@ -211,11 +211,9 @@ class AdminController
             ], 'id = ?', [$depositId]);
 
             $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$deposit['user_id']]);
-            if ($wallet) {
-                Database::update('wallets', [
-                    'balance' => $wallet['balance'] + $deposit['amount'],
-                ], 'user_id = ?', [$deposit['user_id']]);
-            }
+            Database::update('wallets', [
+                'balance' => $wallet['balance'] + $deposit['amount'],
+            ], 'user_id = ?', [$deposit['user_id']]);
 
             AuditLog::log('approve_deposit', 'deposit', $depositId, [
                 'amount' => $deposit['amount'],
@@ -280,13 +278,6 @@ class AdminController
 
         if ($action === 'approve') {
             $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$withdrawal['user_id']]);
-            
-            if (!$wallet) {
-                Session::flash('error', 'User wallet not found.');
-                Router::redirect('/admin/withdrawals');
-                return;
-            }
-            
             $availableBalance = $wallet['balance'] - $wallet['margin_used'];
             
             if ($withdrawal['amount'] > $availableBalance) {
