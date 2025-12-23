@@ -209,14 +209,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="crypto-ticker-wrapper">
     <div class="ticker-container">
         <div class="ticker-content" id="ticker-content">
-            <span class="ticker-item"><strong>BTC:</strong> <span id="btc-price">Loading...</span></span>
-            <span class="ticker-item"><strong>ETH:</strong> <span id="eth-price">Loading...</span></span>
-            <span class="ticker-item"><strong>USDT:</strong> <span id="usdt-price">Loading...</span></span>
-            <span class="ticker-item"><strong>BNB:</strong> <span id="bnb-price">Loading...</span></span>
-            <span class="ticker-item"><strong>XRP:</strong> <span id="xrp-price">Loading...</span></span>
-            <span class="ticker-item"><strong>SOL:</strong> <span id="sol-price">Loading...</span></span>
-            <span class="ticker-item"><strong>ADA:</strong> <span id="ada-price">Loading...</span></span>
-            <span class="ticker-item"><strong>DOT:</strong> <span id="dot-price">Loading...</span></span>
+            <span class="ticker-item"><strong>BTC:</strong> <span id="btc-price">$0.00</span></span>
+            <span class="ticker-item"><strong>ETH:</strong> <span id="eth-price">$0.00</span></span>
+            <span class="ticker-item"><strong>USDT:</strong> <span id="usdt-price">$0.00</span></span>
+            <span class="ticker-item"><strong>BNB:</strong> <span id="bnb-price">$0.00</span></span>
+            <span class="ticker-item"><strong>XRP:</strong> <span id="xrp-price">$0.00</span></span>
+            <span class="ticker-item"><strong>SOL:</strong> <span id="sol-price">$0.00</span></span>
+            <span class="ticker-item"><strong>ADA:</strong> <span id="ada-price">$0.00</span></span>
+            <span class="ticker-item"><strong>DOT:</strong> <span id="dot-price">$0.00</span></span>
         </div>
     </div>
 </div>
@@ -234,12 +234,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <table class="market-table" id="crypto-table">
                 <thead>
                     <tr>
-                        <th class="sortable" onclick="sortCryptoTable('name')">NAME</th>
-                        <th class="sortable" onclick="sortCryptoTable('mktCap')">MKT CAP <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortCryptoTable('fdMktCap')">FD_MKT_CAP <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortCryptoTable('price')">PRICE <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortCryptoTable('availCoins')">AVAIL COINS <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortCryptoTable('totalCoins')">TOTAL COINS <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortCryptoTable('name')">SYMBOL / NAME</th>
+                        <th class="sortable" onclick="sortCryptoTable('mktCap')">MKT CAP</th>
+                        <th class="sortable" onclick="sortCryptoTable('fdMktCap')">FD MKT CAP</th>
+                        <th class="sortable" onclick="sortCryptoTable('price')">PRICE</th>
+                        <th class="sortable" onclick="sortCryptoTable('availCoins')">AVAIL COINS</th>
+                        <th class="sortable" onclick="sortCryptoTable('totalCoins')">TOTAL COINS</th>
                     </tr>
                 </thead>
                 <tbody id="crypto-market-body">
@@ -261,13 +261,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <table class="market-table" id="stock-table">
                 <thead>
                     <tr>
-                        <th class="sortable" onclick="sortStockTable('name')">NAME</th>
-                        <th class="sortable" onclick="sortStockTable('value')">VALUE <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortStockTable('change')">CHANGE <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortStockTable('changePercent')">CHANGE% <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortStockTable('open')">OPEN <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortStockTable('high')">HIGH <span class="sort-indicator"></span></th>
-                        <th class="sortable" onclick="sortStockTable('low')">LOW <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortStockTable('name')">STOCK NAME</th>
+                        <th class="sortable" onclick="sortStockTable('value')">VALUE</th>
+                        <th class="sortable" onclick="sortStockTable('change')">CHANGE</th>
+                        <th class="sortable" onclick="sortStockTable('changePercent')">CHANGE %</th>
+                        <th class="sortable" onclick="sortStockTable('open')">OPEN</th>
+                        <th class="sortable" onclick="sortStockTable('high')">HIGH</th>
+                        <th class="sortable" onclick="sortStockTable('low')">LOW</th>
                     </tr>
                 </thead>
                 <tbody id="stock-market-body">
@@ -278,52 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-<script>
-// Fetch crypto prices from CoinGecko with robust implementation
-function updateTickerPrices() {
-    const priceMap = {
-        'btc-price': 'bitcoin',
-        'eth-price': 'ethereum',
-        'usdt-price': 'tether',
-        'bnb-price': 'binancecoin',
-        'xrp-price': 'ripple',
-        'sol-price': 'solana',
-        'ada-price': 'cardano',
-        'dot-price': 'polkadot'
-    };
-    
-    const decimals = {
-        'xrp-price': 4,
-        'ada-price': 4,
-        'default': 2
-    };
-    
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot&vs_currencies=usd')
-        .then(response => response.json())
-        .then(data => {
-            Object.entries(priceMap).forEach(([elementId, cryptoId]) => {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    const price = data[cryptoId]?.usd || 0;
-                    const decimalPlaces = decimals[elementId] || decimals['default'];
-                    element.textContent = '$' + price.toLocaleString('en-US', {
-                        minimumFractionDigits: decimalPlaces,
-                        maximumFractionDigits: decimalPlaces
-                    });
-                }
-            });
-        })
-        .catch(error => console.error('Error fetching prices:', error));
-}
-
-// Call immediately and then every 60 seconds
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateTickerPrices);
-} else {
-    updateTickerPrices();
-}
-setInterval(updateTickerPrices, 60000);
-</script>
 
 <div id="tradeConfirmModal" class="trade-confirm-modal" style="display: none;">
     <div class="trade-confirm-overlay"></div>
