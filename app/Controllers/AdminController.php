@@ -224,6 +224,9 @@ class AdminController
                 ]);
             }
 
+            // Process Referral Bonus
+            $this->processReferralBonus($deposit);
+
             AuditLog::log('approve_deposit', 'deposit', $depositId, [
                 'amount' => $deposit['amount'],
                 'user_id' => $deposit['user_id'],
@@ -249,6 +252,54 @@ class AdminController
         }
 
         Router::redirect('/admin/deposits');
+    }
+
+    private function processReferralBonus(array $deposit): void
+    {
+        // Check if user was referred
+        $referral = Database::fetch(
+            "SELECT referrer_id FROM referrals WHERE referred_user_id = ?",
+            [$deposit['user_id']]
+        );
+
+        if (!$referral) {
+            return;
+        }
+
+        // Get referral settings
+        $commissionSetting = Database::fetch(
+            "SELECT value FROM settings WHERE setting_key = 'referral_commission'"
+        );
+        $minDepositSetting = Database::fetch(
+            "SELECT value FROM settings WHERE setting_key = 'referral_min_deposit'"
+        );
+
+        $commissionPercent = (float)($commissionSetting['value'] ?? 5);
+        $minDeposit = (float)($minDepositSetting['value'] ?? 50);
+
+        // Only award bonus if deposit meets minimum
+        if ($deposit['amount'] < $minDeposit) {
+            return;
+        }
+
+        // Calculate bonus amount
+        $bonusAmount = ($deposit['amount'] * $commissionPercent) / 100;
+
+        // Record the referral earning
+        Database::insert('referral_earnings', [
+            'referrer_id' => $referral['referrer_id'],
+            'referred_id' => $deposit['user_id'],
+            'amount' => $bonusAmount,
+            'status' => 'pending',
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        AuditLog::log('referral_bonus_awarded', 'referral', $referral['referrer_id'], [
+            'bonus_amount' => $bonusAmount,
+            'deposit_id' => $deposit['id'],
+            'referred_user_id' => $deposit['user_id'],
+            'commission_percent' => $commissionPercent,
+        ]);
     }
 
     public function withdrawals(): void
