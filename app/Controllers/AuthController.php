@@ -101,12 +101,17 @@ class AuthController
 
     public function showRegister(): void
     {
-        $referralCode = filter_input(INPUT_GET, 'ref', FILTER_SANITIZE_SPECIAL_CHARS);
+        // Get referral code from URL parameter - allow alphanumeric only
+        $referralCode = '';
+        if (isset($_GET['ref']) && !empty($_GET['ref'])) {
+            // Only allow alphanumeric characters and hyphens/underscores
+            $referralCode = preg_replace('/[^a-zA-Z0-9\-_]/', '', $_GET['ref']);
+        }
         
         echo Router::render('auth/register', [
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
-            'referral_code' => $referralCode ?? '',
+            'referral_code' => $referralCode,
             'turnstile_site_key' => TurnstileService::getSiteKey(),
         ]);
     }
