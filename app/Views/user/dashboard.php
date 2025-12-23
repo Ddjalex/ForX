@@ -279,25 +279,49 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-// Fetch crypto prices from CoinGecko
-async function updateTickerPrices() {
-    try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot&vs_currencies=usd');
-        const data = await response.json();
-        
-        document.getElementById('btc-price').textContent = '$' + (data.bitcoin?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('eth-price').textContent = '$' + (data.ethereum?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('usdt-price').textContent = '$' + (data.tether?.usd || 1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('bnb-price').textContent = '$' + (data.binancecoin?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('xrp-price').textContent = '$' + (data.ripple?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
-        document.getElementById('sol-price').textContent = '$' + (data.solana?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('ada-price').textContent = '$' + (data.cardano?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
-        document.getElementById('dot-price').textContent = '$' + (data.polkadot?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    } catch (error) {
-        console.error('Error fetching prices:', error);
-    }
+// Fetch crypto prices from CoinGecko with robust implementation
+function updateTickerPrices() {
+    const priceMap = {
+        'btc-price': 'bitcoin',
+        'eth-price': 'ethereum',
+        'usdt-price': 'tether',
+        'bnb-price': 'binancecoin',
+        'xrp-price': 'ripple',
+        'sol-price': 'solana',
+        'ada-price': 'cardano',
+        'dot-price': 'polkadot'
+    };
+    
+    const decimals = {
+        'xrp-price': 4,
+        'ada-price': 4,
+        'default': 2
+    };
+    
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot&vs_currencies=usd')
+        .then(response => response.json())
+        .then(data => {
+            Object.entries(priceMap).forEach(([elementId, cryptoId]) => {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    const price = data[cryptoId]?.usd || 0;
+                    const decimalPlaces = decimals[elementId] || decimals['default'];
+                    element.textContent = '$' + price.toLocaleString('en-US', {
+                        minimumFractionDigits: decimalPlaces,
+                        maximumFractionDigits: decimalPlaces
+                    });
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching prices:', error));
 }
-document.addEventListener('DOMContentLoaded', updateTickerPrices);
+
+// Call immediately and then every 60 seconds
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateTickerPrices);
+} else {
+    updateTickerPrices();
+}
 setInterval(updateTickerPrices, 60000);
 </script>
 
