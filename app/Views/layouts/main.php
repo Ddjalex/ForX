@@ -627,6 +627,32 @@ if (!function_exists('t')) {
         const notificationBadge = document.getElementById('notificationBadge');
         const notificationList = document.getElementById('notificationList');
 
+        // Initialize badge count from localStorage
+        function initializeBadgeCount() {
+            let storedCount = localStorage.getItem('notificationCount');
+            if (storedCount === null) {
+                storedCount = 3; // Default count
+                localStorage.setItem('notificationCount', storedCount);
+            }
+            updateBadgeDisplay(parseInt(storedCount));
+        }
+
+        // Update badge display
+        function updateBadgeDisplay(count) {
+            if (notificationBadge) {
+                count = Math.max(0, count);
+                if (count > 0) {
+                    notificationBadge.textContent = count;
+                    notificationBadge.style.display = 'inline-flex';
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize on page load
+        initializeBadgeCount();
+
         if (notificationBtn && notificationPanel) {
             notificationBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -677,19 +703,15 @@ if (!function_exists('t')) {
                                 break;
                         }
 
+                        // Fade out notification
                         notificationItem.style.opacity = '0.5';
                         notificationItem.style.pointerEvents = 'none';
                         
-                        let badgeCount = parseInt(notificationBadge.textContent) || 0;
-                        badgeCount = Math.max(0, badgeCount - 1);
-                        
-                        if (badgeCount > 0) {
-                            notificationBadge.textContent = badgeCount;
-                            notificationBadge.style.display = 'flex';
-                        } else {
-                            notificationBadge.textContent = '0';
-                            notificationBadge.style.display = 'none';
-                        }
+                        // Update and save badge count
+                        let currentCount = parseInt(localStorage.getItem('notificationCount')) || 0;
+                        currentCount = Math.max(0, currentCount - 1);
+                        localStorage.setItem('notificationCount', currentCount);
+                        updateBadgeDisplay(currentCount);
 
                         setTimeout(() => {
                             window.location.href = targetUrl;
