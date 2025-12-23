@@ -590,6 +590,116 @@ function toggleCard(cardId) {
     card.classList.toggle('collapsed');
     header.classList.toggle('collapsed');
 }
+
+// Real-time balance validation
+const walletBalance = <?= $wallet['balance'] ?? 0 ?>;
+const marginUsed = <?= $wallet['margin_used'] ?? 0 ?>;
+
+function setLeverage(value) {
+    document.getElementById('leverageValue').value = value;
+    document.querySelectorAll('.leverage-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.leverage) === value);
+    });
+    validateTradeAmount();
+}
+
+function validateTradeAmount() {
+    const amountInput = document.getElementById('tradeAmount');
+    const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
+    const amount = parseFloat(amountInput.value) || 0;
+    const balanceErrorDiv = document.getElementById('balanceError');
+    const buyBtn = document.querySelector('.trade-buttons .buy');
+    const sellBtn = document.querySelector('.trade-buttons .sell');
+    
+    if (amount <= 0) {
+        balanceErrorDiv.style.display = 'none';
+        if (buyBtn) buyBtn.disabled = true;
+        if (sellBtn) sellBtn.disabled = true;
+        if (buyBtn) buyBtn.style.opacity = '0.5';
+        if (sellBtn) sellBtn.style.opacity = '0.5';
+        return;
+    }
+    
+    const marketSelect = document.getElementById('assetName');
+    const selectedOption = marketSelect.options[marketSelect.selectedIndex];
+    const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
+    
+    const availableBalance = walletBalance - marginUsed;
+    const maxTradeAmount = availableBalance * leverage;
+    const minTradeAmount = 10;
+    
+    let estimatedPrice = 1;
+    if (symbol.includes('BTC')) estimatedPrice = 50000;
+    else if (symbol.includes('ETH')) estimatedPrice = 3000;
+    else if (symbol.includes('GOLD')) estimatedPrice = 2000;
+    else if (symbol.includes('OIL')) estimatedPrice = 100;
+    
+    const marginRequired = (amount * estimatedPrice) / leverage;
+    
+    let hasError = false;
+    let errorMessage = '';
+    
+    if (amount < minTradeAmount) {
+        errorMessage = '⚠ Minimum trade amount is $' + minTradeAmount;
+        hasError = true;
+    } else if (marginRequired > availableBalance) {
+        errorMessage = '⚠ INSUFFICIENT BALANCE! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+        hasError = true;
+    } else if (amount > maxTradeAmount) {
+        errorMessage = '⚠ Trade amount exceeds max at ' + leverage + 'x leverage. Max: $' + maxTradeAmount.toFixed(2);
+        hasError = true;
+    }
+    
+    if (hasError) {
+        balanceErrorDiv.textContent = errorMessage;
+        balanceErrorDiv.style.display = 'block';
+        if (buyBtn) buyBtn.disabled = true;
+        if (sellBtn) sellBtn.disabled = true;
+        if (buyBtn) buyBtn.style.opacity = '0.5';
+        if (sellBtn) sellBtn.style.opacity = '0.5';
+    } else {
+        balanceErrorDiv.style.display = 'none';
+        if (buyBtn) buyBtn.disabled = false;
+        if (sellBtn) sellBtn.disabled = false;
+        if (buyBtn) buyBtn.style.opacity = '1';
+        if (sellBtn) sellBtn.style.opacity = '1';
+    }
+}
+
+function showConfirmModal(action) {
+    const amountInput = document.getElementById('tradeAmount');
+    const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
+    const amount = parseFloat(amountInput.value) || 0;
+    const balanceErrorDiv = document.getElementById('balanceError');
+    
+    if (!amount || amount <= 0) {
+        balanceErrorDiv.textContent = '⚠ Please enter a valid trade amount';
+        balanceErrorDiv.style.display = 'block';
+        return;
+    }
+    
+    const availableBalance = walletBalance - marginUsed;
+    const marketSelect = document.getElementById('assetName');
+    const selectedOption = marketSelect.options[marketSelect.selectedIndex];
+    const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
+    
+    let estimatedPrice = 1;
+    if (symbol.includes('BTC')) estimatedPrice = 50000;
+    else if (symbol.includes('ETH')) estimatedPrice = 3000;
+    else if (symbol.includes('GOLD')) estimatedPrice = 2000;
+    else if (symbol.includes('OIL')) estimatedPrice = 100;
+    
+    const marginRequired = (amount * estimatedPrice) / leverage;
+    
+    if (marginRequired > availableBalance) {
+        balanceErrorDiv.textContent = '⚠ Insufficient balance! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+        balanceErrorDiv.style.display = 'block';
+        return;
+    }
+    
+    // Modal logic would go here
+    balanceErrorDiv.style.display = 'none';
+}
 </script>
 
 <?php
