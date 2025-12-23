@@ -363,7 +363,7 @@
 
                 <div class="form-group">
                     <label class="form-label" for="referral_link">Referral Link (Optional)</label>
-                    <input type="text" id="referral_link" name="referral_link" class="form-control" placeholder="Enter referral code (e.g., REF123456)">
+                    <input type="text" id="referral_link" name="referral_link" class="form-control" placeholder="Enter referral code (e.g., REF123456)" value="<?= htmlspecialchars($referral_code ?? '') ?>">
                 </div>
 
                 <div class="form-group">

@@ -101,9 +101,12 @@ class AuthController
 
     public function showRegister(): void
     {
+        $referralCode = filter_input(INPUT_GET, 'ref', FILTER_SANITIZE_SPECIAL_CHARS);
+        
         echo Router::render('auth/register', [
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
+            'referral_code' => $referralCode ?? '',
             'turnstile_site_key' => TurnstileService::getSiteKey(),
         ]);
     }
