@@ -362,11 +362,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="referral_link">Referral Link (Optional)</label>
-                    <input type="text" id="referral_link" name="referral_link" class="form-control" placeholder="Enter referral code (e.g., REF123456)">
-                </div>
-
-                <div class="form-group">
                     <div class="cf-turnstile" data-sitekey="<?= $turnstile_site_key ?? '' ?>" data-theme="dark"></div>
                 </div>
 
