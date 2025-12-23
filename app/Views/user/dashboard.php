@@ -215,59 +215,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button class="icon-btn collapse-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
             </div>
         </div>
-        <div class="card-body market-widget-container">
-            <div class="market-list">
-                <?php if (empty($cryptoMarkets)): ?>
-                    <div class="text-center text-muted p-4">No cryptocurrency data available</div>
-                <?php else: ?>
-                    <?php foreach (array_slice($cryptoMarkets, 0, 32) as $market): ?>
-                        <a href="/trade/<?= htmlspecialchars($market['symbol']) ?>" class="market-item">
-                            <div class="market-info">
-                                <span class="market-symbol"><?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?></span>
-                                <span class="market-name"><?= htmlspecialchars($market['name']) ?></span>
-                            </div>
-                            <div class="market-price">
-                                <span class="price">$<?= number_format($market['price'] ?? 0, 2) ?></span>
-                                <span class="change <?= ($market['change_24h'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
-                                    <?= ($market['change_24h'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($market['change_24h'] ?? 0, 2) ?>%
-                                </span>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+        <div class="card-body market-table-container">
+            <table class="market-table">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>MKT CAP</th>
+                        <th>FD_MKT_CAP</th>
+                        <th>PRICE</th>
+                        <th>AVAIL COINS</th>
+                        <th>TOTAL COINS</th>
+                    </tr>
+                </thead>
+                <tbody id="crypto-market-body">
+                    <tr><td colspan="6" class="text-center">Loading cryptocurrency data...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <div class="card market-data-card">
         <div class="card-header">
-            <h3 class="card-title">Forex Market Data</h3>
+            <h3 class="card-title">Stock Market Data</h3>
             <div class="card-actions">
                 <button class="icon-btn expand-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
                 <button class="icon-btn collapse-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
             </div>
         </div>
-        <div class="card-body market-widget-container">
-            <div class="market-list">
-                <?php if (empty($stockMarkets)): ?>
-                    <div class="text-center text-muted p-4">No forex data available</div>
-                <?php else: ?>
-                    <?php foreach ($stockMarkets as $market): ?>
-                        <a href="/trade/<?= htmlspecialchars($market['symbol']) ?>" class="market-item">
-                            <div class="market-info">
-                                <span class="market-symbol"><?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?></span>
-                                <span class="market-name"><?= htmlspecialchars($market['name']) ?></span>
-                            </div>
-                            <div class="market-price">
-                                <span class="price">$<?= number_format($market['price'] ?? 0, 4) ?></span>
-                                <span class="change <?= ($market['change_24h'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
-                                    <?= ($market['change_24h'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($market['change_24h'] ?? 0, 2) ?>%
-                                </span>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+        <div class="card-body market-table-container">
+            <table class="market-table">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>VALUE</th>
+                        <th>CHANGE</th>
+                        <th>CHANGE%</th>
+                        <th>OPEN</th>
+                        <th>HIGH</th>
+                        <th>LOW</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-market-body">
+                    <tr><td colspan="7" class="text-center">Loading stock market data...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -10,10 +10,6 @@ channel = "stable-25_05"
 run = ["php", "-S", "0.0.0.0:8000", "-t", "."]
 deploymentTarget = "cloudrun"
 
-[[ports]]
-localPort = 5000
-externalPort = 80
-
 [agent]
 expertMode = true
 

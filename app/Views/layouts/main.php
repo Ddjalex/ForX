@@ -23,6 +23,7 @@ if (!function_exists('t')) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
     <script src="/assets/js/market-data.js" defer></script>
+    <script src="/assets/js/tradingview-market-data.js" defer></script>
 </head>
 <body>
     <button class="sidebar-toggle" id="sidebarToggle">

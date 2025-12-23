@@ -1967,6 +1967,71 @@ select.form-control {
     padding: 12px 16px;
 }
 
+.market-table-container {
+    padding: 0;
+    min-height: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.market-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.market-table thead {
+    position: sticky;
+    top: 0;
+    background: var(--bg-input);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.market-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.market-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.market-table tbody tr:hover {
+    background-color: rgba(0, 212, 170, 0.05);
+}
+
+.market-table td {
+    padding: 12px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.market-table tbody tr:hover td {
+    color: var(--primary);
+}
+
+.market-table .positive {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.market-table .negative {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.market-table .text-center {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
 .market-widget-container {
     padding: 0;
     min-height: 280px;
