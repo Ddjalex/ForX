@@ -72,6 +72,7 @@ Router::get('/admin/markets', [AdminController::class, 'markets'], [AdminMiddlew
 Router::post('/admin/markets/update', [AdminController::class, 'updateMarket'], [AdminMiddleware::class]);
 Router::get('/admin/settings', [AdminController::class, 'settings'], [AdminMiddleware::class]);
 Router::post('/admin/settings', [AdminController::class, 'updateSettings'], [AdminMiddleware::class]);
+Router::post('/admin/change-password', [AdminController::class, 'changeAdminPassword'], [AdminMiddleware::class]);
 Router::get('/admin/audit-logs', [AdminController::class, 'auditLogs'], [AdminMiddleware::class]);
 Router::get('/admin/positions', [AdminController::class, 'positions'], [AdminMiddleware::class]);
 

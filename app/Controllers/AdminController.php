@@ -401,6 +401,7 @@ class AdminController
             'settings' => $settingsArray,
             'csrf_token' => Session::generateCsrfToken(),
             'success' => Session::getFlash('success'),
+            'error' => Session::getFlash('error'),
         ]);
     }
 
@@ -456,5 +457,47 @@ class AdminController
             'positions' => $positions,
             'csrf_token' => Session::generateCsrfToken(),
         ]);
+    }
+
+    public function changeAdminPassword(): void
+    {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/admin/settings');
+            return;
+        }
+
+        $admin = Auth::user();
+        $oldPassword = $_POST['old_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (!password_verify($oldPassword, $admin['password'])) {
+            Session::flash('error', 'Current password is incorrect.');
+            Router::redirect('/admin/settings');
+            return;
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            Session::flash('error', 'New passwords do not match.');
+            Router::redirect('/admin/settings');
+            return;
+        }
+
+        if (strlen($newPassword) < 8) {
+            Session::flash('error', 'Password must be at least 8 characters.');
+            Router::redirect('/admin/settings');
+            return;
+        }
+
+        Database::update('users', [
+            'password' => password_hash($newPassword, PASSWORD_DEFAULT),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ], 'id = ?', [$admin['id']]);
+
+        AuditLog::log('admin_password_changed', 'user', $admin['id']);
+
+        Session::flash('success', 'Password changed successfully.');
+        Router::redirect('/admin/settings');
     }
 }

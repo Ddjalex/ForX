@@ -221,6 +221,39 @@ ob_start();
     </div>
 </div>
 
+<div class="card" style="max-width: 800px; margin-top: 24px;">
+    <div class="card-header">
+        <h3 class="card-title">Change Admin Password</h3>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        
+        <form method="POST" action="/admin/change-password">
+            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+            
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="old_password" class="form-control" required placeholder="Enter your current password">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" name="new_password" class="form-control" required placeholder="Enter new password" minlength="8">
+                <small class="form-text text-muted">Password must be at least 8 characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-control" required placeholder="Confirm new password">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+    </div>
+</div>
+
 <?php
 $content = ob_get_clean();
 $pageTitle = 'Platform Settings';
