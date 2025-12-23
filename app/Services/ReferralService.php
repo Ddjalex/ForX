@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\NotificationService;
+
 class ReferralService
 {
     public static function getUserReferralCode(int $userId): string
@@ -79,7 +81,7 @@ class ReferralService
     
     public static function trackClick(string $code): bool
     {
-        $link = Database::fetch("SELECT id FROM referral_links WHERE code = ?", [$code]);
+        $link = Database::fetch("SELECT user_id FROM referral_links WHERE code = ?", [$code]);
         
         if (!$link) {
             return false;
@@ -89,6 +91,9 @@ class ReferralService
             "UPDATE referral_links SET clicks = clicks + 1 WHERE code = ?",
             [$code]
         );
+
+        // Send notification about the link click
+        NotificationService::notifyReferralClick($link['user_id']);
         
         return true;
     }

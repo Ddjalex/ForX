@@ -9,6 +9,7 @@ use App\Controllers\AdminController;
 use App\Controllers\ApiController;
 use App\Controllers\AccountsController;
 use App\Controllers\FeatureController;
+use App\Controllers\NotificationController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\GuestMiddleware;
@@ -98,3 +99,11 @@ Router::get('/api/wallet', [ApiController::class, 'walletBalance']);
 Router::post('/api/trade', [ApiController::class, 'executeTrade'], [AuthMiddleware::class]);
 Router::post('/api/positions/close-expired', [ApiController::class, 'closeExpiredPositions'], [AuthMiddleware::class]);
 Router::post('/api/positions/close', [ApiController::class, 'closePosition'], [AuthMiddleware::class]);
+
+// Notification routes
+Router::get('/api/notifications/unread', [NotificationController::class, 'getUnread'], [AuthMiddleware::class]);
+Router::get('/api/notifications', [NotificationController::class, 'getAll'], [AuthMiddleware::class]);
+Router::post('/api/notifications/read', [NotificationController::class, 'markAsRead'], [AuthMiddleware::class]);
+Router::post('/api/notifications/read-all', [NotificationController::class, 'markAllAsRead'], [AuthMiddleware::class]);
+Router::post('/api/notifications/delete', [NotificationController::class, 'delete'], [AuthMiddleware::class]);
+Router::post('/api/notifications/delete-all', [NotificationController::class, 'deleteAll'], [AuthMiddleware::class]);

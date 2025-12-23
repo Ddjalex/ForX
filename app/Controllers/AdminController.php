@@ -7,6 +7,7 @@ use App\Services\Database;
 use App\Services\Router;
 use App\Services\Session;
 use App\Services\AuditLog;
+use App\Services\NotificationService;
 
 class AdminController
 {
@@ -227,6 +228,9 @@ class AdminController
             // Process Referral Bonus
             $this->processReferralBonus($deposit);
 
+            // Send notification to user
+            NotificationService::notifyDepositApproved($deposit['user_id'], (float)$deposit['amount']);
+
             AuditLog::log('approve_deposit', 'deposit', $depositId, [
                 'amount' => $deposit['amount'],
                 'user_id' => $deposit['user_id'],
@@ -242,6 +246,9 @@ class AdminController
                 'approved_at' => date('Y-m-d H:i:s'),
                 'approved_by' => Auth::id(),
             ], 'id = ?', [$depositId]);
+
+            // Send notification to user
+            NotificationService::notifyDepositRejected($deposit['user_id'], $reason);
 
             AuditLog::log('reject_deposit', 'deposit', $depositId, [
                 'reason' => $reason,
@@ -299,6 +306,13 @@ class AdminController
             'deposit_id' => $deposit['id'],
             'referred_user_id' => $deposit['user_id'],
         ]);
+
+        // Get referred user name for notification
+        $referredUser = Database::fetch("SELECT name FROM users WHERE id = ?", [$deposit['user_id']]);
+        $referredName = $referredUser['name'] ?? 'A user';
+
+        // Send notification to referrer about bonus
+        NotificationService::notifyReferralBonus($referrerId, $bonusAmount, $referredName);
     }
 
     public function withdrawals(): void
