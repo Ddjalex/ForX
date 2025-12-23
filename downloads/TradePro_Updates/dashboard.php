@@ -605,22 +605,26 @@ function setLeverage(value) {
 
 function validateTradeAmount() {
     const amountInput = document.getElementById('tradeAmount');
+    if (!amountInput) return;
+    
     const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
     const amount = parseFloat(amountInput.value) || 0;
     const balanceErrorDiv = document.getElementById('balanceError');
-    const buyBtn = document.querySelector('.trade-buttons .buy');
-    const sellBtn = document.querySelector('.trade-buttons .sell');
+    
+    // Find buttons - try multiple selectors
+    let buyBtn = document.querySelector('.trade-buttons .buy') || document.querySelector('button.buy');
+    let sellBtn = document.querySelector('.trade-buttons .sell') || document.querySelector('button.sell');
     
     if (amount <= 0) {
-        balanceErrorDiv.style.display = 'none';
-        if (buyBtn) buyBtn.disabled = true;
-        if (sellBtn) sellBtn.disabled = true;
-        if (buyBtn) buyBtn.style.opacity = '0.5';
-        if (sellBtn) sellBtn.style.opacity = '0.5';
+        if (balanceErrorDiv) balanceErrorDiv.style.display = 'none';
+        if (buyBtn) { buyBtn.disabled = true; buyBtn.style.opacity = '0.5'; }
+        if (sellBtn) { sellBtn.disabled = true; sellBtn.style.opacity = '0.5'; }
         return;
     }
     
     const marketSelect = document.getElementById('assetName');
+    if (!marketSelect) return;
+    
     const selectedOption = marketSelect.options[marketSelect.selectedIndex];
     const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
     
@@ -629,10 +633,10 @@ function validateTradeAmount() {
     const minTradeAmount = 10;
     
     let estimatedPrice = 1;
-    if (symbol.includes('BTC')) estimatedPrice = 50000;
-    else if (symbol.includes('ETH')) estimatedPrice = 3000;
-    else if (symbol.includes('GOLD')) estimatedPrice = 2000;
-    else if (symbol.includes('OIL')) estimatedPrice = 100;
+    if (symbol && symbol.includes('BTC')) estimatedPrice = 50000;
+    else if (symbol && symbol.includes('ETH')) estimatedPrice = 3000;
+    else if (symbol && symbol.includes('GOLD')) estimatedPrice = 2000;
+    else if (symbol && symbol.includes('OIL')) estimatedPrice = 100;
     
     const marginRequired = (amount * estimatedPrice) / leverage;
     
@@ -650,19 +654,21 @@ function validateTradeAmount() {
         hasError = true;
     }
     
+    if (balanceErrorDiv) {
+        if (hasError) {
+            balanceErrorDiv.textContent = errorMessage;
+            balanceErrorDiv.style.display = 'block';
+        } else {
+            balanceErrorDiv.style.display = 'none';
+        }
+    }
+    
     if (hasError) {
-        balanceErrorDiv.textContent = errorMessage;
-        balanceErrorDiv.style.display = 'block';
-        if (buyBtn) buyBtn.disabled = true;
-        if (sellBtn) sellBtn.disabled = true;
-        if (buyBtn) buyBtn.style.opacity = '0.5';
-        if (sellBtn) sellBtn.style.opacity = '0.5';
+        if (buyBtn) { buyBtn.disabled = true; buyBtn.style.opacity = '0.5'; }
+        if (sellBtn) { sellBtn.disabled = true; sellBtn.style.opacity = '0.5'; }
     } else {
-        balanceErrorDiv.style.display = 'none';
-        if (buyBtn) buyBtn.disabled = false;
-        if (sellBtn) sellBtn.disabled = false;
-        if (buyBtn) buyBtn.style.opacity = '1';
-        if (sellBtn) sellBtn.style.opacity = '1';
+        if (buyBtn) { buyBtn.disabled = false; buyBtn.style.opacity = '1'; }
+        if (sellBtn) { sellBtn.disabled = false; sellBtn.style.opacity = '1'; }
     }
 }
 
