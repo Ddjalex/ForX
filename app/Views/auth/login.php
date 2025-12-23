@@ -35,7 +35,7 @@
                 
                 <div class="form-group">
                     <label class="form-label" for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" value="<?= isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '' ?>" required>
                 </div>
 
                 <div class="form-group">

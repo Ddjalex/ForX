@@ -18,11 +18,13 @@ class AuthController
 
     public function showLogin(): void
     {
+        $email = filter_input(INPUT_GET, 'email', FILTER_SANITIZE_EMAIL);
         echo Router::render('auth/login', [
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
             'success' => Session::getFlash('success'),
             'turnstile_site_key' => TurnstileService::getSiteKey(),
+            'email' => $email ?? '',
         ]);
     }
 
@@ -286,7 +288,7 @@ class AuthController
         AuditLog::log('email_verified', 'user', $user['id']);
 
         Session::flash('success', 'Email verified successfully! You can now log in.');
-        Router::redirect('/login');
+        Router::redirect('/login?email=' . urlencode($email));
     }
 
     public function resendVerification(): void
