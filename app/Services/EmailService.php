@@ -149,13 +149,12 @@ class EmailService
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="UTF-8">
             <style>
-                body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 20px; }
+                body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 20px; margin: 0; }
                 .container { max-width: 600px; margin: 0 auto; background-color: #252525; border-radius: 10px; padding: 40px; }
                 .logo { color: #1abc9c; font-size: 28px; font-weight: bold; text-align: center; margin-bottom: 30px; }
-                .button { background-color: #1abc9c; color: #000000; text-align: center; padding: 15px; border-radius: 8px; margin: 30px 0; }
-                .button a { color: #000000; text-decoration: none; font-weight: bold; font-size: 16px; }
-                .message { color: #999999; text-align: center; line-height: 1.6; }
+                .message { color: #999999; text-align: center; line-height: 1.6; margin: 15px 0; }
                 .footer { color: #666666; font-size: 12px; text-align: center; margin-top: 30px; }
             </style>
         </head>
@@ -163,8 +162,19 @@ class EmailService
             <div class="container">
                 <div class="logo">Alpha Core Markets</div>
                 <p class="message">Hello ' . htmlspecialchars($name) . ',</p>
-                <p class="message">We received a request to reset your password. Click the button below to create a new password:</p>
-                <div class="button"><a href="' . htmlspecialchars($resetLink) . '">Reset Password</a></div>
+                <p class="message">We received a request to reset your password. Click the link below to create a new password:</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="' . htmlspecialchars($resetLink) . '" style="background-color: #1abc9c; color: #000000; padding: 15px 40px; text-decoration: none; font-weight: bold; font-size: 16px; border-radius: 8px; display: inline-block;">Reset Password</a>
+                </div>
+                
+                <p class="message" style="word-break: break-all; font-size: 12px; color: #666666;">
+                    Or copy and paste this link in your browser:<br>
+                    <a href="' . htmlspecialchars($resetLink) . '" style="color: #1abc9c; text-decoration: underline;">
+                        ' . htmlspecialchars($resetLink) . '
+                    </a>
+                </p>
+                
                 <p class="message">This link will expire in 1 hour.</p>
                 <p class="message">If you did not request a password reset, please ignore this email and your password will remain unchanged.</p>
                 <div class="footer">© ' . date('Y') . ' Alpha Core Markets. All rights reserved.</div>
