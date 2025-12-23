@@ -364,4 +364,107 @@ class AuthController
         Session::flash('success', 'If the email exists, a password reset link will be sent.');
         Router::redirect('/forgot-password');
     }
+
+    public function showResetPassword(): void
+    {
+        $token = filter_input(INPUT_GET, 'token', FILTER_SANITIZE_SPECIAL_CHARS);
+        $email = filter_input(INPUT_GET, 'email', FILTER_SANITIZE_EMAIL);
+
+        if (empty($token) || empty($email)) {
+            Session::flash('error', 'Invalid reset link.');
+            Router::redirect('/login');
+            return;
+        }
+
+        $user = Database::fetch(
+            "SELECT id, reset_token, reset_expires FROM users WHERE email = ? AND reset_token = ?",
+            [$email, $token]
+        );
+
+        if (!$user) {
+            Session::flash('error', 'Invalid reset link.');
+            Router::redirect('/login');
+            return;
+        }
+
+        if (strtotime($user['reset_expires']) < time()) {
+            Session::flash('error', 'Reset link has expired. Please request a new one.');
+            Router::redirect('/forgot-password');
+            return;
+        }
+
+        echo Router::render('auth/reset-password', [
+            'csrf_token' => Session::generateCsrfToken(),
+            'token' => $token,
+            'email' => $email,
+            'error' => Session::getFlash('error'),
+        ]);
+    }
+
+    public function updatePassword(): void
+    {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/login');
+            return;
+        }
+
+        $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_SPECIAL_CHARS);
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($token) || empty($email)) {
+            Session::flash('error', 'Invalid reset link.');
+            Router::redirect('/login');
+            return;
+        }
+
+        if (empty($password) || empty($confirmPassword)) {
+            Session::flash('error', 'Please fill in all fields.');
+            Router::redirect('/reset-password?token=' . urlencode($token) . '&email=' . urlencode($email));
+            return;
+        }
+
+        if ($password !== $confirmPassword) {
+            Session::flash('error', 'Passwords do not match.');
+            Router::redirect('/reset-password?token=' . urlencode($token) . '&email=' . urlencode($email));
+            return;
+        }
+
+        if (strlen($password) < 8) {
+            Session::flash('error', 'Password must be at least 8 characters.');
+            Router::redirect('/reset-password?token=' . urlencode($token) . '&email=' . urlencode($email));
+            return;
+        }
+
+        $user = Database::fetch(
+            "SELECT id, reset_token, reset_expires FROM users WHERE email = ? AND reset_token = ?",
+            [$email, $token]
+        );
+
+        if (!$user) {
+            Session::flash('error', 'Invalid reset link.');
+            Router::redirect('/login');
+            return;
+        }
+
+        if (strtotime($user['reset_expires']) < time()) {
+            Session::flash('error', 'Reset link has expired.');
+            Router::redirect('/forgot-password');
+            return;
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        Database::update('users', [
+            'password' => $hashedPassword,
+            'reset_token' => null,
+            'reset_expires' => null,
+        ], 'id = ?', [$user['id']]);
+
+        AuditLog::log('password_reset', 'user', $user['id']);
+
+        Session::flash('success', 'Password reset successfully! You can now log in.');
+        Router::redirect('/login');
+    }
 }

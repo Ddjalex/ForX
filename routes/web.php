@@ -27,6 +27,8 @@ Router::get('/register', [AuthController::class, 'showRegister'], [GuestMiddlewa
 Router::post('/register', [AuthController::class, 'register']);
 Router::get('/forgot-password', [AuthController::class, 'showForgotPassword'], [GuestMiddleware::class]);
 Router::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Router::get('/reset-password', [AuthController::class, 'showResetPassword'], [GuestMiddleware::class]);
+Router::post('/reset-password', [AuthController::class, 'updatePassword']);
 Router::get('/verify-email', [AuthController::class, 'showVerifyEmail'], [GuestMiddleware::class]);
 Router::post('/verify-email', [AuthController::class, 'verifyEmail']);
 Router::get('/resend-verification', [AuthController::class, 'resendVerification'], [GuestMiddleware::class]);
