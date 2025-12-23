@@ -788,12 +788,16 @@ window.sortStockTable = function(column) {
 
 window.loadMarketDataNow = function() {
     const cryptoBody = document.getElementById('crypto-market-body');
-    if (cryptoBody) {
+    if (cryptoBody && window.cryptoData && window.cryptoData.length > 0) {
         let html = '';
         window.cryptoData.forEach(crypto => {
-            html += '<tr data-symbol="' + crypto.symbol + '" data-name="' + crypto.name + '" data-price="' + crypto.price + '" data-mktCap="' + crypto.mktCap + '" data-fdMktCap="' + crypto.fdMktCap + '" onclick="navigateToTrade(\'' + crypto.symbol + '\')"><td class="market-symbol"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--bg-dark);">' + crypto.symbol.charAt(0) + '</span><strong>' + crypto.symbol + '</strong></span></td><td>' + (crypto.mktCap / 1e12).toFixed(2) + 'T</td><td>' + (crypto.fdMktCap / 1e9).toFixed(2) + 'B</td><td class="positive">$' + crypto.price.toLocaleString() + '</td><td>' + crypto.availCoins + '</td><td>' + crypto.totalCoins + '</td></tr>';
+            if (crypto.price > 0) {
+                let mktCapDisplay = crypto.mktCap >= 1e12 ? (crypto.mktCap / 1e12).toFixed(2) + 'T' : crypto.mktCap >= 1e9 ? (crypto.mktCap / 1e9).toFixed(2) + 'B' : crypto.mktCap >= 1e6 ? (crypto.mktCap / 1e6).toFixed(2) + 'M' : '0.00';
+                let fdMktCapDisplay = crypto.fdMktCap >= 1e12 ? (crypto.fdMktCap / 1e12).toFixed(2) + 'T' : crypto.fdMktCap >= 1e9 ? (crypto.fdMktCap / 1e9).toFixed(2) + 'B' : crypto.fdMktCap >= 1e6 ? (crypto.fdMktCap / 1e6).toFixed(2) + 'M' : '0.00';
+                html += '<tr data-symbol="' + crypto.symbol + '" data-name="' + crypto.name + '" data-price="' + crypto.price + '" data-mktCap="' + crypto.mktCap + '" data-fdMktCap="' + crypto.fdMktCap + '" onclick="navigateToTrade(\'' + crypto.symbol + '\')"><td class="market-symbol"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--bg-dark);">' + crypto.symbol.charAt(0) + '</span><strong>' + crypto.symbol + '</strong></span></td><td>$' + mktCapDisplay + '</td><td>$' + fdMktCapDisplay + '</td><td class="positive">$' + crypto.price.toFixed(2) + '</td><td>' + crypto.availCoins + '</td><td>' + crypto.totalCoins + '</td></tr>';
+            }
         });
-        cryptoBody.innerHTML = html;
+        if (html) cryptoBody.innerHTML = html;
     }
     
     const stockBody = document.getElementById('stock-market-body');
@@ -807,13 +811,11 @@ window.loadMarketDataNow = function() {
     }
 };
 
-setTimeout(function() { 
-    if (window.fetchCryptoData) window.fetchCryptoData();
-}, 100);
+if (window.fetchCryptoData) window.fetchCryptoData();
 
 setInterval(function() {
     if (window.fetchCryptoData) window.fetchCryptoData();
-}, 60000);
+}, 30000);
 </script>
 
 <?php
