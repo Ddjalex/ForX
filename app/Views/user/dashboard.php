@@ -712,8 +712,7 @@ window.stockData = [
 ];
 
 window.fetchCryptoData = function() {
-    const coinIds = 'bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot';
-    const url = 'https://api.coingecko.com/api/v3/simple/price?ids=' + coinIds + '&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&x_cg_pro_api_key=CG-WSd513UKp8XTr3JTgrbRhwgs';
+    const url = '/api/crypto-prices';
     
     fetch(url)
         .then(response => response.json())
