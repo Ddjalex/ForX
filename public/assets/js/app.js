@@ -372,14 +372,14 @@ async function updateWalletBalance() {
         
         const data = await response.json();
         if (data.success && data.data) {
+            // Store current balance for validation
+            window.currentWalletData = data.data;
+            
             // Update balance display in the panel
             const balanceValueEl = document.querySelector('.balance-value');
             if (balanceValueEl) {
                 const available = data.data.available || 0;
                 balanceValueEl.textContent = '$' + formatNumber(available, 2);
-                
-                // Store current balance for validation
-                window.currentWalletData = data.data;
             }
             
             // Check if balance is low and show warning
@@ -434,16 +434,20 @@ function validateTradeAmount() {
     const amount = parseFloat(amountInput.value) || 0;
     const leverage = parseInt(leverageInput?.value) || 1;
     
-    // Get balance from stored wallet data or fallback to DOM
+    // Get balance from DOM element (most reliable source)
     let availableBalance = 0;
-    if (window.currentWalletData) {
-        availableBalance = window.currentWalletData.available || 0;
-    } else {
-        const balanceText = document.querySelector('.balance-value');
-        if (balanceText) {
-            availableBalance = parseFloat(balanceText.textContent.replace('$', '').replace(',', '')) || 0;
-        }
+    const balanceText = document.querySelector('.balance-value');
+    if (balanceText && balanceText.textContent) {
+        // Parse balance from text like "$2.00" or "$2,000.00"
+        const cleanBalance = balanceText.textContent
+            .replace(/^\$/, '')  // Remove leading $
+            .replace(/,/g, '')   // Remove commas
+            .trim();
+        availableBalance = parseFloat(cleanBalance) || 0;
     }
+    
+    // Also store in window for other uses
+    window.availableBalance = availableBalance;
     
     const marginRequired = amount / leverage;
     const maxTradeable = availableBalance * leverage;
