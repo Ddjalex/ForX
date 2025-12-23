@@ -667,7 +667,7 @@ if (!function_exists('t')) {
 
                         switch(action) {
                             case 'deposit':
-                                targetUrl = '/dashboard/trades/history';
+                                targetUrl = '/wallet/deposit';
                                 break;
                             case 'news':
                                 targetUrl = '/news';
@@ -677,13 +677,17 @@ if (!function_exists('t')) {
                                 break;
                         }
 
-                        notificationItem.remove();
+                        notificationItem.style.opacity = '0.5';
+                        notificationItem.style.pointerEvents = 'none';
+                        
                         let badgeCount = parseInt(notificationBadge.textContent) || 0;
-                        badgeCount--;
-
+                        badgeCount = Math.max(0, badgeCount - 1);
+                        
                         if (badgeCount > 0) {
                             notificationBadge.textContent = badgeCount;
+                            notificationBadge.style.display = 'flex';
                         } else {
+                            notificationBadge.textContent = '0';
                             notificationBadge.style.display = 'none';
                         }
 
