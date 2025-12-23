@@ -745,8 +745,8 @@ window.fetchCryptoData = function() {
                 totalCoins: 'N/A'
             }));
             
-            window.updateTicker(cryptoList);
             window.loadMarketDataNow();
+            window.updateTicker(cryptoList);
         })
         .catch(err => {
             console.error('Error fetching crypto data:', err);
@@ -759,11 +759,15 @@ window.updateTicker = function(cryptoList) {
     if (!tickerContent) return;
     
     let html = '';
-    cryptoList.forEach(item => {
-        const price = item.data?.usd || 0;
-        html += '<span class="ticker-item" onclick="navigateToTrade(\'' + item.symbol + '\')" style="cursor: pointer;"><strong>' + item.symbol + ':</strong> $' + (price > 1 ? price.toFixed(2) : price.toFixed(6)) + '</span>';
-    });
+    if (window.cryptoData && window.cryptoData.length > 0) {
+        window.cryptoData.forEach(crypto => {
+            if (crypto.price > 0) {
+                html += '<span class="ticker-item" onclick="navigateToTrade(\'' + crypto.symbol + '\')" style="cursor: pointer;"><strong>' + crypto.symbol + ':</strong> $' + (crypto.price > 1 ? crypto.price.toFixed(2) : crypto.price.toFixed(6)) + '</span>';
+            }
+        });
+    }
     
+    // Duplicate for continuous scroll effect
     html += html;
     tickerContent.innerHTML = html;
 };
