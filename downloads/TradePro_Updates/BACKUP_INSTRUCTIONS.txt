@@ -1,0 +1,21 @@
+=== IMPORTANT: BACKUP YOUR FILES FIRST ===
+
+Before replacing files, please backup the original versions:
+
+1. Via cPanel File Manager:
+   - Navigate to each file location
+   - Right-click → Copy
+   - Create a "backup" folder
+   - Paste the files there
+
+2. Via FTP:
+   - Download the original files to your computer
+   - Keep them in a safe location
+
+ORIGINAL FILES TO BACKUP:
+- app/Controllers/AdminController.php
+- routes/web.php
+- app/Views/admin/settings.php
+- app/Views/trading/trade.php
+
+This way, if anything goes wrong, you can quickly restore the originals.

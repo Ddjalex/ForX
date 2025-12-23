@@ -1,0 +1,43 @@
+=== Chart Synchronization Update - Installation Guide ===
+
+DATE: December 23, 2025
+VERSION: 2.0
+
+UPDATED FILES (2 total):
+1. dashboard.php → Replace: app/Views/user/dashboard.php
+2. trade.php → Replace: app/Views/trading/trade.php
+
+PREVIOUS FILES (Still needed from earlier):
+1. AdminController.php → Replace: app/Controllers/AdminController.php
+2. web.php → Replace: routes/web.php
+3. settings.php → Replace: app/Views/admin/settings.php
+
+TOTAL FILES TO UPLOAD: 5 files
+
+INSTALLATION STEPS:
+1. Download all files from this folder
+2. Connect to cPanel using File Manager or FTP
+3. Upload/Replace each file in its correct location
+4. Clear browser cache (Ctrl+Shift+Delete or Cmd+Shift+Delete)
+5. Test the features:
+   ✓ Dashboard: Select different assets and verify chart updates
+   ✓ Trade Page: Change asset types and confirm chart syncs
+   ✓ Admin Settings: Verify password change feature works
+   ✓ Trade Validation: Try invalid amounts and see warnings
+
+FEATURES COMPLETED:
+✓ Admin password change functionality
+✓ Enhanced trade validation with warning messages
+✓ Real-time balance checking
+✓ Live chart synchronization across routes
+✓ Asset type filtering
+✓ Proper chart symbol updates
+
+WHAT'S IMPROVED:
+- Chart now updates instantly when you select a different asset
+- Asset name dropdown properly filters by asset type
+- Both dashboard and trade pages show consistent charts
+- Better error handling for TradingView widget
+- Smoother user experience when switching between assets
+
+For detailed changes, see SYNC_CHART_CHANGES.md and CHANGES_SUMMARY.md
