@@ -724,6 +724,40 @@ if (!function_exists('t')) {
         }
     </script>
     
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 <a href="https://alphacoremarkets.com" target="_blank">Alpha Core Markets</a>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <style>
+        .footer {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.05) 0%, rgba(10, 22, 40, 0.5) 100%);
+            border-top: 1px solid rgba(0, 212, 170, 0.1);
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+    </style>
+
     <?php
     // Load Tawk.to settings safely
     try {

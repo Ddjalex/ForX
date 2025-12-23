@@ -209,14 +209,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="crypto-ticker-wrapper">
     <div class="ticker-container">
         <div class="ticker-content" id="ticker-content">
-            <span class="ticker-item"><strong>BTC:</strong> $0.00</span>
-            <span class="ticker-item"><strong>ETH:</strong> $0.00</span>
-            <span class="ticker-item"><strong>USDT:</strong> $0.00</span>
-            <span class="ticker-item"><strong>BNB:</strong> $0.00</span>
-            <span class="ticker-item"><strong>XRP:</strong> $0.00</span>
-            <span class="ticker-item"><strong>SOL:</strong> $0.00</span>
-            <span class="ticker-item"><strong>ADA:</strong> $0.00</span>
-            <span class="ticker-item"><strong>DOT:</strong> $0.00</span>
+            <span class="ticker-item"><strong>BTC:</strong> <span id="btc-price">Loading...</span></span>
+            <span class="ticker-item"><strong>ETH:</strong> <span id="eth-price">Loading...</span></span>
+            <span class="ticker-item"><strong>USDT:</strong> <span id="usdt-price">Loading...</span></span>
+            <span class="ticker-item"><strong>BNB:</strong> <span id="bnb-price">Loading...</span></span>
+            <span class="ticker-item"><strong>XRP:</strong> <span id="xrp-price">Loading...</span></span>
+            <span class="ticker-item"><strong>SOL:</strong> <span id="sol-price">Loading...</span></span>
+            <span class="ticker-item"><strong>ADA:</strong> <span id="ada-price">Loading...</span></span>
+            <span class="ticker-item"><strong>DOT:</strong> <span id="dot-price">Loading...</span></span>
         </div>
     </div>
 </div>
@@ -277,6 +277,29 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+<script>
+// Fetch crypto prices from CoinGecko
+async function updateTickerPrices() {
+    try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot&vs_currencies=usd');
+        const data = await response.json();
+        
+        document.getElementById('btc-price').textContent = '$' + (data.bitcoin?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('eth-price').textContent = '$' + (data.ethereum?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('usdt-price').textContent = '$' + (data.tether?.usd || 1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('bnb-price').textContent = '$' + (data.binancecoin?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('xrp-price').textContent = '$' + (data.ripple?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+        document.getElementById('sol-price').textContent = '$' + (data.solana?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('ada-price').textContent = '$' + (data.cardano?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+        document.getElementById('dot-price').textContent = '$' + (data.polkadot?.usd || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    } catch (error) {
+        console.error('Error fetching prices:', error);
+    }
+}
+document.addEventListener('DOMContentLoaded', updateTickerPrices);
+setInterval(updateTickerPrices, 60000);
+</script>
 
 <div id="tradeConfirmModal" class="trade-confirm-modal" style="display: none;">
     <div class="trade-confirm-overlay"></div>
