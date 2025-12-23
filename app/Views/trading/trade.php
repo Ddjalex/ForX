@@ -675,6 +675,36 @@ function showTab(tab) {
 }
 
 function showConfirmModal(action) {
+    const amountInput = document.getElementById('tradeAmount');
+    const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
+    const amount = parseFloat(amountInput.value) || 0;
+    const balanceErrorDiv = document.getElementById('balanceError');
+    
+    if (!amount || amount <= 0) {
+        balanceErrorDiv.textContent = '⚠ Please enter a valid trade amount';
+        balanceErrorDiv.style.display = 'block';
+        return;
+    }
+    
+    const availableBalance = walletBalance - marginUsed;
+    const marketSelect = document.getElementById('assetName');
+    const selectedOption = marketSelect.options[marketSelect.selectedIndex];
+    const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
+    
+    let estimatedPrice = 1;
+    if (symbol.includes('BTC')) estimatedPrice = 50000;
+    else if (symbol.includes('ETH')) estimatedPrice = 3000;
+    else if (symbol.includes('GOLD')) estimatedPrice = 2000;
+    else if (symbol.includes('OIL')) estimatedPrice = 100;
+    
+    const marginRequired = (amount * estimatedPrice) / leverage;
+    
+    if (marginRequired > availableBalance) {
+        balanceErrorDiv.textContent = '⚠ Insufficient balance! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+        balanceErrorDiv.style.display = 'block';
+        return;
+    }
+    
     currentTradeAction = action;
     const modal = document.getElementById('tradeConfirmModal');
     const title = document.getElementById('confirmModalTitle');
@@ -690,6 +720,7 @@ function showConfirmModal(action) {
         confirmBtn.className = 'btn btn-sell';
     }
     
+    balanceErrorDiv.style.display = 'none';
     modal.style.display = 'flex';
 }
 
@@ -884,25 +915,28 @@ function validateTradeAmount() {
     const amount = parseFloat(amountInput.value) || 0;
     const balanceErrorDiv = document.getElementById('balanceError');
     const maxAmountDiv = document.getElementById('maxAmount');
+    const buyBtn = document.querySelector('.trade-btn.buy');
+    const sellBtn = document.querySelector('.trade-btn.sell');
     
     if (amount <= 0) {
         balanceErrorDiv.style.display = 'none';
         maxAmountDiv.style.display = 'none';
+        buyBtn.disabled = true;
+        sellBtn.disabled = true;
+        buyBtn.style.opacity = '0.5';
+        sellBtn.style.opacity = '0.5';
         return;
     }
     
-    // Get current selected market price
     const marketSelect = document.getElementById('assetName');
     const selectedOption = marketSelect.options[marketSelect.selectedIndex];
     const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
     
-    // For now, we estimate based on leverage calculation
-    // In production, fetch real price from API
     const availableBalance = walletBalance - marginUsed;
     const maxTradeAmount = availableBalance * leverage;
+    const minTradeAmount = 10;
     
-    // Estimate entry price - use a reasonable assumption for validation
-    let estimatedPrice = 1; // Default to 1
+    let estimatedPrice = 1;
     if (symbol.includes('BTC')) estimatedPrice = 50000;
     else if (symbol.includes('ETH')) estimatedPrice = 3000;
     else if (symbol.includes('GOLD')) estimatedPrice = 2000;
@@ -910,15 +944,37 @@ function validateTradeAmount() {
     
     const marginRequired = (amount * estimatedPrice) / leverage;
     
-    if (marginRequired > availableBalance) {
-        balanceErrorDiv.textContent = '⚠ Insufficient balance! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+    let hasError = false;
+    let errorMessage = '';
+    
+    if (amount < minTradeAmount) {
+        errorMessage = '⚠ Minimum trade amount is $' + minTradeAmount;
+        hasError = true;
+    } else if (marginRequired > availableBalance) {
+        errorMessage = '⚠ INSUFFICIENT BALANCE! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+        hasError = true;
+    } else if (amount > maxTradeAmount) {
+        errorMessage = '⚠ Trade amount exceeds max at ' + leverage + 'x leverage. Max: $' + maxTradeAmount.toFixed(2);
+        hasError = true;
+    }
+    
+    if (hasError) {
+        balanceErrorDiv.textContent = errorMessage;
         balanceErrorDiv.style.display = 'block';
+        buyBtn.disabled = true;
+        sellBtn.disabled = true;
+        buyBtn.style.opacity = '0.5';
+        sellBtn.style.opacity = '0.5';
         maxAmountDiv.style.display = 'block';
         maxAmountDiv.textContent = '💡 Max trade amount: $' + maxTradeAmount.toFixed(2) + ' at ' + leverage + 'x leverage';
     } else {
         balanceErrorDiv.style.display = 'none';
+        buyBtn.disabled = false;
+        sellBtn.disabled = false;
+        buyBtn.style.opacity = '1';
+        sellBtn.style.opacity = '1';
         maxAmountDiv.style.display = 'block';
-        maxAmountDiv.textContent = '✓ Max trade amount: $' + maxTradeAmount.toFixed(2) + ' at ' + leverage + 'x leverage';
+        maxAmountDiv.textContent = '✓ Max available: $' + maxTradeAmount.toFixed(2) + ' at ' + leverage + 'x leverage | Fee: ~$' + (amount * 0.001).toFixed(2);
     }
 }
 
