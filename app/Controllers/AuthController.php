@@ -127,6 +127,7 @@ class AuthController
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
+        $referralLink = filter_input(INPUT_POST, 'referral_link', FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (empty($name) || empty($email) || empty($password)) {
             Session::flash('error', 'Please fill in all fields.');
@@ -186,16 +187,26 @@ class AuthController
             'created_at' => date('Y-m-d H:i:s'),
         ]);
 
+        if (!empty($referralLink)) {
+            $referralData = Database::fetch(
+                "SELECT id FROM referral_links WHERE code = ? OR id = ?",
+                [$referralLink, $referralLink]
+            );
+            
+            if ($referralData) {
+                Database::insert('referrals', [
+                    'referrer_id' => $referralData['id'],
+                    'referred_user_id' => $userId,
+                    'status' => 'pending',
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
         AuditLog::log('register', 'user', $userId);
 
         $emailSent = EmailService::sendVerificationCode($email, $name, $verificationCode);
         
-        if (!$emailSent) {
-            Session::flash('error', 'Failed to send verification email. Please try again.');
-            Router::redirect('/register');
-            return;
-        }
-
         Router::redirect('/verify-email?email=' . urlencode($email));
     }
 
