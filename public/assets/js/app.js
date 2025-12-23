@@ -372,7 +372,8 @@ async function updateWalletBalance() {
         
         const data = await response.json();
         if (data.success && data.data) {
-            // Store current balance for validation
+            // Store current balance in multiple places for validation
+            window.currentBalance = data.data.available || 0;
             window.currentWalletData = data.data;
             
             // Update balance display in the panel
@@ -434,20 +435,31 @@ function validateTradeAmount() {
     const amount = parseFloat(amountInput.value) || 0;
     const leverage = parseInt(leverageInput?.value) || 1;
     
-    // Get balance from DOM element (most reliable source)
+    // Try to get balance from multiple sources
     let availableBalance = 0;
-    const balanceText = document.querySelector('.balance-value');
-    if (balanceText && balanceText.textContent) {
-        // Parse balance from text like "$2.00" or "$2,000.00"
-        const cleanBalance = balanceText.textContent
-            .replace(/^\$/, '')  // Remove leading $
-            .replace(/,/g, '')   // Remove commas
-            .trim();
-        availableBalance = parseFloat(cleanBalance) || 0;
-    }
     
-    // Also store in window for other uses
-    window.availableBalance = availableBalance;
+    // Priority 1: Use window.currentBalance (set by API)
+    if (window.currentBalance && window.currentBalance > 0) {
+        availableBalance = window.currentBalance;
+    } 
+    // Priority 2: Get from wallet data API
+    else if (window.currentWalletData && window.currentWalletData.available) {
+        availableBalance = window.currentWalletData.available;
+    }
+    // Priority 3: Parse from DOM element
+    else {
+        const balanceText = document.querySelector('.balance-value');
+        if (balanceText && balanceText.textContent) {
+            const cleanBalance = balanceText.textContent
+                .replace(/^\$/, '')
+                .replace(/,/g, '')
+                .trim();
+            const parsed = parseFloat(cleanBalance);
+            if (!isNaN(parsed) && parsed > 0) {
+                availableBalance = parsed;
+            }
+        }
+    }
     
     const marginRequired = amount / leverage;
     const maxTradeable = availableBalance * leverage;
