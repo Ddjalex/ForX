@@ -1810,8 +1810,8 @@ select.form-control {
 .pro-ticker-content {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 0 15px;
+    gap: 16px;
+    padding: 0 20px;
     height: 50px;
     flex-shrink: 0;
     min-width: max-content;
@@ -1820,15 +1820,15 @@ select.form-control {
 .ticker-category {
     display: flex;
     align-items: center;
-    margin-right: 5px;
+    margin-right: 8px;
 }
 
 .category-label {
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    padding: 3px 8px;
+    padding: 3px 7px;
     border-radius: 3px;
     white-space: nowrap;
 }
@@ -1861,8 +1861,8 @@ select.form-control {
 .ticker-item {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 5px 10px;
+    gap: 6px;
+    padding: 5px 11px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1882,21 +1882,21 @@ select.form-control {
 }
 
 .ticker-symbol {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
     color: var(--text-secondary);
-    min-width: 75px;
+    min-width: 70px;
 }
 
 .ticker-price {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--text-primary);
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 }
 
 .ticker-change {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 600;
     padding: 1px 4px;
     border-radius: 2px;
@@ -1928,31 +1928,31 @@ select.form-control {
     
     .pro-ticker-content {
         height: 46px;
-        padding: 0 10px;
-        gap: 8px;
+        padding: 0 12px;
+        gap: 12px;
     }
     
     .ticker-item {
-        padding: 4px 8px;
+        padding: 4px 9px;
         gap: 5px;
     }
     
     .ticker-symbol {
-        font-size: 9px;
+        font-size: 8px;
         min-width: 65px;
     }
     
     .ticker-price {
-        font-size: 10px;
+        font-size: 9px;
     }
     
     .ticker-change {
-        font-size: 8px;
+        font-size: 7px;
         padding: 1px 3px;
     }
     
     .category-label {
-        font-size: 7px;
+        font-size: 6px;
         padding: 2px 6px;
     }
 }
