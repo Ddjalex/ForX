@@ -206,6 +206,42 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<div class="tradingview-ticker-container">
+    <div class="ticker-label">MARKETS:</div>
+    <div class="ticker-slider">
+        <div class="ticker-item">
+            <span class="ticker-symbol">NASDAQ</span>
+            <span class="ticker-value">19,542.18</span>
+            <span class="ticker-change positive">+1.25%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-symbol">DOW_JONES</span>
+            <span class="ticker-value">42,156.89</span>
+            <span class="ticker-change positive">-0.18%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-symbol">FTSE:100</span>
+            <span class="ticker-value">8,245.67</span>
+            <span class="ticker-change positive">+0.45%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-symbol">DAX</span>
+            <span class="ticker-value">18,892.34</span>
+            <span class="ticker-change positive">+0.67%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-symbol">NIKKEI:225</span>
+            <span class="ticker-value">38,456.12</span>
+            <span class="ticker-change negative">-0.32%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-symbol">BITCOIN</span>
+            <span class="ticker-value">$104,256</span>
+            <span class="ticker-change positive">+2.45%</span>
+        </div>
+    </div>
+</div>
+
 <div class="grid-2">
     <div class="card market-data-card">
         <div class="card-header">
@@ -216,15 +252,15 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
         <div class="card-body market-table-container">
-            <table class="market-table">
+            <table class="market-table" id="crypto-table">
                 <thead>
                     <tr>
-                        <th>NAME</th>
-                        <th>MKT CAP</th>
-                        <th>FD_MKT_CAP</th>
-                        <th>PRICE</th>
-                        <th>AVAIL COINS</th>
-                        <th>TOTAL COINS</th>
+                        <th class="sortable" onclick="sortCryptoTable('name')">NAME</th>
+                        <th class="sortable" onclick="sortCryptoTable('mktCap')">MKT CAP <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortCryptoTable('fdMktCap')">FD_MKT_CAP <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortCryptoTable('price')">PRICE <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortCryptoTable('availCoins')">AVAIL COINS <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortCryptoTable('totalCoins')">TOTAL COINS <span class="sort-indicator"></span></th>
                     </tr>
                 </thead>
                 <tbody id="crypto-market-body">
@@ -243,16 +279,16 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
         <div class="card-body market-table-container">
-            <table class="market-table">
+            <table class="market-table" id="stock-table">
                 <thead>
                     <tr>
-                        <th>NAME</th>
-                        <th>VALUE</th>
-                        <th>CHANGE</th>
-                        <th>CHANGE%</th>
-                        <th>OPEN</th>
-                        <th>HIGH</th>
-                        <th>LOW</th>
+                        <th class="sortable" onclick="sortStockTable('name')">NAME</th>
+                        <th class="sortable" onclick="sortStockTable('value')">VALUE <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortStockTable('change')">CHANGE <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortStockTable('changePercent')">CHANGE% <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortStockTable('open')">OPEN <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortStockTable('high')">HIGH <span class="sort-indicator"></span></th>
+                        <th class="sortable" onclick="sortStockTable('low')">LOW <span class="sort-indicator"></span></th>
                     </tr>
                 </thead>
                 <tbody id="stock-market-body">
@@ -698,32 +734,76 @@ function showConfirmModal(action) {
     balanceErrorDiv.style.display = 'none';
 }
 
+window.cryptoData = [
+    { symbol: 'BTC', name: 'Bitcoin', mktCap: 1.2e12, fdMktCap: 1.18e12, price: 104256, availCoins: '21M', totalCoins: '21M' },
+    { symbol: 'ETH', name: 'Ethereum', mktCap: 478e9, fdMktCap: 465e9, price: 3892, availCoins: '120M', totalCoins: '120M' },
+    { symbol: '#TRUMP', name: 'Trump', mktCap: 967.2e6, fdMktCap: 4.93e9, price: 4.934, availCoins: '200M', totalCoins: '1E' },
+    { symbol: 'finch', name: 'Finch Token', mktCap: 211.29e6, fdMktCap: 226.04e6, price: 0.15069114, availCoins: '1.4B', totalCoins: '1.5E' },
+    { symbol: 'ACryptoS', name: 'Akropolis Synths', mktCap: 13.38e6, fdMktCap: 26.71e6, price: 0.0002983, availCoins: '44.86B', totalCoins: '89.54E' },
+    { symbol: 'AI', name: 'AI Protocol', mktCap: 16.67e6, fdMktCap: 36.78e6, price: 0.03673376, availCoins: '453.31M', totalCoins: '1E' },
+    { symbol: 'API3', name: 'API3', mktCap: 36.47e6, fdMktCap: 66.19e6, price: 0.422000, availCoins: '86.42M', totalCoins: '156.84M' },
+    { symbol: 'ARPA', name: 'ARPA Chain', mktCap: 18.69e6, fdMktCap: 24.59e6, price: 0.01229653, availCoins: '1.52B', totalCoins: '2E' }
+];
+window.stockData = [
+    { symbol: 'NASDAQ', name: 'NASDAQ', value: 97.46, change: 2.10, changePercent: 2.20, open: 95.36, high: 97.72, low: 95 },
+    { symbol: 'AAPL', name: 'APPLE STOCK', value: 270.97, change: -2.70, changePercent: -0.99, open: 272.86, high: 273.88, low: 270 },
+    { symbol: 'GOOGL', name: 'GOOGL', value: 309.78, change: 2.62, changePercent: 0.89, open: 309.88, high: 310.13, low: 308 },
+    { symbol: 'NVAX', name: 'NVAX NA', value: 6.89, change: 0.23, changePercent: 3.45, open: 6.71, high: 6.98, low: 6.80 },
+    { symbol: 'AMZN', name: 'AMAZON', value: 228.43, change: 1.08, changePercent: 0.48, open: 228.61, high: 229.48, low: 227 },
+    { symbol: 'FACEB', name: 'FACEBOOK', value: 1.54, change: 0.05, changePercent: 3.35, open: 1.50, high: 1.60, low: 1.50 },
+    { symbol: 'TSLA', name: 'TESLA', value: 280.50, change: 5.50, changePercent: 2.00, open: 275.00, high: 285.00, low: 274.50 }
+];
+
+window.sortCryptoTable = function(column) {
+    const tbody = document.getElementById('crypto-market-body');
+    let rows = Array.from(tbody.querySelectorAll('tr'));
+    let isAsc = !document.querySelector('#crypto-table th.sortable.active')?.dataset.asc;
+    if (document.querySelector('#crypto-table th.sortable.active')) {
+        document.querySelector('#crypto-table th.sortable.active').classList.remove('active');
+    }
+    rows.sort((a, b) => {
+        let aVal = a.dataset[column] || (window.cryptoData.find(d => d.symbol === a.dataset.symbol)?.[column] ?? 0);
+        let bVal = b.dataset[column] || (window.cryptoData.find(d => d.symbol === b.dataset.symbol)?.[column] ?? 0);
+        aVal = isNaN(aVal) ? aVal : parseFloat(aVal);
+        bVal = isNaN(bVal) ? bVal : parseFloat(bVal);
+        return isAsc ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+    });
+    rows.forEach(row => tbody.appendChild(row));
+    const th = event.target.closest('th');
+    if (th) {
+        th.classList.add('active');
+        th.dataset.asc = isAsc;
+    }
+};
+
+window.sortStockTable = function(column) {
+    const tbody = document.getElementById('stock-market-body');
+    let rows = Array.from(tbody.querySelectorAll('tr'));
+    let isAsc = !document.querySelector('#stock-table th.sortable.active')?.dataset.asc;
+    if (document.querySelector('#stock-table th.sortable.active')) {
+        document.querySelector('#stock-table th.sortable.active').classList.remove('active');
+    }
+    rows.sort((a, b) => {
+        let aVal = a.dataset[column] || (window.stockData.find(d => d.symbol === a.dataset.symbol)?.[column] ?? 0);
+        let bVal = b.dataset[column] || (window.stockData.find(d => d.symbol === b.dataset.symbol)?.[column] ?? 0);
+        aVal = isNaN(aVal) ? aVal : parseFloat(aVal);
+        bVal = isNaN(bVal) ? bVal : parseFloat(bVal);
+        return isAsc ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+    });
+    rows.forEach(row => tbody.appendChild(row));
+    const th = event.target.closest('th');
+    if (th) {
+        th.classList.add('active');
+        th.dataset.asc = isAsc;
+    }
+};
+
 window.loadMarketDataNow = function() {
-    const cryptoData = [
-        { symbol: 'BTC', name: 'Bitcoin', mktCap: '$1.2T', fdMktCap: '$1.18T', price: '$104,256', availCoins: '21M', totalCoins: '21M' },
-        { symbol: 'ETH', name: 'Ethereum', mktCap: '$478B', fdMktCap: '$465B', price: '$3,892', availCoins: '120M', totalCoins: '120M' },
-        { symbol: '#TRUMP', name: 'Trump', mktCap: '967.2M', fdMktCap: '4.93B', price: '4.934', availCoins: '200M', totalCoins: '1E' },
-        { symbol: 'finch', name: 'Finch Token', mktCap: '211.29M', fdMktCap: '226.04M', price: '0.15069114', availCoins: '1.4B', totalCoins: '1.5E' },
-        { symbol: 'ACryptoS', name: 'Akropolis Synths', mktCap: '13.38M', fdMktCap: '26.71M', price: '0.0002983', availCoins: '44.86B', totalCoins: '89.54E' },
-        { symbol: 'AI', name: 'AI Protocol', mktCap: '16.67M', fdMktCap: '36.78M', price: '0.03673376', availCoins: '453.31M', totalCoins: '1E' },
-        { symbol: 'API3', name: 'API3', mktCap: '36.47M', fdMktCap: '66.19M', price: '0.422000', availCoins: '86.42M', totalCoins: '156.84M' },
-        { symbol: 'ARPA', name: 'ARPA Chain', mktCap: '18.69M', fdMktCap: '24.59M', price: '0.01229653', availCoins: '1.52B', totalCoins: '2E' }
-    ];
-    const stockData = [
-        { symbol: 'NASDAQ', name: 'NASDAQ', value: '97.46', change: '2.10', changePercent: '2.20%', open: '95.36', high: '97.72', low: '95' },
-        { symbol: 'AAPL', name: 'APPLE STOCK', value: '270.97', change: '-2.70', changePercent: '-0.99%', open: '272.86', high: '273.88', low: '270' },
-        { symbol: 'GOOGL', name: 'GOOGL', value: '309.78', change: '2.62', changePercent: '0.89%', open: '309.88', high: '310.13', low: '308' },
-        { symbol: 'NVAX', name: 'NVAX NA', value: '6.89', change: '0.23', changePercent: '3.45%', open: '6.71', high: '6.98', low: '6.80' },
-        { symbol: 'AMZN', name: 'AMAZON', value: '228.43', change: '1.08', changePercent: '0.48%', open: '228.61', high: '229.48', low: '227' },
-        { symbol: 'FACEB', name: 'FACEBOOK', value: '1.54', change: '0.05', changePercent: '3.35%', open: '1.50', high: '1.60', low: '1.50' },
-        { symbol: 'TSLA', name: 'TESLA', value: '280.50', change: '5.50', changePercent: '2.00%', open: '275.00', high: '285.00', low: '274.50' }
-    ];
-    
     const cryptoBody = document.getElementById('crypto-market-body');
     if (cryptoBody) {
         let html = '';
-        cryptoData.forEach(crypto => {
-            html += '<tr onclick="navigateToTrade(\'' + crypto.symbol + '\')"><td class="market-symbol"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--bg-dark);">' + crypto.symbol.charAt(0) + '</span><strong>' + crypto.symbol + '</strong></span></td><td>' + crypto.mktCap + '</td><td>' + crypto.fdMktCap + '</td><td class="positive">' + crypto.price + '</td><td>' + crypto.availCoins + '</td><td>' + crypto.totalCoins + '</td></tr>';
+        window.cryptoData.forEach(crypto => {
+            html += '<tr data-symbol="' + crypto.symbol + '" data-name="' + crypto.name + '" data-price="' + crypto.price + '" data-mktCap="' + crypto.mktCap + '" data-fdMktCap="' + crypto.fdMktCap + '" onclick="navigateToTrade(\'' + crypto.symbol + '\')"><td class="market-symbol"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--bg-dark);">' + crypto.symbol.charAt(0) + '</span><strong>' + crypto.symbol + '</strong></span></td><td>' + (crypto.mktCap / 1e12).toFixed(2) + 'T</td><td>' + (crypto.fdMktCap / 1e9).toFixed(2) + 'B</td><td class="positive">$' + crypto.price.toLocaleString() + '</td><td>' + crypto.availCoins + '</td><td>' + crypto.totalCoins + '</td></tr>';
         });
         cryptoBody.innerHTML = html;
     }
@@ -731,9 +811,9 @@ window.loadMarketDataNow = function() {
     const stockBody = document.getElementById('stock-market-body');
     if (stockBody) {
         let html = '';
-        stockData.forEach(stock => {
-            const changeClass = stock.change.startsWith('-') ? 'negative' : 'positive';
-            html += '<tr onclick="navigateToTrade(\'' + stock.symbol + '\')"><td class="market-symbol"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 24px; height: 24px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--bg-dark);">◆</span><strong>' + stock.name + '</strong></span></td><td>' + stock.value + '</td><td class="' + changeClass + '">' + stock.change + '</td><td class="' + changeClass + '">' + stock.changePercent + '</td><td>' + stock.open + '</td><td>' + stock.high + '</td><td>' + stock.low + '</td></tr>';
+        window.stockData.forEach(stock => {
+            const changeClass = stock.change < 0 ? 'negative' : 'positive';
+            html += '<tr data-symbol="' + stock.symbol + '" data-name="' + stock.name + '" data-value="' + stock.value + '" data-change="' + stock.change + '" data-changePercent="' + stock.changePercent + '" onclick="navigateToTrade(\'' + stock.symbol + '\')"><td class="market-symbol"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 24px; height: 24px; background: var(--primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--bg-dark);">◆</span><strong>' + stock.name + '</strong></span></td><td>' + stock.value.toFixed(2) + '</td><td class="' + changeClass + '">' + (stock.change > 0 ? '+' : '') + stock.change.toFixed(2) + '</td><td class="' + changeClass + '">' + (stock.changePercent > 0 ? '+' : '') + stock.changePercent.toFixed(2) + '%</td><td>' + stock.open.toFixed(2) + '</td><td>' + stock.high.toFixed(2) + '</td><td>' + stock.low.toFixed(2) + '</td></tr>';
         });
         stockBody.innerHTML = html;
     }

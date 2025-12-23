@@ -1967,6 +1967,94 @@ select.form-control {
     padding: 12px 16px;
 }
 
+.tradingview-ticker-container {
+    background: linear-gradient(90deg, rgba(10, 22, 40, 0.95) 0%, rgba(15, 39, 68, 0.95) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    overflow-x: auto;
+}
+
+.ticker-label {
+    font-weight: 700;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.ticker-slider {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    flex: 1;
+    scroll-behavior: smooth;
+}
+
+.ticker-slider::-webkit-scrollbar {
+    height: 4px;
+}
+
+.ticker-slider::-webkit-scrollbar-track {
+    background: rgba(0, 212, 170, 0.1);
+    border-radius: 2px;
+}
+
+.ticker-slider::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.ticker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 8px 12px;
+    background: rgba(0, 212, 170, 0.05);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    border-radius: 8px;
+    white-space: nowrap;
+    min-width: 160px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.ticker-item:hover {
+    background: rgba(0, 212, 170, 0.15);
+    border-color: var(--primary);
+}
+
+.ticker-symbol {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.ticker-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ticker-change {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.ticker-change.positive {
+    color: var(--success);
+}
+
+.ticker-change.negative {
+    color: var(--danger);
+}
+
 .market-table-container {
     padding: 0;
     min-height: 320px;
@@ -1995,6 +2083,38 @@ select.form-control {
     font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.market-table th.sortable {
+    background: linear-gradient(to bottom, rgba(0, 212, 170, 0.05), transparent);
+}
+
+.market-table th.sortable:hover {
+    background: rgba(0, 212, 170, 0.15);
+    color: var(--primary);
+}
+
+.market-table th.sortable.active {
+    background: rgba(0, 212, 170, 0.2);
+    color: var(--primary);
+}
+
+.sort-indicator {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 10px;
+}
+
+.market-table th.sortable.active .sort-indicator::after {
+    content: '▲';
+}
+
+.market-table th.sortable.active[data-asc="false"] .sort-indicator::after {
+    content: '▼';
 }
 
 .market-table tbody tr {
