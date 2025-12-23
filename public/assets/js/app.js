@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updatePrices, 30000);
     setInterval(updatePositions, 10000);
     setInterval(checkExpiredPositions, 5000);
+    setInterval(updateWalletBalance, 5000);
     checkExpiredPositions();
+    updateWalletBalance();
     
     initSidebar();
     initLanguageToggle();
@@ -283,6 +285,11 @@ function setLeverage(leverage) {
         btn.classList.remove('active');
     });
     if (event && event.target) event.target.classList.add('active');
+    
+    // Re-validate trade amount with new leverage
+    if (typeof validateTradeAmount === 'function') {
+        validateTradeAmount();
+    }
 }
 
 function updateLeverageFromSlider(value) {
@@ -294,6 +301,11 @@ function updateLeverageFromSlider(value) {
     });
     const targetBtn = document.querySelector(`[data-leverage="${value}"]`);
     if (targetBtn) targetBtn.classList.add('active');
+    
+    // Re-validate trade amount with new leverage
+    if (typeof validateTradeAmount === 'function') {
+        validateTradeAmount();
+    }
 }
 
 function updateAssetNames() {
@@ -353,25 +365,132 @@ function showConfirmModal(side) {
     modal.style.display = 'flex';
 }
 
+async function updateWalletBalance() {
+    try {
+        const response = await fetch('/api/wallet');
+        if (!response.ok) return;
+        
+        const data = await response.json();
+        if (data.success && data.data) {
+            // Update balance display in the panel
+            const balanceValueEl = document.querySelector('.balance-value');
+            if (balanceValueEl) {
+                const available = data.data.available || 0;
+                balanceValueEl.textContent = '$' + formatNumber(available, 2);
+                
+                // Store current balance for validation
+                window.currentWalletData = data.data;
+            }
+            
+            // Check if balance is low and show warning
+            if (data.data.available < 100) {
+                showLowBalanceWarning(data.data.available);
+            }
+        }
+    } catch (e) {
+        console.log('Wallet balance update failed:', e);
+    }
+}
+
+function showLowBalanceWarning(balance) {
+    const existingWarning = document.getElementById('lowBalanceWarning');
+    if (existingWarning) return;
+    
+    const warning = document.createElement('div');
+    warning.id = 'lowBalanceWarning';
+    warning.className = 'alert alert-warning';
+    warning.style.cssText = `
+        position: sticky;
+        top: 10px;
+        z-index: 100;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        border-radius: 8px;
+        border-left: 4px solid #ff6f00;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+    `;
+    warning.innerHTML = `
+        <strong>⚠️ Low Balance Warning</strong><br>
+        Your available balance is only <strong>$${balance.toFixed(2)}</strong>. 
+        <a href="/wallet/deposit" style="color: white; text-decoration: underline; font-weight: bold;">Make a deposit</a>
+    `;
+    
+    const tradingPanel = document.querySelector('.trading-panel');
+    if (tradingPanel && !tradingPanel.querySelector('#lowBalanceWarning')) {
+        tradingPanel.insertBefore(warning, tradingPanel.firstChild);
+    }
+}
+
 function validateTradeAmount() {
     const amountInput = document.getElementById('tradeAmount');
     const errorDiv = document.getElementById('balanceError');
-    const balanceText = document.querySelector('.balance-value');
+    const maxAmountDiv = document.getElementById('maxAmount');
+    const leverageInput = document.getElementById('leverageValue');
     
-    if (!amountInput || !errorDiv || !balanceText) return;
+    if (!amountInput || !errorDiv) return;
     
-    const amount = parseFloat(amountInput.value);
-    const balance = parseFloat(balanceText.textContent.replace('$', '').replace(',', ''));
-    const leverage = parseInt(document.getElementById('leverageValue').value) || 1;
+    const amount = parseFloat(amountInput.value) || 0;
+    const leverage = parseInt(leverageInput?.value) || 1;
+    
+    // Get balance from stored wallet data or fallback to DOM
+    let availableBalance = 0;
+    if (window.currentWalletData) {
+        availableBalance = window.currentWalletData.available || 0;
+    } else {
+        const balanceText = document.querySelector('.balance-value');
+        if (balanceText) {
+            availableBalance = parseFloat(balanceText.textContent.replace('$', '').replace(',', '')) || 0;
+        }
+    }
+    
     const marginRequired = amount / leverage;
+    const maxTradeable = availableBalance * leverage;
     
-    if (marginRequired > balance) {
-        errorDiv.textContent = `Insufficient Balance! Required Margin: $${marginRequired.toFixed(2)}`;
-        errorDiv.style.display = 'block';
+    // Show max amount helper
+    if (maxAmountDiv && availableBalance > 0) {
+        maxAmountDiv.textContent = `Max tradeable amount: $${maxTradeable.toFixed(2)} (at ${leverage}x leverage)`;
+        maxAmountDiv.style.display = 'block';
+    }
+    
+    // Validate balance
+    if (amount > 0 && marginRequired > availableBalance) {
+        errorDiv.textContent = `❌ Insufficient Balance! Required Margin: $${marginRequired.toFixed(2)} | Available: $${availableBalance.toFixed(2)}`;
+        errorDiv.className = 'balance-error-display';
+        errorDiv.style.cssText = `
+            color: #ff4757;
+            font-size: 13px;
+            margin-top: 8px;
+            font-weight: 500;
+            display: block;
+            padding: 10px;
+            background: rgba(255, 71, 87, 0.15);
+            border-radius: 6px;
+            border-left: 3px solid #ff4757;
+        `;
         amountInput.style.borderColor = '#ff4757';
+        amountInput.style.boxShadow = '0 0 0 2px rgba(255, 71, 87, 0.1)';
+    } else if (amount > 0) {
+        const remainingBalance = availableBalance - marginRequired;
+        errorDiv.innerHTML = `✓ Sufficient balance. Remaining after trade: $${remainingBalance.toFixed(2)}`;
+        errorDiv.style.cssText = `
+            color: #00d4aa;
+            font-size: 13px;
+            margin-top: 8px;
+            font-weight: 500;
+            display: block;
+            padding: 10px;
+            background: rgba(0, 212, 170, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #00d4aa;
+        `;
+        amountInput.style.borderColor = '#00d4aa';
+        amountInput.style.boxShadow = '0 0 0 2px rgba(0, 212, 170, 0.1)';
     } else {
         errorDiv.style.display = 'none';
         amountInput.style.borderColor = '';
+        amountInput.style.boxShadow = '';
     }
 }
 
