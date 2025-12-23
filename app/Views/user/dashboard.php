@@ -762,13 +762,15 @@ window.updateTicker = function(cryptoList) {
     if (window.cryptoData && window.cryptoData.length > 0) {
         window.cryptoData.forEach(crypto => {
             if (crypto.price > 0) {
-                html += '<span class="ticker-item" onclick="navigateToTrade(\'' + crypto.symbol + '\')" style="cursor: pointer;"><strong>' + crypto.symbol + ':</strong> $' + (crypto.price > 1 ? crypto.price.toFixed(2) : crypto.price.toFixed(6)) + '</span>';
+                const priceDisplay = crypto.price > 1 ? '$' + crypto.price.toFixed(2) : '$' + crypto.price.toFixed(6);
+                html += '<span class="ticker-item" onclick="navigateToTrade(\'' + crypto.symbol + '\')" title="' + crypto.name + '" style="cursor: pointer;"><strong>' + crypto.symbol + ':</strong> <span>' + priceDisplay + '</span></span>';
             }
         });
     }
     
     // Duplicate for continuous scroll effect
-    html += html;
+    const originalHtml = html;
+    html += originalHtml;
     tickerContent.innerHTML = html;
 };
 

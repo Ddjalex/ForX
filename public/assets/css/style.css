@@ -1970,8 +1970,9 @@ select.form-control {
 .crypto-ticker-wrapper {
     background: linear-gradient(90deg, rgba(10, 22, 40, 0.98) 0%, rgba(15, 39, 68, 0.98) 100%);
     border-bottom: 1px solid var(--border-color);
-    overflow: hidden;
+    overflow: visible;
     margin: 0 0 24px 0;
+    padding: 8px 0;
 }
 
 .ticker-container {
@@ -1982,34 +1983,41 @@ select.form-control {
 
 .ticker-content {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     padding: 12px 20px;
-    animation: scroll-left 30s linear infinite;
+    animation: scroll-left 40s linear infinite;
     white-space: nowrap;
+    align-items: center;
+    min-width: max-content;
 }
 
 .ticker-item {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     min-width: max-content;
-    padding: 8px 16px;
-    background: rgba(0, 212, 170, 0.05);
-    border: 1px solid rgba(0, 212, 170, 0.2);
-    border-radius: 6px;
-    font-size: 13px;
+    padding: 10px 16px;
+    background: rgba(0, 212, 170, 0.08);
+    border: 1px solid rgba(0, 212, 170, 0.25);
+    border-radius: 8px;
+    font-size: 14px;
     color: var(--text-primary);
     transition: all 0.3s;
+    flex-shrink: 0;
 }
 
 .ticker-item:hover {
-    background: rgba(0, 212, 170, 0.15);
+    background: rgba(0, 212, 170, 0.2);
     border-color: var(--primary);
     color: var(--primary);
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
 }
 
-.ticker-content strong {
+.ticker-item strong {
     color: var(--primary);
     font-weight: 700;
+    min-width: max-content;
 }
 
 @keyframes scroll-left {
