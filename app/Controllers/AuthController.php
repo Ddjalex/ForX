@@ -189,13 +189,13 @@ class AuthController
 
         if (!empty($referralLink)) {
             $referralData = Database::fetch(
-                "SELECT id FROM referral_links WHERE code = ? OR id = ?",
+                "SELECT user_id FROM referral_links WHERE code = ? OR id = ?",
                 [$referralLink, $referralLink]
             );
             
             if ($referralData) {
                 Database::insert('referrals', [
-                    'referrer_id' => $referralData['id'],
+                    'referrer_user_id' => $referralData['user_id'],
                     'referred_user_id' => $userId,
                     'status' => 'pending',
                     'created_at' => date('Y-m-d H:i:s'),

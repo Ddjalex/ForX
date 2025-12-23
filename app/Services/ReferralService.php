@@ -75,7 +75,7 @@ class ReferralService
             return false;
         }
         
-        Database::execute(
+        Database::query(
             "UPDATE referral_links SET clicks = clicks + 1 WHERE code = ?",
             [$code]
         );

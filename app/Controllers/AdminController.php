@@ -258,7 +258,7 @@ class AdminController
     {
         // Check if user was referred
         $referral = Database::fetch(
-            "SELECT referrer_id FROM referrals WHERE referred_user_id = ?",
+            "SELECT referrer_user_id FROM referrals WHERE referred_user_id = ?",
             [$deposit['user_id']]
         );
 
@@ -287,14 +287,14 @@ class AdminController
 
         // Record the referral earning
         Database::insert('referral_earnings', [
-            'referrer_id' => $referral['referrer_id'],
+            'referrer_id' => $referral['referrer_user_id'],
             'referred_id' => $deposit['user_id'],
             'amount' => $bonusAmount,
             'status' => 'pending',
             'created_at' => date('Y-m-d H:i:s'),
         ]);
 
-        AuditLog::log('referral_bonus_awarded', 'referral', $referral['referrer_id'], [
+        AuditLog::log('referral_bonus_awarded', 'referral', $referral['referrer_user_id'], [
             'bonus_amount' => $bonusAmount,
             'deposit_id' => $deposit['id'],
             'referred_user_id' => $deposit['user_id'],
