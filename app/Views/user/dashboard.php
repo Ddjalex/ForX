@@ -206,42 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div class="tradingview-ticker-container">
-    <div class="ticker-label">MARKETS:</div>
-    <div class="ticker-slider">
-        <div class="ticker-item">
-            <span class="ticker-symbol">NASDAQ</span>
-            <span class="ticker-value">19,542.18</span>
-            <span class="ticker-change positive">+1.25%</span>
-        </div>
-        <div class="ticker-item">
-            <span class="ticker-symbol">DOW_JONES</span>
-            <span class="ticker-value">42,156.89</span>
-            <span class="ticker-change positive">-0.18%</span>
-        </div>
-        <div class="ticker-item">
-            <span class="ticker-symbol">FTSE:100</span>
-            <span class="ticker-value">8,245.67</span>
-            <span class="ticker-change positive">+0.45%</span>
-        </div>
-        <div class="ticker-item">
-            <span class="ticker-symbol">DAX</span>
-            <span class="ticker-value">18,892.34</span>
-            <span class="ticker-change positive">+0.67%</span>
-        </div>
-        <div class="ticker-item">
-            <span class="ticker-symbol">NIKKEI:225</span>
-            <span class="ticker-value">38,456.12</span>
-            <span class="ticker-change negative">-0.32%</span>
-        </div>
-        <div class="ticker-item">
-            <span class="ticker-symbol">BITCOIN</span>
-            <span class="ticker-value">$104,256</span>
-            <span class="ticker-change positive">+2.45%</span>
-        </div>
-    </div>
-</div>
-
 <div class="grid-2">
     <div class="card market-data-card">
         <div class="card-header">
@@ -746,21 +710,29 @@ window.stockData = [
 ];
 
 window.fetchCryptoData = function() {
-    const coinIds = 'bitcoin,ethereum,trump-coin,finch-coin,akropolis-synths,ai-protocol,api3,arpa-chain';
-    const url = 'https://api.coingecko.com/api/v3/simple/price?ids=' + coinIds + '&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&order=market_cap_desc&sparkline=false&x_cg_pro_api_key=CG-WSd513UKp8XTr3JTgrbRhwgs';
+    const coinIds = 'bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot';
+    const url = 'https://api.coingecko.com/api/v3/simple/price?ids=' + coinIds + '&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&x_cg_pro_api_key=CG-WSd513UKp8XTr3JTgrbRhwgs';
     
     fetch(url)
         .then(response => response.json())
         .then(data => {
+            const formatMarketCap = (cap) => {
+                if (!cap) return 'N/A';
+                if (cap >= 1e12) return '$' + (cap / 1e12).toFixed(2) + 'T';
+                if (cap >= 1e9) return '$' + (cap / 1e9).toFixed(2) + 'B';
+                if (cap >= 1e6) return '$' + (cap / 1e6).toFixed(2) + 'M';
+                return '$' + cap.toFixed(2);
+            };
+            
             window.cryptoData = [
                 { symbol: 'BTC', name: 'Bitcoin', mktCap: data['bitcoin']?.usd_market_cap || 0, fdMktCap: data['bitcoin']?.usd_market_cap || 0, price: data['bitcoin']?.usd || 0, availCoins: '21M', totalCoins: '21M' },
                 { symbol: 'ETH', name: 'Ethereum', mktCap: data['ethereum']?.usd_market_cap || 0, fdMktCap: data['ethereum']?.usd_market_cap || 0, price: data['ethereum']?.usd || 0, availCoins: '120M', totalCoins: '120M' },
-                { symbol: '#TRUMP', name: 'Trump', mktCap: data['trump-coin']?.usd_market_cap || 0, fdMktCap: data['trump-coin']?.usd_market_cap || 0, price: data['trump-coin']?.usd || 0, availCoins: '200M', totalCoins: '1E' },
-                { symbol: 'finch', name: 'Finch Token', mktCap: data['finch-coin']?.usd_market_cap || 0, fdMktCap: data['finch-coin']?.usd_market_cap || 0, price: data['finch-coin']?.usd || 0, availCoins: '1.4B', totalCoins: '1.5E' },
-                { symbol: 'ACryptoS', name: 'Akropolis Synths', mktCap: data['akropolis-synths']?.usd_market_cap || 0, fdMktCap: data['akropolis-synths']?.usd_market_cap || 0, price: data['akropolis-synths']?.usd || 0, availCoins: '44.86B', totalCoins: '89.54E' },
-                { symbol: 'AI', name: 'AI Protocol', mktCap: data['ai-protocol']?.usd_market_cap || 0, fdMktCap: data['ai-protocol']?.usd_market_cap || 0, price: data['ai-protocol']?.usd || 0, availCoins: '453.31M', totalCoins: '1E' },
-                { symbol: 'API3', name: 'API3', mktCap: data['api3']?.usd_market_cap || 0, fdMktCap: data['api3']?.usd_market_cap || 0, price: data['api3']?.usd || 0, availCoins: '86.42M', totalCoins: '156.84M' },
-                { symbol: 'ARPA', name: 'ARPA Chain', mktCap: data['arpa-chain']?.usd_market_cap || 0, fdMktCap: data['arpa-chain']?.usd_market_cap || 0, price: data['arpa-chain']?.usd || 0, availCoins: '1.52B', totalCoins: '2E' }
+                { symbol: 'USDT', name: 'Tether USDt', mktCap: data['tether']?.usd_market_cap || 0, fdMktCap: data['tether']?.usd_market_cap || 0, price: data['tether']?.usd || 0, availCoins: '186.91B', totalCoins: '188.85B' },
+                { symbol: 'BNB', name: 'Binance Coin', mktCap: data['binancecoin']?.usd_market_cap || 0, fdMktCap: data['binancecoin']?.usd_market_cap || 0, price: data['binancecoin']?.usd || 0, availCoins: '137.73M', totalCoins: '137.73M' },
+                { symbol: 'XRP', name: 'Ripple', mktCap: data['ripple']?.usd_market_cap || 0, fdMktCap: data['ripple']?.usd_market_cap || 0, price: data['ripple']?.usd || 0, availCoins: '60.57B', totalCoins: '99.99B' },
+                { symbol: 'SOL', name: 'Solana', mktCap: data['solana']?.usd_market_cap || 0, fdMktCap: data['solana']?.usd_market_cap || 0, price: data['solana']?.usd || 0, availCoins: '562.42M', totalCoins: '616.72M' },
+                { symbol: 'ADA', name: 'Cardano', mktCap: data['cardano']?.usd_market_cap || 0, fdMktCap: data['cardano']?.usd_market_cap || 0, price: data['cardano']?.usd || 0, availCoins: '39.87B', totalCoins: '45B' },
+                { symbol: 'DOT', name: 'Polkadot', mktCap: data['polkadot']?.usd_market_cap || 0, fdMktCap: data['polkadot']?.usd_market_cap || 0, price: data['polkadot']?.usd || 0, availCoins: '1.39B', totalCoins: '1.39B' }
             ];
             window.loadMarketDataNow();
         })
