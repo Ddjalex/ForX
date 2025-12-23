@@ -268,10 +268,10 @@ class AdminController
 
         // Get referral settings
         $commissionSetting = Database::fetch(
-            "SELECT value FROM settings WHERE `key` = 'referral_commission'"
+            "SELECT value FROM settings WHERE setting_key = 'referral_commission'"
         );
         $minDepositSetting = Database::fetch(
-            "SELECT value FROM settings WHERE `key` = 'referral_min_deposit'"
+            "SELECT value FROM settings WHERE setting_key = 'referral_min_deposit'"
         );
 
         $commissionPercent = (float)($commissionSetting['value'] ?? 5);
