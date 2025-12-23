@@ -81,7 +81,19 @@ PostgreSQL with the following main tables:
 - loan_plans, loans
 - referral_links, referral_earnings
 
-## Recent Changes
+## Recent Changes (Completed)
+- **December 23, 2024: Referral System - FULLY OPERATIONAL** ✅
+  - Auto-generates referral codes for every user on registration
+  - Tracks referral clicks when users visit referral links
+  - Automatically creates "pending" referral earnings when referred user registers
+  - Auto-approves referral bonuses when referred user's deposit is approved
+  - Bonus automatically added to referrer's wallet balance
+  - Commission rate: 5% with $50 minimum deposit requirement
+  - Features: Total Referrals count, Link Clicks tracking, Total Earnings & Pending display
+  - **Production-Ready**: All files uploaded to cPanel at alphacoremarkets.com
+- December 2024: Email Auto-Fill After Verification
+  - Login form auto-fills email after email verification
+  - Improved user experience for returning users
 - December 2024: New Features Implementation:
   - Added NewsService with Finnhub API integration for market news
   - Added NFTService with CoinGecko API for NFT marketplace data
