@@ -1,7 +1,7 @@
 run = "php -S 0.0.0.0:8000 -t ."
 
 entrypoint = "index.php"
-modules = ["php-8.2", "web", "nodejs-20", "nix"]
+modules = ["php-8.2", "nodejs-20", "web", "nix"]
 
 [nix]
 channel = "stable-25_05"
@@ -44,3 +44,7 @@ BREVO_SENDER_EMAIL = "noreply@alphacoremarkets.com"
 BREVO_SENDER_NAME = "Alpha Core Markets"
 BREVO_API_KEY = "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"
 COINGECKO_API_KEY = "CG-WSd513UKp8XTr3JTgrbRhwgs"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
