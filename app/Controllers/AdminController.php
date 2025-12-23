@@ -256,68 +256,48 @@ class AdminController
 
     private function processReferralBonus(array $deposit): void
     {
-        // Check if user was referred
-        $referral = Database::fetch(
-            "SELECT referrer_user_id FROM referrals WHERE referred_user_id = ?",
+        // Check if user has pending referral earnings
+        $referralEarning = Database::fetch(
+            "SELECT * FROM referral_earnings WHERE referred_id = ? AND status = 'pending' LIMIT 1",
             [$deposit['user_id']]
         );
 
-        if (!$referral) {
+        if (!$referralEarning) {
             return;
         }
 
-        // Get referral settings
-        $commissionSetting = Database::fetch(
-            "SELECT value FROM settings WHERE setting_key = 'referral_commission'"
-        );
-        $minDepositSetting = Database::fetch(
-            "SELECT value FROM settings WHERE setting_key = 'referral_min_deposit'"
-        );
+        $referrerId = $referralEarning['referrer_id'];
+        $bonusAmount = (float)$referralEarning['amount'];
 
-        $commissionPercent = (float)($commissionSetting['value'] ?? 5);
-        $minDeposit = (float)($minDepositSetting['value'] ?? 50);
-
-        // Only award bonus if deposit meets minimum
-        if ($deposit['amount'] < $minDeposit) {
-            return;
-        }
-
-        // Calculate bonus amount
-        $bonusAmount = ($deposit['amount'] * $commissionPercent) / 100;
-
-        // Record the referral earning
-        Database::insert('referral_earnings', [
-            'referrer_id' => $referral['referrer_user_id'],
-            'referred_id' => $deposit['user_id'],
-            'amount' => $bonusAmount,
+        // Update referral earning to paid status
+        Database::update('referral_earnings', [
             'status' => 'paid',
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
+            'updated_at' => date('Y-m-d H:i:s'),
+        ], 'id = ?', [$referralEarning['id']]);
 
         // Add bonus to referrer's wallet
         $referrerWallet = Database::fetch(
             "SELECT * FROM wallets WHERE user_id = ?",
-            [$referral['referrer_user_id']]
+            [$referrerId]
         );
 
         if ($referrerWallet) {
             Database::update('wallets', [
                 'balance' => $referrerWallet['balance'] + $bonusAmount,
-            ], 'user_id = ?', [$referral['referrer_user_id']]);
+            ], 'user_id = ?', [$referrerId]);
         } else {
             Database::insert('wallets', [
-                'user_id' => $referral['referrer_user_id'],
+                'user_id' => $referrerId,
                 'balance' => $bonusAmount,
                 'margin_used' => 0,
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
         }
 
-        AuditLog::log('referral_bonus_awarded', 'referral', $referral['referrer_user_id'], [
+        AuditLog::log('referral_bonus_awarded', 'referral', $referrerId, [
             'bonus_amount' => $bonusAmount,
             'deposit_id' => $deposit['id'],
             'referred_user_id' => $deposit['user_id'],
-            'commission_percent' => $commissionPercent,
         ]);
     }
 
