@@ -64,11 +64,11 @@
             <p class="auth-subtitle">It's Free to Sign up and only takes a minute.</p>
 
             <?php if (!empty($error)): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
 
             <form method="POST" action="/register">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
+                <input type="hidden" name="_csrf_token" value="<?php echo isset($csrf_token) ? htmlspecialchars($csrf_token) : ''; ?>">
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -363,11 +363,11 @@
 
                 <div class="form-group">
                     <label class="form-label" for="referral_link">Referral Link (Optional)</label>
-                    <input type="text" id="referral_link" name="referral_link" class="form-control" placeholder="Enter referral code (e.g., REF123456)" value="<?= htmlspecialchars($referral_code ?? '') ?>">
+                    <input type="text" id="referral_link" name="referral_link" class="form-control" placeholder="Enter referral code (e.g., REF123456)" value="<?php echo isset($referral_code) ? htmlspecialchars($referral_code) : ''; ?>">
                 </div>
 
                 <div class="form-group">
-                    <div class="cf-turnstile" data-sitekey="<?= $turnstile_site_key ?? '' ?>" data-theme="dark"></div>
+                    <div class="cf-turnstile" data-sitekey="<?php echo isset($turnstile_site_key) ? htmlspecialchars($turnstile_site_key) : ''; ?>" data-theme="dark"></div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block mt-4">Sign Up</button>

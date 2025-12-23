@@ -101,11 +101,11 @@ class AuthController
 
     public function showRegister(): void
     {
-        // Get referral code from URL parameter - allow alphanumeric only
+        // Extract referral code from URL parameter
         $referralCode = '';
-        if (isset($_GET['ref']) && !empty($_GET['ref'])) {
-            // Only allow alphanumeric characters and hyphens/underscores
-            $referralCode = preg_replace('/[^a-zA-Z0-9\-_]/', '', $_GET['ref']);
+        if (!empty($_GET['ref'])) {
+            // Sanitize: only keep alphanumeric, hyphens, underscores
+            $referralCode = preg_replace('/[^a-zA-Z0-9_-]/', '', trim($_GET['ref']));
         }
         
         echo Router::render('auth/register', [
