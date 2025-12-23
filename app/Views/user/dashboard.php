@@ -765,15 +765,38 @@ window.updateTicker = function(cryptoList) {
     const tickerContent = document.getElementById('ticker-content');
     if (!tickerContent) return;
     
-    let html = '';
+    let tickerItems = [];
     if (window.cryptoData && window.cryptoData.length > 0) {
         window.cryptoData.forEach(crypto => {
             if (crypto.price > 0) {
-                const priceDisplay = crypto.price > 1 ? '$' + crypto.price.toFixed(2) : '$' + crypto.price.toFixed(6);
-                html += '<span class="ticker-item" onclick="navigateToTrade(\'' + crypto.symbol + '\')"><strong>' + crypto.symbol + ':</strong> ' + priceDisplay + '</span>';
+                const priceDisplay = crypto.price > 1 ? crypto.price.toFixed(2) : crypto.price.toFixed(6);
+                tickerItems.push({
+                    symbol: crypto.symbol,
+                    price: priceDisplay
+                });
             }
         });
     }
+    
+    // If no data yet, use placeholder values
+    if (tickerItems.length === 0) {
+        tickerItems = [
+            { symbol: 'BTC', price: '0.00' },
+            { symbol: 'ETH', price: '0.00' },
+            { symbol: 'USDT', price: '0.00' },
+            { symbol: 'BNB', price: '0.00' },
+            { symbol: 'XRP', price: '0.00' },
+            { symbol: 'SOL', price: '0.00' },
+            { symbol: 'ADA', price: '0.00' },
+            { symbol: 'DOT', price: '0.00' }
+        ];
+    }
+    
+    // Build HTML with ticker items
+    let html = '';
+    tickerItems.forEach(item => {
+        html += '<span class="ticker-item" onclick="navigateToTrade(\'' + item.symbol + '\')" style="cursor: pointer;"><strong>' + item.symbol + ':</strong> $' + item.price + '</span>';
+    });
     
     // Duplicate for continuous scroll effect
     html = html + html + html;
@@ -849,8 +872,13 @@ window.loadMarketDataNow = function() {
     }
 };
 
-if (window.fetchCryptoData) window.fetchCryptoData();
+// Fetch crypto data immediately and set up auto-refresh
+window.fetchCryptoData = window.fetchCryptoData || function() {};
+if (window.fetchCryptoData) {
+    window.fetchCryptoData();
+}
 
+// Refresh every 30 seconds
 setInterval(function() {
     if (window.fetchCryptoData) window.fetchCryptoData();
 }, 30000);
