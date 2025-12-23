@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize balance from DOM on page load
+    initializeBalance();
+    
     setInterval(updatePrices, 30000);
     setInterval(updatePositions, 10000);
     setInterval(checkExpiredPositions, 5000);
@@ -9,6 +12,20 @@ document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
     initLanguageToggle();
 });
+
+function initializeBalance() {
+    const balanceText = document.querySelector('.balance-value');
+    if (balanceText && balanceText.textContent) {
+        const cleanBalance = balanceText.textContent
+            .replace(/^\$/, '')
+            .replace(/,/g, '')
+            .trim();
+        const parsed = parseFloat(cleanBalance);
+        if (!isNaN(parsed) && parsed > 0) {
+            window.currentBalance = parsed;
+        }
+    }
+}
 
 function initLanguageToggle() {
     const languageSelector = document.querySelector('.language-selector');
