@@ -290,9 +290,28 @@ class AdminController
             'referrer_id' => $referral['referrer_user_id'],
             'referred_id' => $deposit['user_id'],
             'amount' => $bonusAmount,
-            'status' => 'pending',
+            'status' => 'paid',
             'created_at' => date('Y-m-d H:i:s'),
         ]);
+
+        // Add bonus to referrer's wallet
+        $referrerWallet = Database::fetch(
+            "SELECT * FROM wallets WHERE user_id = ?",
+            [$referral['referrer_user_id']]
+        );
+
+        if ($referrerWallet) {
+            Database::update('wallets', [
+                'balance' => $referrerWallet['balance'] + $bonusAmount,
+            ], 'user_id = ?', [$referral['referrer_user_id']]);
+        } else {
+            Database::insert('wallets', [
+                'user_id' => $referral['referrer_user_id'],
+                'balance' => $bonusAmount,
+                'margin_used' => 0,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         AuditLog::log('referral_bonus_awarded', 'referral', $referral['referrer_user_id'], [
             'bonus_amount' => $bonusAmount,

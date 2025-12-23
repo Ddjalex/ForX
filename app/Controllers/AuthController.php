@@ -10,6 +10,7 @@ use App\Services\AuditLog;
 use App\Services\RateLimiter;
 use App\Services\EmailService;
 use App\Services\TurnstileService;
+use App\Services\ReferralService;
 
 class AuthController
 {
@@ -198,20 +199,8 @@ class AuthController
         ]);
 
         if (!empty($referralLink)) {
-            $referralData = Database::fetch(
-                "SELECT user_id FROM referral_links WHERE code = ? OR id = ?",
-                [$referralLink, $referralLink]
-            );
-            
-            if ($referralData) {
-                Database::insert('referrals', [
-                    'referral_code' => $referralLink,
-                    'referrer_user_id' => $referralData['user_id'],
-                    'referred_user_id' => $userId,
-                    'status' => 'pending',
-                    'created_at' => date('Y-m-d H:i:s'),
-                ]);
-            }
+            ReferralService::trackClick($referralLink);
+            ReferralService::processReferral($userId, $referralLink);
         }
 
         AuditLog::log('register', 'user', $userId);
