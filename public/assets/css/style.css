@@ -1967,6 +1967,64 @@ select.form-control {
     padding: 12px 16px;
 }
 
+.crypto-ticker-wrapper {
+    background: linear-gradient(90deg, rgba(10, 22, 40, 0.98) 0%, rgba(15, 39, 68, 0.98) 100%);
+    border-bottom: 1px solid var(--border-color);
+    overflow: hidden;
+    margin: 0 0 24px 0;
+}
+
+.ticker-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.ticker-content {
+    display: flex;
+    gap: 30px;
+    padding: 12px 20px;
+    animation: scroll-left 30s linear infinite;
+    white-space: nowrap;
+}
+
+.ticker-item {
+    display: inline-block;
+    min-width: max-content;
+    padding: 8px 16px;
+    background: rgba(0, 212, 170, 0.05);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-primary);
+    transition: all 0.3s;
+}
+
+.ticker-item:hover {
+    background: rgba(0, 212, 170, 0.15);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: scale(1.05);
+}
+
+.ticker-content strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.ticker-container:hover .ticker-content {
+    animation-play-state: paused;
+}
+
 .tradingview-ticker-container {
     background: linear-gradient(90deg, rgba(10, 22, 40, 0.95) 0%, rgba(15, 39, 68, 0.95) 100%);
     border: 1px solid var(--border-color);

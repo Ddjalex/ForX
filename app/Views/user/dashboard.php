@@ -206,6 +206,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<div class="crypto-ticker-wrapper">
+    <div class="ticker-container">
+        <div class="ticker-content" id="ticker-content">
+            <!-- Populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
 <div class="grid-2">
     <div class="card market-data-card">
         <div class="card-header">
@@ -716,30 +724,48 @@ window.fetchCryptoData = function() {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            const formatMarketCap = (cap) => {
-                if (!cap) return 'N/A';
-                if (cap >= 1e12) return '$' + (cap / 1e12).toFixed(2) + 'T';
-                if (cap >= 1e9) return '$' + (cap / 1e9).toFixed(2) + 'B';
-                if (cap >= 1e6) return '$' + (cap / 1e6).toFixed(2) + 'M';
-                return '$' + cap.toFixed(2);
-            };
-            
-            window.cryptoData = [
-                { symbol: 'BTC', name: 'Bitcoin', mktCap: data['bitcoin']?.usd_market_cap || 0, fdMktCap: data['bitcoin']?.usd_market_cap || 0, price: data['bitcoin']?.usd || 0, availCoins: '21M', totalCoins: '21M' },
-                { symbol: 'ETH', name: 'Ethereum', mktCap: data['ethereum']?.usd_market_cap || 0, fdMktCap: data['ethereum']?.usd_market_cap || 0, price: data['ethereum']?.usd || 0, availCoins: '120M', totalCoins: '120M' },
-                { symbol: 'USDT', name: 'Tether USDt', mktCap: data['tether']?.usd_market_cap || 0, fdMktCap: data['tether']?.usd_market_cap || 0, price: data['tether']?.usd || 0, availCoins: '186.91B', totalCoins: '188.85B' },
-                { symbol: 'BNB', name: 'Binance Coin', mktCap: data['binancecoin']?.usd_market_cap || 0, fdMktCap: data['binancecoin']?.usd_market_cap || 0, price: data['binancecoin']?.usd || 0, availCoins: '137.73M', totalCoins: '137.73M' },
-                { symbol: 'XRP', name: 'Ripple', mktCap: data['ripple']?.usd_market_cap || 0, fdMktCap: data['ripple']?.usd_market_cap || 0, price: data['ripple']?.usd || 0, availCoins: '60.57B', totalCoins: '99.99B' },
-                { symbol: 'SOL', name: 'Solana', mktCap: data['solana']?.usd_market_cap || 0, fdMktCap: data['solana']?.usd_market_cap || 0, price: data['solana']?.usd || 0, availCoins: '562.42M', totalCoins: '616.72M' },
-                { symbol: 'ADA', name: 'Cardano', mktCap: data['cardano']?.usd_market_cap || 0, fdMktCap: data['cardano']?.usd_market_cap || 0, price: data['cardano']?.usd || 0, availCoins: '39.87B', totalCoins: '45B' },
-                { symbol: 'DOT', name: 'Polkadot', mktCap: data['polkadot']?.usd_market_cap || 0, fdMktCap: data['polkadot']?.usd_market_cap || 0, price: data['polkadot']?.usd || 0, availCoins: '1.39B', totalCoins: '1.39B' }
+            const cryptoList = [
+                { symbol: 'BTC', name: 'Bitcoin', data: data['bitcoin'] },
+                { symbol: 'ETH', name: 'Ethereum', data: data['ethereum'] },
+                { symbol: 'USDT', name: 'Tether', data: data['tether'] },
+                { symbol: 'BNB', name: 'Binance Coin', data: data['binancecoin'] },
+                { symbol: 'XRP', name: 'Ripple', data: data['ripple'] },
+                { symbol: 'SOL', name: 'Solana', data: data['solana'] },
+                { symbol: 'ADA', name: 'Cardano', data: data['cardano'] },
+                { symbol: 'DOT', name: 'Polkadot', data: data['polkadot'] }
             ];
+            
+            window.cryptoData = cryptoList.map(item => ({
+                symbol: item.symbol,
+                name: item.name,
+                mktCap: item.data?.usd_market_cap || 0,
+                fdMktCap: item.data?.usd_market_cap || 0,
+                price: item.data?.usd || 0,
+                availCoins: 'N/A',
+                totalCoins: 'N/A'
+            }));
+            
+            window.updateTicker(cryptoList);
             window.loadMarketDataNow();
         })
         .catch(err => {
             console.error('Error fetching crypto data:', err);
             window.loadMarketDataNow();
         });
+};
+
+window.updateTicker = function(cryptoList) {
+    const tickerContent = document.getElementById('ticker-content');
+    if (!tickerContent) return;
+    
+    let html = '';
+    cryptoList.forEach(item => {
+        const price = item.data?.usd || 0;
+        html += '<span class="ticker-item" onclick="navigateToTrade(\'' + item.symbol + '\')" style="cursor: pointer;"><strong>' + item.symbol + ':</strong> $' + (price > 1 ? price.toFixed(2) : price.toFixed(6)) + '</span>';
+    });
+    
+    html += html;
+    tickerContent.innerHTML = html;
 };
 
 window.sortCryptoTable = function(column) {
