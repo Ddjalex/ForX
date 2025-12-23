@@ -1749,30 +1749,44 @@ select.form-control {
 /* Professional All-Markets Ticker Styles */
 .pro-ticker-wrapper {
     width: 100%;
-    height: auto;
+    height: 50px;
     background: linear-gradient(180deg, #0a1628 0%, #0d1e36 100%);
     border-bottom: 1px solid var(--border-color);
-    overflow: visible;
+    overflow: hidden;
     position: relative;
-    padding: 8px 0;
 }
 
 .pro-ticker-wrapper::before,
 .pro-ticker-wrapper::after {
-    display: none;
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.pro-ticker-wrapper::before {
+    left: 0;
+    background: linear-gradient(90deg, #0a1628 0%, transparent 100%);
+}
+
+.pro-ticker-wrapper::after {
+    right: 0;
+    background: linear-gradient(270deg, #0a1628 0%, transparent 100%);
 }
 
 .pro-ticker-track {
     display: flex;
-    flex-wrap: wrap;
-    animation: none;
-    will-change: auto;
-    backface-visibility: auto;
-    transform: none;
+    animation: tickerScroll 40s linear infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .pro-ticker-track:hover {
-    animation-play-state: running;
+    animation-play-state: paused;
 }
 
 @keyframes tickerScroll {
@@ -1796,11 +1810,11 @@ select.form-control {
 .pro-ticker-content {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 15px;
-    height: auto;
-    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 15px;
+    height: 50px;
     flex-shrink: 0;
+    min-width: max-content;
 }
 
 .ticker-category {
@@ -1810,12 +1824,12 @@ select.form-control {
 }
 
 .category-label {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 3px;
     white-space: nowrap;
 }
 
@@ -1847,10 +1861,10 @@ select.form-control {
 .ticker-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
+    gap: 7px;
+    padding: 5px 10px;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 6px;
+    border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     white-space: nowrap;
@@ -1861,32 +1875,31 @@ select.form-control {
 .ticker-item:hover {
     background: rgba(0, 212, 170, 0.15);
     border-color: rgba(0, 212, 170, 0.5);
-    transform: translateY(-2px);
 }
 
 .ticker-item:active {
-    transform: translateY(0);
+    opacity: 0.8;
 }
 
 .ticker-symbol {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--text-secondary);
-    min-width: 80px;
+    min-width: 75px;
 }
 
 .ticker-price {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-primary);
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 }
 
 .ticker-change {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 3px;
+    padding: 1px 4px;
+    border-radius: 2px;
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 }
 
@@ -1901,45 +1914,46 @@ select.form-control {
 }
 
 .ticker-divider {
-    width: 2px;
-    height: 25px;
+    width: 1px;
+    height: 20px;
     background: rgba(255, 255, 255, 0.1);
-    margin: 0 12px;
+    margin: 0 8px;
     flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
     .pro-ticker-wrapper {
-        padding: 6px 0;
+        height: 46px;
     }
     
     .pro-ticker-content {
-        padding: 6px 10px;
+        height: 46px;
+        padding: 0 10px;
         gap: 8px;
     }
     
     .ticker-item {
-        padding: 5px 10px;
-        gap: 6px;
+        padding: 4px 8px;
+        gap: 5px;
     }
     
     .ticker-symbol {
-        font-size: 10px;
-        min-width: 70px;
+        font-size: 9px;
+        min-width: 65px;
     }
     
     .ticker-price {
-        font-size: 11px;
+        font-size: 10px;
     }
     
     .ticker-change {
-        font-size: 9px;
-        padding: 1px 5px;
+        font-size: 8px;
+        padding: 1px 3px;
     }
     
     .category-label {
-        font-size: 8px;
-        padding: 3px 8px;
+        font-size: 7px;
+        padding: 2px 6px;
     }
 }
 
