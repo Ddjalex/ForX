@@ -734,16 +734,7 @@ function showConfirmModal(action) {
     balanceErrorDiv.style.display = 'none';
 }
 
-window.cryptoData = [
-    { symbol: 'BTC', name: 'Bitcoin', mktCap: 1.2e12, fdMktCap: 1.18e12, price: 104256, availCoins: '21M', totalCoins: '21M' },
-    { symbol: 'ETH', name: 'Ethereum', mktCap: 478e9, fdMktCap: 465e9, price: 3892, availCoins: '120M', totalCoins: '120M' },
-    { symbol: '#TRUMP', name: 'Trump', mktCap: 967.2e6, fdMktCap: 4.93e9, price: 4.934, availCoins: '200M', totalCoins: '1E' },
-    { symbol: 'finch', name: 'Finch Token', mktCap: 211.29e6, fdMktCap: 226.04e6, price: 0.15069114, availCoins: '1.4B', totalCoins: '1.5E' },
-    { symbol: 'ACryptoS', name: 'Akropolis Synths', mktCap: 13.38e6, fdMktCap: 26.71e6, price: 0.0002983, availCoins: '44.86B', totalCoins: '89.54E' },
-    { symbol: 'AI', name: 'AI Protocol', mktCap: 16.67e6, fdMktCap: 36.78e6, price: 0.03673376, availCoins: '453.31M', totalCoins: '1E' },
-    { symbol: 'API3', name: 'API3', mktCap: 36.47e6, fdMktCap: 66.19e6, price: 0.422000, availCoins: '86.42M', totalCoins: '156.84M' },
-    { symbol: 'ARPA', name: 'ARPA Chain', mktCap: 18.69e6, fdMktCap: 24.59e6, price: 0.01229653, availCoins: '1.52B', totalCoins: '2E' }
-];
+window.cryptoData = [];
 window.stockData = [
     { symbol: 'NASDAQ', name: 'NASDAQ', value: 97.46, change: 2.10, changePercent: 2.20, open: 95.36, high: 97.72, low: 95 },
     { symbol: 'AAPL', name: 'APPLE STOCK', value: 270.97, change: -2.70, changePercent: -0.99, open: 272.86, high: 273.88, low: 270 },
@@ -753,6 +744,31 @@ window.stockData = [
     { symbol: 'FACEB', name: 'FACEBOOK', value: 1.54, change: 0.05, changePercent: 3.35, open: 1.50, high: 1.60, low: 1.50 },
     { symbol: 'TSLA', name: 'TESLA', value: 280.50, change: 5.50, changePercent: 2.00, open: 275.00, high: 285.00, low: 274.50 }
 ];
+
+window.fetchCryptoData = function() {
+    const coinIds = 'bitcoin,ethereum,trump-coin,finch-coin,akropolis-synths,ai-protocol,api3,arpa-chain';
+    const url = 'https://api.coingecko.com/api/v3/simple/price?ids=' + coinIds + '&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&order=market_cap_desc&sparkline=false&x_cg_pro_api_key=CG-WSd513UKp8XTr3JTgrbRhwgs';
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            window.cryptoData = [
+                { symbol: 'BTC', name: 'Bitcoin', mktCap: data['bitcoin']?.usd_market_cap || 0, fdMktCap: data['bitcoin']?.usd_market_cap || 0, price: data['bitcoin']?.usd || 0, availCoins: '21M', totalCoins: '21M' },
+                { symbol: 'ETH', name: 'Ethereum', mktCap: data['ethereum']?.usd_market_cap || 0, fdMktCap: data['ethereum']?.usd_market_cap || 0, price: data['ethereum']?.usd || 0, availCoins: '120M', totalCoins: '120M' },
+                { symbol: '#TRUMP', name: 'Trump', mktCap: data['trump-coin']?.usd_market_cap || 0, fdMktCap: data['trump-coin']?.usd_market_cap || 0, price: data['trump-coin']?.usd || 0, availCoins: '200M', totalCoins: '1E' },
+                { symbol: 'finch', name: 'Finch Token', mktCap: data['finch-coin']?.usd_market_cap || 0, fdMktCap: data['finch-coin']?.usd_market_cap || 0, price: data['finch-coin']?.usd || 0, availCoins: '1.4B', totalCoins: '1.5E' },
+                { symbol: 'ACryptoS', name: 'Akropolis Synths', mktCap: data['akropolis-synths']?.usd_market_cap || 0, fdMktCap: data['akropolis-synths']?.usd_market_cap || 0, price: data['akropolis-synths']?.usd || 0, availCoins: '44.86B', totalCoins: '89.54E' },
+                { symbol: 'AI', name: 'AI Protocol', mktCap: data['ai-protocol']?.usd_market_cap || 0, fdMktCap: data['ai-protocol']?.usd_market_cap || 0, price: data['ai-protocol']?.usd || 0, availCoins: '453.31M', totalCoins: '1E' },
+                { symbol: 'API3', name: 'API3', mktCap: data['api3']?.usd_market_cap || 0, fdMktCap: data['api3']?.usd_market_cap || 0, price: data['api3']?.usd || 0, availCoins: '86.42M', totalCoins: '156.84M' },
+                { symbol: 'ARPA', name: 'ARPA Chain', mktCap: data['arpa-chain']?.usd_market_cap || 0, fdMktCap: data['arpa-chain']?.usd_market_cap || 0, price: data['arpa-chain']?.usd || 0, availCoins: '1.52B', totalCoins: '2E' }
+            ];
+            window.loadMarketDataNow();
+        })
+        .catch(err => {
+            console.error('Error fetching crypto data:', err);
+            window.loadMarketDataNow();
+        });
+};
 
 window.sortCryptoTable = function(column) {
     const tbody = document.getElementById('crypto-market-body');
@@ -820,8 +836,12 @@ window.loadMarketDataNow = function() {
 };
 
 setTimeout(function() { 
-    if (window.loadMarketDataNow) window.loadMarketDataNow();
+    if (window.fetchCryptoData) window.fetchCryptoData();
 }, 100);
+
+setInterval(function() {
+    if (window.fetchCryptoData) window.fetchCryptoData();
+}, 60000);
 </script>
 
 <?php
