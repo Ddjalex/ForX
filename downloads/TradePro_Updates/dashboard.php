@@ -440,6 +440,45 @@ document.addEventListener('DOMContentLoaded', function() {
 let tvChart = null;
 let currentSymbol = 'BINANCE:BTCUSDT';
 
+// Symbol mapping for TradingView
+const symbolMap = {
+    'BTCUSDT': 'BINANCE:BTCUSDT',
+    'ETHUSDT': 'BINANCE:ETHUSDT',
+    'BNBUSDT': 'BINANCE:BNBUSDT',
+    'XRPUSDT': 'BINANCE:XRPUSDT',
+    'ADAUSDT': 'BINANCE:ADAUSDT',
+    'LINKUSDT': 'BINANCE:LINKUSDT',
+    'DOGEUSDT': 'BINANCE:DOGEUSDT',
+    'LTCUSDT': 'BINANCE:LTCUSDT',
+    'TRXUSDT': 'BINANCE:TRXUSDT',
+    'FTMUSDT': 'BINANCE:FTMUSDT',
+    'FTMUSD': 'BINANCE:FTMUSDT',
+    'AUDUSD': 'BINANCE:AUDUSD',
+    'USDAUD': 'BINANCE:AUDUSD',
+    'AUDJPY': 'BINANCE:AUDJPY',
+    'GOLDUSDT': 'BINANCE:GOLDUSDT',
+    'XAUUSD': 'BINANCE:XAUUSD',
+    'OILUSD': 'BINANCE:OILUSD',
+    'USOIL': 'BINANCE:USOIL'
+};
+
+function getProperTradingViewSymbol(symbol) {
+    if (!symbol) return 'BINANCE:BTCUSDT';
+    
+    // Check if exact match exists
+    if (symbolMap[symbol]) {
+        return symbolMap[symbol];
+    }
+    
+    // If symbol already has exchange prefix, use it
+    if (symbol.includes(':')) {
+        return symbol;
+    }
+    
+    // Default to BINANCE prefix
+    return 'BINANCE:' + symbol;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize TradingView chart
     initTradingViewChart();
@@ -527,7 +566,12 @@ function updateTradingViewChart() {
     const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
     if (!selectedOption) return;
     
-    const tradingViewSymbol = selectedOption.getAttribute('data-tradingview') || 'BINANCE:BTCUSDT';
+    // Get tradingview symbol - use stored value or fallback to symbol mapping
+    let tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
+    if (!tradingViewSymbol || tradingViewSymbol.trim() === '') {
+        const symbol = selectedOption.getAttribute('data-symbol') || selectedOption.textContent;
+        tradingViewSymbol = getProperTradingViewSymbol(symbol);
+    }
     
     if (tradingViewSymbol && tradingViewSymbol !== currentSymbol) {
         currentSymbol = tradingViewSymbol;

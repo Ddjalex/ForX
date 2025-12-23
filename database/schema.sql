@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS markets (
     max_leverage INTEGER DEFAULT 100,
     min_trade_size DECIMAL(20, 8) DEFAULT 0.001,
     fee DECIMAL(10, 6) DEFAULT 0.001,
+    symbol_tradingview VARCHAR(100),
     status VARCHAR(50) DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

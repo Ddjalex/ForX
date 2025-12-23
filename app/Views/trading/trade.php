@@ -579,6 +579,45 @@ let currentTradeAction = 'buy';
 let tvWidget = null;
 const initialSymbol = '<?= htmlspecialchars($market['symbol_tradingview'] ?? 'BINANCE:BTCUSDT') ?>';
 
+// Symbol mapping for TradingView
+const symbolMap = {
+    'BTCUSDT': 'BINANCE:BTCUSDT',
+    'ETHUSDT': 'BINANCE:ETHUSDT',
+    'BNBUSDT': 'BINANCE:BNBUSDT',
+    'XRPUSDT': 'BINANCE:XRPUSDT',
+    'ADAUSDT': 'BINANCE:ADAUSDT',
+    'LINKUSDT': 'BINANCE:LINKUSDT',
+    'DOGEUSDT': 'BINANCE:DOGEUSDT',
+    'LTCUSDT': 'BINANCE:LTCUSDT',
+    'TRXUSDT': 'BINANCE:TRXUSDT',
+    'FTMUSDT': 'BINANCE:FTMUSDT',
+    'FTMUSD': 'BINANCE:FTMUSDT',
+    'AUDUSD': 'BINANCE:AUDUSD',
+    'USDAUD': 'BINANCE:AUDUSD',
+    'AUDJPY': 'BINANCE:AUDJPY',
+    'GOLDUSDT': 'BINANCE:GOLDUSDT',
+    'XAUUSD': 'BINANCE:XAUUSD',
+    'OILUSD': 'BINANCE:OILUSD',
+    'USOIL': 'BINANCE:USOIL'
+};
+
+function getProperTradingViewSymbol(symbol) {
+    if (!symbol) return 'BINANCE:BTCUSDT';
+    
+    // Check if exact match exists
+    if (symbolMap[symbol]) {
+        return symbolMap[symbol];
+    }
+    
+    // If symbol already has exchange prefix, use it
+    if (symbol.includes(':')) {
+        return symbol;
+    }
+    
+    // Default to BINANCE prefix
+    return 'BINANCE:' + symbol;
+}
+
 function updateAssetNames() {
     const assetType = document.getElementById('assetType').value;
     const assetNameSelect = document.getElementById('assetName');
@@ -609,7 +648,12 @@ function updateTradingViewChart() {
     const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
     if (!selectedOption) return;
     
-    const tradingviewSymbol = selectedOption.dataset.tradingview || 'BINANCE:BTCUSDT';
+    // Get tradingview symbol - use stored value or fallback to symbol mapping
+    let tradingviewSymbol = selectedOption.dataset.tradingview;
+    if (!tradingviewSymbol || tradingviewSymbol.trim() === '') {
+        const symbol = selectedOption.dataset.symbol || selectedOption.textContent;
+        tradingviewSymbol = getProperTradingViewSymbol(symbol);
+    }
     
     const container = document.getElementById('tradingview_chart');
     if (container) {
