@@ -209,7 +209,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="crypto-ticker-wrapper">
     <div class="ticker-container">
         <div class="ticker-content" id="ticker-content">
-            <!-- Populated by JavaScript -->
+            <span class="ticker-item"><strong>BTC:</strong> $0.00</span>
+            <span class="ticker-item"><strong>ETH:</strong> $0.00</span>
+            <span class="ticker-item"><strong>USDT:</strong> $0.00</span>
+            <span class="ticker-item"><strong>BNB:</strong> $0.00</span>
+            <span class="ticker-item"><strong>XRP:</strong> $0.00</span>
+            <span class="ticker-item"><strong>SOL:</strong> $0.00</span>
+            <span class="ticker-item"><strong>ADA:</strong> $0.00</span>
+            <span class="ticker-item"><strong>DOT:</strong> $0.00</span>
         </div>
     </div>
 </div>
@@ -763,14 +770,13 @@ window.updateTicker = function(cryptoList) {
         window.cryptoData.forEach(crypto => {
             if (crypto.price > 0) {
                 const priceDisplay = crypto.price > 1 ? '$' + crypto.price.toFixed(2) : '$' + crypto.price.toFixed(6);
-                html += '<span class="ticker-item" onclick="navigateToTrade(\'' + crypto.symbol + '\')" title="' + crypto.name + '" style="cursor: pointer;"><strong>' + crypto.symbol + ':</strong> <span>' + priceDisplay + '</span></span>';
+                html += '<span class="ticker-item" onclick="navigateToTrade(\'' + crypto.symbol + '\')"><strong>' + crypto.symbol + ':</strong> ' + priceDisplay + '</span>';
             }
         });
     }
     
     // Duplicate for continuous scroll effect
-    const originalHtml = html;
-    html += originalHtml;
+    html = html + html + html;
     tickerContent.innerHTML = html;
 };
 
