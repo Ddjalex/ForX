@@ -110,17 +110,16 @@ class FeatureController
             }
         }
         
-        $allowedHosts = ['alphacore.markets', 'alpha-core-markets.replit.app'];
-        $host = $_SERVER['HTTP_HOST'] ?? 'alphacore.markets';
-        if (!in_array($host, $allowedHosts) && !preg_match('/\.replit\.dev$/', $host) && !preg_match('/\.repl\.co$/', $host)) {
-            $host = 'alphacore.markets';
-        }
+        // Use APP_URL environment variable for referral links (primary domain)
+        $appUrl = getenv('APP_URL') ?: 'https://alphacoremarkets.com';
+        $appUrl = rtrim($appUrl, '/');
+        $referralLink = $appUrl . '/register?ref=' . htmlspecialchars($stats['code'], ENT_QUOTES, 'UTF-8');
         
         echo Router::render('features/referrals', [
             'stats' => $stats,
             'tiers' => $tiers,
             'currentTier' => $currentTier,
-            'referralLink' => 'https://' . htmlspecialchars($host, ENT_QUOTES, 'UTF-8') . '/register?ref=' . htmlspecialchars($stats['code'], ENT_QUOTES, 'UTF-8'),
+            'referralLink' => $referralLink,
             'csrf_token' => Session::generateCsrfToken(),
         ]);
     }
