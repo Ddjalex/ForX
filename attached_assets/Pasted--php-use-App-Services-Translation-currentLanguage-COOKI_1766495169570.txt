@@ -5,10 +5,8 @@ $currentLanguage = $_COOKIE['language'] ?? $_GET['lang'] ?? 'en';
 Translation::setLanguage($currentLanguage);
 setcookie('language', $currentLanguage, time() + (365 * 24 * 60 * 60), '/');
 
-if (!function_exists('t')) {
-    function t($key, $default = '') {
-        return Translation::t($key, $default);
-    }
+function t($key, $default = '') {
+    return Translation::t($key, $default);
 }
 ?>
 <!DOCTYPE html>
@@ -152,24 +150,6 @@ if (!function_exists('t')) {
                     </div>
                 </div>
             </a>
-            <div class="top-header-actions">
-                <button class="notification-btn" id="notificationBtn" title="Notifications">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
-                </button>
-                <div class="notification-panel" id="notificationPanel" style="display: none;">
-                    <div class="notification-header">
-                        <h3>Notifications</h3>
-                        <button class="notification-close" id="notificationClose">×</button>
-                    </div>
-                    <div class="notification-list" id="notificationList">
-                        <div class="notification-empty">No notifications</div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="pro-ticker-wrapper">
@@ -567,30 +547,6 @@ if (!function_exists('t')) {
     </div>
 
     <script src="/assets/js/app.js"></script>
-    
-    <script>
-        const notificationBtn = document.getElementById('notificationBtn');
-        const notificationPanel = document.getElementById('notificationPanel');
-        const notificationClose = document.getElementById('notificationClose');
-
-        if (notificationBtn && notificationPanel) {
-            notificationBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                notificationPanel.style.display = notificationPanel.style.display === 'none' ? 'block' : 'none';
-            });
-
-            notificationClose.addEventListener('click', (e) => {
-                e.stopPropagation();
-                notificationPanel.style.display = 'none';
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!notificationBtn.contains(e.target) && !notificationPanel.contains(e.target)) {
-                    notificationPanel.style.display = 'none';
-                }
-            });
-        }
-    </script>
     
     <?php
     // Load Tawk.to settings safely
