@@ -611,45 +611,44 @@ function updateTradingViewChart() {
     
     const tradingviewSymbol = selectedOption.dataset.tradingview || 'BINANCE:BTCUSDT';
     
-    const hiddenInput = document.querySelector('input[name="market_id"][type="hidden"]');
-    if (hiddenInput) {
-        hiddenInput.value = selectedOption.value;
+    const container = document.getElementById('tradingview_chart');
+    if (container) {
+        container.innerHTML = '';
     }
-    
-    if (tvWidget && tvWidget.iframe) {
-        try {
-            tvWidget.iframe.contentWindow.postMessage({
-                name: 'setSymbol',
-                data: { symbol: tradingviewSymbol }
-            }, '*');
-        } catch(e) {
-            initTradingViewWidget(tradingviewSymbol);
-        }
-    } else {
-        initTradingViewWidget(tradingviewSymbol);
-    }
+    tvWidget = null;
+    setTimeout(() => initTradingViewWidget(tradingviewSymbol), 100);
 }
 
 function initTradingViewWidget(symbol) {
-    const container = document.getElementById('tradingview_chart');
-    container.innerHTML = '';
-    
-    tvWidget = new TradingView.widget({
-        "width": "100%",
-        "height": "100%",
-        "symbol": symbol,
-        "interval": "30",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#0f2744",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies"],
-        "container_id": "tradingview_chart"
-    });
+    try {
+        if (typeof TradingView === 'undefined') {
+            console.log('TradingView library not loaded yet');
+            setTimeout(() => initTradingViewWidget(symbol), 500);
+            return;
+        }
+        
+        const container = document.getElementById('tradingview_chart');
+        if (!container) return;
+        
+        tvWidget = new TradingView.widget({
+            "width": "100%",
+            "height": "100%",
+            "symbol": symbol,
+            "interval": "30",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#0f2744",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies"],
+            "container_id": "tradingview_chart"
+        });
+    } catch (e) {
+        console.log('TradingView widget creation error:', e);
+    }
 }
 
 function setLeverage(value) {

@@ -444,19 +444,44 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize TradingView chart
     initTradingViewChart();
     
+    // Update chart when asset type changes
+    const assetTypeSelect = document.getElementById('assetType');
+    if (assetTypeSelect) {
+        assetTypeSelect.addEventListener('change', function() {
+            updateAssetNames();
+        });
+    }
+    
     // Update chart when asset name changes
     const assetSelect = document.getElementById('assetName');
     if (assetSelect) {
         assetSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
-            if (tradingViewSymbol) {
-                currentSymbol = tradingViewSymbol;
-                updateTradingViewChart();
-            }
+            updateTradingViewChart();
         });
     }
 });
+
+function updateAssetNames() {
+    const assetType = document.getElementById('assetType').value;
+    const assetNameSelect = document.getElementById('assetName');
+    const options = assetNameSelect.querySelectorAll('option');
+    
+    let firstVisible = null;
+    options.forEach(option => {
+        const optionType = option.getAttribute('data-type');
+        if (optionType === assetType) {
+            option.style.display = '';
+            if (!firstVisible) firstVisible = option;
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    
+    if (firstVisible) {
+        assetNameSelect.value = firstVisible.value;
+        updateTradingViewChart();
+    }
+}
 
 function initTradingViewChart() {
     if (!tvChart) {
@@ -496,12 +521,23 @@ function createTradingViewWidget() {
 }
 
 function updateTradingViewChart() {
-    const container = document.getElementById('tradingview_chart');
-    if (container) {
-        container.innerHTML = '';
+    const assetNameSelect = document.getElementById('assetName');
+    if (!assetNameSelect) return;
+    
+    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    if (!selectedOption) return;
+    
+    const tradingViewSymbol = selectedOption.getAttribute('data-tradingview') || 'BINANCE:BTCUSDT';
+    
+    if (tradingViewSymbol && tradingViewSymbol !== currentSymbol) {
+        currentSymbol = tradingViewSymbol;
+        const container = document.getElementById('tradingview_chart');
+        if (container) {
+            container.innerHTML = '';
+        }
+        tvChart = null;
+        setTimeout(createTradingViewWidget, 100);
     }
-    tvChart = null;
-    setTimeout(createTradingViewWidget, 100);
 }
 
 function toggleCard(cardId) {
