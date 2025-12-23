@@ -2123,12 +2123,20 @@ select.form-control {
     max-height: 400px;
     overflow-y: auto;
     overflow-x: auto;
+    width: 100%;
 }
 
 .market-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
+    table-layout: auto;
+}
+
+.market-table td:first-child,
+.market-table th:first-child {
+    min-width: 180px;
+    width: 25%;
 }
 
 .market-table thead {
@@ -2144,7 +2152,7 @@ select.form-control {
     text-align: left;
     font-weight: 600;
     color: var(--text-secondary);
-    white-space: nowrap;
+    white-space: normal;
     cursor: pointer;
     user-select: none;
     position: relative;

@@ -206,20 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div class="crypto-ticker-wrapper">
-    <div class="ticker-container">
-        <div class="ticker-content" id="ticker-content">
-            <span class="ticker-item"><strong>BTC:</strong> <span id="btc-price">$0.00</span></span>
-            <span class="ticker-item"><strong>ETH:</strong> <span id="eth-price">$0.00</span></span>
-            <span class="ticker-item"><strong>USDT:</strong> <span id="usdt-price">$0.00</span></span>
-            <span class="ticker-item"><strong>BNB:</strong> <span id="bnb-price">$0.00</span></span>
-            <span class="ticker-item"><strong>XRP:</strong> <span id="xrp-price">$0.00</span></span>
-            <span class="ticker-item"><strong>SOL:</strong> <span id="sol-price">$0.00</span></span>
-            <span class="ticker-item"><strong>ADA:</strong> <span id="ada-price">$0.00</span></span>
-            <span class="ticker-item"><strong>DOT:</strong> <span id="dot-price">$0.00</span></span>
-        </div>
-    </div>
-</div>
 
 <div class="grid-2">
     <div class="card market-data-card">
