@@ -345,7 +345,7 @@ class AuthController
 
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         
-        $user = Database::fetch("SELECT id FROM users WHERE email = ?", [$email]);
+        $user = Database::fetch("SELECT id, name FROM users WHERE email = ?", [$email]);
         
         if ($user) {
             $token = bin2hex(random_bytes(32));
@@ -355,6 +355,8 @@ class AuthController
                 'reset_token' => $token,
                 'reset_expires' => $expires,
             ], 'id = ?', [$user['id']]);
+            
+            EmailService::sendPasswordReset($email, $user['name'], $token);
             
             AuditLog::log('password_reset_request', 'user', $user['id']);
         }
