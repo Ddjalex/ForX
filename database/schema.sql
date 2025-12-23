@@ -181,6 +181,15 @@ CREATE TABLE IF NOT EXISTS referral_links (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Referrals table (tracks referrer-referred user relationships)
+CREATE TABLE IF NOT EXISTS referrals (
+    id SERIAL PRIMARY KEY,
+    referrer_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    referred_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Referral earnings table
 CREATE TABLE IF NOT EXISTS referral_earnings (
     id SERIAL PRIMARY KEY,
