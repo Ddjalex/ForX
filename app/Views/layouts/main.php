@@ -141,6 +141,15 @@ if (!function_exists('t')) {
 
     <main class="main-content">
         <div class="top-header">
+            <div class="top-header-left">
+                <button class="notification-btn" id="notificationBtn" title="Notifications">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="notification-badge" id="notificationBadge">3</span>
+                </button>
+            </div>
             <a href="/dashboard" class="top-header-link">
                 <div class="top-header-content">
                     <div class="top-header-logo">
@@ -152,21 +161,62 @@ if (!function_exists('t')) {
                     </div>
                 </div>
             </a>
-            <div class="top-header-actions">
-                <button class="notification-btn" id="notificationBtn" title="Notifications">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
-                </button>
-                <div class="notification-panel" id="notificationPanel" style="display: none;">
-                    <div class="notification-header">
-                        <h3>Notifications</h3>
-                        <button class="notification-close" id="notificationClose">×</button>
+        </div>
+
+        <div class="notification-panel" id="notificationPanel" style="display: none;">
+            <div class="notification-backdrop" id="notificationBackdrop"></div>
+            <div class="notification-modal">
+                <div class="notification-modal-header">
+                    <h2>Notifications</h2>
+                    <button class="notification-close" id="notificationClose">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="notification-list" id="notificationList">
+                    <div class="notification-item">
+                        <div class="notification-item-icon success">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="notification-item-content">
+                            <div class="notification-item-title">Deposit Confirmed</div>
+                            <div class="notification-item-message">Your deposit of $500 has been processed</div>
+                            <div class="notification-item-time">2 hours ago</div>
+                        </div>
                     </div>
-                    <div class="notification-list" id="notificationList">
-                        <div class="notification-empty">No notifications</div>
+
+                    <div class="notification-item">
+                        <div class="notification-item-icon info">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="notification-item-content">
+                            <div class="notification-item-title">New Market Update</div>
+                            <div class="notification-item-message">EUR/USD has reached new support level</div>
+                            <div class="notification-item-time">5 hours ago</div>
+                        </div>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-item-icon warning">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="notification-item-content">
+                            <div class="notification-item-title">Position Alert</div>
+                            <div class="notification-item-message">Your BTC position is nearing stop loss</div>
+                            <div class="notification-item-time">1 day ago</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -572,11 +622,12 @@ if (!function_exists('t')) {
         const notificationBtn = document.getElementById('notificationBtn');
         const notificationPanel = document.getElementById('notificationPanel');
         const notificationClose = document.getElementById('notificationClose');
+        const notificationBackdrop = document.getElementById('notificationBackdrop');
 
         if (notificationBtn && notificationPanel) {
             notificationBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                notificationPanel.style.display = notificationPanel.style.display === 'none' ? 'block' : 'none';
+                notificationPanel.style.display = notificationPanel.style.display === 'none' ? 'flex' : 'none';
             });
 
             notificationClose.addEventListener('click', (e) => {
@@ -584,8 +635,22 @@ if (!function_exists('t')) {
                 notificationPanel.style.display = 'none';
             });
 
+            if (notificationBackdrop) {
+                notificationBackdrop.addEventListener('click', () => {
+                    notificationPanel.style.display = 'none';
+                });
+            }
+
             document.addEventListener('click', (e) => {
-                if (!notificationBtn.contains(e.target) && !notificationPanel.contains(e.target)) {
+                if (notificationPanel.style.display === 'flex' && 
+                    !notificationBtn.contains(e.target) && 
+                    !notificationPanel.contains(e.target)) {
+                    notificationPanel.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && notificationPanel.style.display === 'flex') {
                     notificationPanel.style.display = 'none';
                 }
             });
