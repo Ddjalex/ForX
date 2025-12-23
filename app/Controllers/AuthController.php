@@ -203,6 +203,7 @@ class AuthController
             
             if ($referralData) {
                 Database::insert('referrals', [
+                    'referral_code' => $referralLink,
                     'referrer_user_id' => $referralData['user_id'],
                     'referred_user_id' => $userId,
                     'status' => 'pending',
