@@ -36,6 +36,10 @@ class ReferralService
         $code = $link ? ($link['code'] ?? null) : null;
         if (!$code) {
             $code = self::getUserReferralCode($userId);
+            $link = Database::fetch(
+                "SELECT * FROM referral_links WHERE user_id = ?",
+                [$userId]
+            );
         }
         
         $referrals = Database::fetchAll(
@@ -57,10 +61,16 @@ class ReferralService
             [$userId]
         );
         
+        // Count actual referrals from referral_earnings
+        $totalReferralsCount = Database::fetch(
+            "SELECT COUNT(DISTINCT referred_id) as count FROM referral_earnings WHERE referrer_id = ?",
+            [$userId]
+        );
+        
         return [
             'code' => $code,
             'clicks' => $link ? (int)($link['clicks'] ?? 0) : 0,
-            'total_referrals' => count($referrals),
+            'total_referrals' => (int)($totalReferralsCount['count'] ?? 0),
             'total_earnings' => (float)($totalEarnings['total'] ?? 0),
             'pending_earnings' => (float)($pendingEarnings['total'] ?? 0),
             'referrals' => $referrals,

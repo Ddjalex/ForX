@@ -198,6 +198,10 @@ class AuthController
             'created_at' => date('Y-m-d H:i:s'),
         ]);
 
+        // Auto-create referral code for this user
+        ReferralService::getUserReferralCode($userId);
+
+        // Process referral if code was provided
         if (!empty($referralLink)) {
             ReferralService::trackClick($referralLink);
             ReferralService::processReferral($userId, $referralLink);
