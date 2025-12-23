@@ -1,4 +1,4 @@
-// Real-time cryptocurrency ticker prices from CoinGecko
+// Real-time cryptocurrency ticker prices from backend
 (function() {
     const priceMap = {
         'btc-price': { crypto: 'bitcoin', decimals: 2 },
@@ -13,11 +13,11 @@
 
     async function updateTickerPrices() {
         try {
-            const ids = Object.values(priceMap).map(p => p.crypto).join(',');
-            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {
+            const response = await fetch('/api/crypto-prices', {
                 method: 'GET',
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 }
             });
 
@@ -41,7 +41,7 @@
                 }
             }
         } catch (error) {
-            console.error('Error fetching crypto prices from CoinGecko:', error);
+            console.error('Error fetching crypto prices:', error);
         }
     }
 
