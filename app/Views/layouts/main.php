@@ -177,7 +177,7 @@ if (!function_exists('t')) {
                     </button>
                 </div>
                 <div class="notification-list" id="notificationList">
-                    <div class="notification-item">
+                    <div class="notification-item" data-action="deposit">
                         <div class="notification-item-icon success">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -190,7 +190,7 @@ if (!function_exists('t')) {
                         </div>
                     </div>
 
-                    <div class="notification-item">
+                    <div class="notification-item" data-action="news">
                         <div class="notification-item-icon info">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -205,7 +205,7 @@ if (!function_exists('t')) {
                         </div>
                     </div>
 
-                    <div class="notification-item">
+                    <div class="notification-item" data-action="dashboard">
                         <div class="notification-item-icon warning">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -624,6 +624,8 @@ if (!function_exists('t')) {
         const notificationPanel = document.getElementById('notificationPanel');
         const notificationClose = document.getElementById('notificationClose');
         const notificationBackdrop = document.getElementById('notificationBackdrop');
+        const notificationBadge = document.getElementById('notificationBadge');
+        const notificationList = document.getElementById('notificationList');
 
         if (notificationBtn && notificationPanel) {
             notificationBtn.addEventListener('click', (e) => {
@@ -655,6 +657,42 @@ if (!function_exists('t')) {
                     notificationPanel.style.display = 'none';
                 }
             });
+
+            if (notificationList) {
+                notificationList.addEventListener('click', (e) => {
+                    const notificationItem = e.target.closest('.notification-item');
+                    if (notificationItem) {
+                        const action = notificationItem.getAttribute('data-action');
+                        let targetUrl = '/dashboard';
+
+                        switch(action) {
+                            case 'deposit':
+                                targetUrl = '/dashboard/trades/history';
+                                break;
+                            case 'news':
+                                targetUrl = '/news';
+                                break;
+                            case 'dashboard':
+                                targetUrl = '/dashboard';
+                                break;
+                        }
+
+                        notificationItem.remove();
+                        let badgeCount = parseInt(notificationBadge.textContent) || 0;
+                        badgeCount--;
+
+                        if (badgeCount > 0) {
+                            notificationBadge.textContent = badgeCount;
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+
+                        setTimeout(() => {
+                            window.location.href = targetUrl;
+                        }, 300);
+                    }
+                });
+            }
         }
     </script>
     
