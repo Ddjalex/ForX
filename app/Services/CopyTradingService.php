@@ -46,49 +46,18 @@ class CopyTradingService
     private static function fetchFromBingX(): array
     {
         try {
-            // BingX API endpoint for copy trading leaders (public data, no auth needed)
-            $url = 'https://api.bingx.com/openapi/spot/v1/public/trades/leaders';
+            // Use Finnhub service to fetch real market data
+            $finnhubService = new \App\Services\FinnhubService();
+            $traders = \App\Services\FinnhubService::generateTraderProfiles(20);
             
-            $context = stream_context_create([
-                'http' => [
-                    'method' => 'GET',
-                    'timeout' => 10,
-                    'header' => "Accept: application/json\r\n",
-                ]
-            ]);
-            
-            $response = @file_get_contents($url, false, $context);
-            
-            if (!$response) {
-                // Fallback to mock data if API fails
-                return self::getMockTraders();
+            if (!empty($traders)) {
+                return $traders;
             }
             
-            $data = json_decode($response, true);
-            
-            if (!isset($data['data']) || !is_array($data['data'])) {
-                return self::getMockTraders();
-            }
-            
-            // Transform API data
-            $traders = [];
-            foreach (array_slice($data['data'], 0, 20) as $item) {
-                $traders[] = [
-                    'api_id' => $item['uid'] ?? uniqid(),
-                    'name' => $item['nickName'] ?? 'Trader ' . substr(uniqid(), 0, 8),
-                    'title' => 'Professional Trader',
-                    'bio' => 'Expert trader with proven track record on BingX',
-                    'profile_image' => 'https://ui-avatars.com/api/?name=' . urlencode($item['nickName'] ?? 'Trader') . '&background=00D4AA&color=0a1628&size=300',
-                    'win_rate' => (float)($item['winRate'] ?? 58.5),
-                    'profit_share' => (float)($item['profitShare'] ?? rand(25, 85)),
-                    'minimum_capital' => 100,
-                    'total_followers' => (int)($item['followerCount'] ?? rand(100, 5000)),
-                    'monthly_return' => (float)(rand(50, 300) / 10),
-                ];
-            }
-            
-            return !empty($traders) ? $traders : self::getMockTraders();
+            // Fallback to mock data if Finnhub fails
+            return self::getMockTraders();
         } catch (\Exception $e) {
+            // Fallback to mock data if API fails
             return self::getMockTraders();
         }
     }
