@@ -1189,10 +1189,46 @@ function validateTradeAmount() {
     }
 }
 
+// Countdown timer for open trades
+function updateTradeCountdowns() {
+    const countdownCells = document.querySelectorAll('.time-left[data-expires]');
+    
+    countdownCells.forEach(cell => {
+        const expiresAt = cell.getAttribute('data-expires');
+        if (!expiresAt) return;
+        
+        const expiryTime = new Date(expiresAt).getTime();
+        const now = new Date().getTime();
+        const timeLeft = expiryTime - now;
+        
+        const countdownSpan = cell.querySelector('.countdown');
+        if (!countdownSpan) return;
+        
+        if (timeLeft > 0) {
+            const minutes = Math.floor(timeLeft / 60000);
+            const seconds = Math.floor((timeLeft % 60000) / 1000);
+            countdownSpan.textContent = `⏱ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft < 60000) {
+                countdownSpan.style.color = '#ff6b6b';
+            } else if (timeLeft < 300000) {
+                countdownSpan.style.color = '#ffc107';
+            } else {
+                countdownSpan.style.color = '#10B981';
+            }
+        } else {
+            countdownSpan.textContent = '⏱ 0:00 EXPIRED';
+            countdownSpan.style.color = '#FF4757';
+        }
+    });
+}
+
 // Validate when leverage changes
 document.addEventListener('DOMContentLoaded', function() {
     updateAssetNames();
     initTradingViewWidget(initialSymbol);
+    updateTradeCountdowns();
+    setInterval(updateTradeCountdowns, 1000);
     
     // Add leverage change listeners
     document.querySelectorAll('.leverage-btn').forEach(btn => {

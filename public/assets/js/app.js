@@ -291,33 +291,8 @@ async function checkExpiredPositions() {
         }
         
         if (data.success && data.closed_count > 0 && data.positions && data.positions.length > 0) {
-            let countdown = 10;
-            const notification = document.createElement('div');
-            notification.className = 'alert alert-success';
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 10000;
-                padding: 16px 20px;
-                background: #00C853;
-                color: white;
-                border-radius: 8px;
-                font-weight: 500;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
-            notification.textContent = `${data.closed_count} trade(s) closed! Redirecting in ${countdown}s...`;
-            document.body.appendChild(notification);
-            
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                notification.textContent = `${data.closed_count} trade(s) closed! Redirecting in ${countdown}s...`;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = '/dashboard/trades/history';
-                }
-            }, 1000);
+            // Automatically redirect to trade panel without showing countdown notification
+            window.location.href = '/dashboard/trade';
         }
     } catch (e) {
         console.log('Expired positions check failed:', e);
