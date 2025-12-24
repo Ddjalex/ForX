@@ -138,15 +138,15 @@ $mockNotifications = [
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px;">
                     <div>
                         <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Type:</span>
-                        <div style="color: #e0e0e0; font-weight: 600;" id="dashboardCurrentAssetType"><?= htmlspecialchars($allMarkets[0]['asset_type'] ?? $allMarkets[0]['type'] ?? 'Crypto') ?></div>
+                        <div style="color: #e0e0e0; font-weight: 600;" id="dashboardCurrentAssetType">Crypto</div>
                     </div>
                     <div>
                         <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Name:</span>
-                        <div style="color: #e0e0e0; font-weight: 600;" id="dashboardCurrentAssetName"><?= htmlspecialchars($allMarkets[0]['display_name'] ?? $allMarkets[0]['symbol'] ?? 'BTC/USD') ?></div>
+                        <div style="color: #e0e0e0; font-weight: 600;" id="dashboardCurrentAssetName">BTC/USD</div>
                     </div>
                     <div>
                         <span style="color: #8899a6; display: block; margin-bottom: 6px;">Current Price:</span>
-                        <div style="color: #10B981; font-weight: 700;" id="dashboardCurrentPrice">$<?= number_format($allMarkets[0]['price'] ?? 0, 2) ?></div>
+                        <div style="color: #10B981; font-weight: 700;" id="dashboardCurrentPrice">$0.00</div>
                     </div>
                 </div>
             </div>
@@ -723,11 +723,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize TradingView chart
     initTradingViewChart();
     
-    // Initialize market info
-    updateMarketInfo();
-    
-    // Sync prices every 30 seconds
+    // Initial sync and then every 30 seconds
+    syncDashboardPrices();
     setInterval(syncDashboardPrices, 30000);
+    
+    // Initialize market info with current selection
+    setTimeout(updateMarketInfo, 100);
     
     // Update chart when asset type changes
     const assetTypeSelect = document.getElementById('assetType');
@@ -806,6 +807,18 @@ function createTradingViewWidget() {
     }
 }
 
+function capitalizeAssetType(type) {
+    if (!type) return 'Crypto';
+    const typeMap = {
+        'crypto': 'Crypto',
+        'forex': 'Forex',
+        'stocks': 'Stocks',
+        'commodities': 'Commodities',
+        'indices': 'Indices'
+    };
+    return typeMap[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1);
+}
+
 function updateMarketInfo() {
     const assetNameSelect = document.getElementById('assetName');
     if (!assetNameSelect) return;
@@ -813,9 +826,11 @@ function updateMarketInfo() {
     const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
     if (!selectedOption) return;
     
-    const assetType = selectedOption.getAttribute('data-type') || 'Crypto';
+    const assetTypeRaw = selectedOption.getAttribute('data-type') || 'crypto';
+    const assetType = capitalizeAssetType(assetTypeRaw);
     const assetName = selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
-    const assetPrice = selectedOption.getAttribute('data-price') || '0.00';
+    const assetPriceRaw = selectedOption.getAttribute('data-price') || '0';
+    const assetPrice = parseFloat(assetPriceRaw);
     
     const currentAssetTypeEl = document.getElementById('dashboardCurrentAssetType');
     const currentAssetNameEl = document.getElementById('dashboardCurrentAssetName');
@@ -823,7 +838,13 @@ function updateMarketInfo() {
     
     if (currentAssetTypeEl) currentAssetTypeEl.textContent = assetType;
     if (currentAssetNameEl) currentAssetNameEl.textContent = assetName;
-    if (currentPriceEl) currentPriceEl.textContent = '$' + parseFloat(assetPrice).toFixed(2);
+    if (currentPriceEl) {
+        if (assetPrice > 0 && isFinite(assetPrice)) {
+            currentPriceEl.textContent = '$' + assetPrice.toFixed(2);
+        } else {
+            currentPriceEl.textContent = '$0.00';
+        }
+    }
 }
 
 // Real-time price sync for dashboard
@@ -832,20 +853,30 @@ async function syncDashboardPrices() {
         const response = await fetch('/api/prices');
         const data = await response.json();
         
-        if (data.success && data.data) {
+        if (data.success && Array.isArray(data.data)) {
             const assetNameSelect = document.getElementById('assetName');
             if (!assetNameSelect) return;
             
+            let hasUpdates = false;
             data.data.forEach(priceData => {
-                const options = assetNameSelect.querySelectorAll('option');
-                options.forEach(option => {
-                    if (option.getAttribute('data-symbol') === priceData.symbol) {
-                        option.setAttribute('data-price', priceData.price);
-                    }
-                });
+                if (priceData && priceData.symbol && priceData.price) {
+                    const options = assetNameSelect.querySelectorAll('option');
+                    options.forEach(option => {
+                        const optionSymbol = option.getAttribute('data-symbol');
+                        if (optionSymbol === priceData.symbol) {
+                            const newPrice = parseFloat(priceData.price);
+                            if (newPrice > 0 && isFinite(newPrice)) {
+                                option.setAttribute('data-price', newPrice.toString());
+                                hasUpdates = true;
+                            }
+                        }
+                    });
+                }
             });
             
-            updateMarketInfo();
+            if (hasUpdates) {
+                updateMarketInfo();
+            }
         }
     } catch (e) {
         console.log('Price sync failed:', e);
