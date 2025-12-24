@@ -23,3 +23,23 @@ RewriteRule ^assets$ public/assets [L,NC]
     Header set Pragma "no-cache"
     Header set Expires "0"
 </IfModule>
+
+# ----------------------------------------------------
+# Environment variables (optional)
+# ----------------------------------------------------
+SetEnv APP_URL "https://alphacoremarkets.com"
+
+SetEnv DB_HOST "localhost"
+SetEnv DB_PORT "3306"
+SetEnv DB_NAME "alphacfp_ForX"
+SetEnv DB_USER "alphacfp_ForX"
+SetEnv DB_PASS "a1e2y3t4h5"
+
+SetEnv TURNSTILE_SITE_KEY "0x4AAAAAACHiemCSgZI8cCuL"
+SetEnv TURNSTILE_SECRET_KEY "0x4AAAAAACHiekkfjXj2QoONbmhhNt4gQlM"
+
+SetEnv BREVO_API_KEY "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"
+SetEnv BREVO_SENDER_EMAIL "almesagadw@gmail.com"
+SetEnv BREVO_SENDER_NAME "Alpha Core Markets"
+
+SetEnv COINGECKO_API_KEY "CG-WSd513UKp8XTr3JTgrbRhwgs"
