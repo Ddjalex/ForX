@@ -55,28 +55,21 @@ $mockNotifications = [
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Market Prices - Asset Type | Name | Price</h3>
-    </div>
-    <div class="card-body" style="overflow-x: auto;">
-        <div id="marketTicker" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
-            <?php foreach ($allMarkets ?? [] as $market): ?>
-                <div class="market-ticker-item" style="background: #1a2332; border: 1px solid #2d3a4f; padding: 12px; border-radius: 4px;">
-                    <div style="font-size: 11px; color: #8899a6; text-transform: uppercase; font-weight: 600;">
-                        <?= htmlspecialchars($market['asset_type'] ?? $market['type'] ?? 'Other') ?>
-                    </div>
-                    <div style="font-size: 13px; color: #e0e0e0; font-weight: 600; margin: 4px 0;">
-                        <?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?>
-                    </div>
-                    <div style="font-size: 14px; color: #10B981; font-weight: 700;">
-                        $<?= number_format($market['price'] ?? 0, 2) ?>
-                    </div>
-                    <div style="font-size: 12px; color: <?= ($market['change_24h'] ?? 0) >= 0 ? '#10B981' : '#dc3545' ?>; margin-top: 4px;">
-                        <?= ($market['change_24h'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($market['change_24h'] ?? 0, 2) ?>%
-                    </div>
-                </div>
-            <?php endforeach; ?>
+
+<div style="background: #0f1822; border: 1px solid #2d3a4f; padding: 16px; margin-bottom: 20px; border-radius: 6px;">
+    <div style="font-size: 11px; color: #8899a6; text-transform: uppercase; font-weight: 600; margin-bottom: 12px;">Current Market Info</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px;">
+        <div>
+            <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Type:</span>
+            <div style="color: #e0e0e0; font-weight: 600;" id="currentAssetType"><?= htmlspecialchars($allMarkets[0]['asset_type'] ?? $allMarkets[0]['type'] ?? 'Crypto') ?></div>
+        </div>
+        <div>
+            <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Name:</span>
+            <div style="color: #e0e0e0; font-weight: 600;" id="currentAssetName"><?= htmlspecialchars($allMarkets[0]['display_name'] ?? $allMarkets[0]['symbol'] ?? 'BTC/USD') ?></div>
+        </div>
+        <div>
+            <span style="color: #8899a6; display: block; margin-bottom: 6px;">Current Price:</span>
+            <div style="color: #10B981; font-weight: 700;" id="currentPrice">$<?= number_format($allMarkets[0]['price'] ?? 0, 2) ?></div>
         </div>
     </div>
 </div>
@@ -766,6 +759,7 @@ function updateAssetNames() {
     
     if (firstVisible) {
         assetNameSelect.value = firstVisible.value;
+        updateMarketInfo();
         updateTradingViewChart();
     }
 }
@@ -807,12 +801,34 @@ function createTradingViewWidget() {
     }
 }
 
+function updateMarketInfo() {
+    const assetNameSelect = document.getElementById('assetName');
+    if (!assetNameSelect) return;
+    
+    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    if (!selectedOption) return;
+    
+    const assetType = selectedOption.getAttribute('data-type') || 'Crypto';
+    const assetName = selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
+    const assetPrice = selectedOption.getAttribute('data-price') || '0.00';
+    
+    const currentAssetTypeEl = document.getElementById('currentAssetType');
+    const currentAssetNameEl = document.getElementById('currentAssetName');
+    const currentPriceEl = document.getElementById('currentPrice');
+    
+    if (currentAssetTypeEl) currentAssetTypeEl.textContent = assetType;
+    if (currentAssetNameEl) currentAssetNameEl.textContent = assetName;
+    if (currentPriceEl) currentPriceEl.textContent = '$' + parseFloat(assetPrice).toFixed(2);
+}
+
 function updateTradingViewChart() {
     const assetNameSelect = document.getElementById('assetName');
     if (!assetNameSelect) return;
     
     const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
     if (!selectedOption) return;
+    
+    updateMarketInfo();
     
     // Get tradingview symbol - use stored value or fallback to symbol mapping
     let tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
