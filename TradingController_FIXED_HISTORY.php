@@ -219,11 +219,9 @@ class TradingController
             $entryPrice = $price;
         }
 
-        // Strict validation: margin required cannot exceed total wallet balance (not just available)
         $marginRequired = ($amount * $entryPrice) / $leverage;
         $availableBalance = $wallet['balance'] - $wallet['margin_used'];
 
-        // Check 1: Must have enough available balance for margin
         if ($marginRequired > $availableBalance) {
             $error = 'Insufficient balance. Available: $' . number_format($availableBalance, 2) . ' | Required: $' . number_format($marginRequired, 2);
             if ($isAjax) {
@@ -235,7 +233,6 @@ class TradingController
             return;
         }
 
-        // Check 2: Total balance must be positive (cannot trade with $0 balance)
         if ($wallet['balance'] <= 0) {
             $error = 'Your account balance is zero or negative. Please make a deposit.';
             if ($isAjax) {
@@ -247,7 +244,6 @@ class TradingController
             return;
         }
 
-        // Check 3: Ensure amount doesn't exceed what's possible with available balance
         if ($amount > ($availableBalance * $leverage)) {
             $error = 'Trade amount too large for available balance with selected leverage. Max amount: $' . number_format(($availableBalance * $leverage), 2);
             if ($isAjax) {
@@ -266,7 +262,6 @@ class TradingController
             $createdAt = date('Y-m-d H:i:s');
             $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
 
-            // Check for duplicate position created in the last 2 seconds
             $twoSecondsAgo = date('Y-m-d H:i:s', time() - 2);
             $recentDuplicate = Database::fetch(
                 "SELECT id FROM positions 
@@ -277,7 +272,6 @@ class TradingController
             );
             
             if ($recentDuplicate) {
-                // Skip duplicate insertion
                 Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
                 Router::redirect('/dashboard/trades/history');
                 return;
@@ -397,32 +391,24 @@ class TradingController
             $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
         }
 
-        // Apply asymmetric profit control formula:
-        // Positive % = users profit MORE on wins, lose MORE on losses (admin profit range)
-        // Negative % = users profit LESS on wins, lose LESS on losses
         $profitControlPercent = Database::fetch(
             "SELECT value FROM settings WHERE setting_key = ?", 
             ['profit_control_percent']
         );
         $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
         
-        // If control percent is 0, use real market pnl
         if ($controlPercent == 0) {
             $adjustedPnl = $pnl;
         } else {
             if ($pnl >= 0) {
-                // Winning trade: positive control increases profit
-                // Win Multiplier: 1 + (control% / 100)
                 $winMultiplier = 1 + ($controlPercent / 100);
                 $adjustedPnl = $pnl * $winMultiplier;
             } else {
-                // Losing trade: positive control increases loss (makes user lose MORE)
                 $lossMultiplier = 1 + ($controlPercent / 100);
                 $adjustedPnl = $pnl * $lossMultiplier;
             }
         }
 
-        // Ensure we don't return 0 if there was actual movement
         if ($adjustedPnl == 0 && $pnl != 0) {
             $adjustedPnl = $pnl;
         }
