@@ -71,6 +71,24 @@ $totalBalance = $wallet['balance'] ?? 0;
                 <span class="balance-value">$<?= number_format(($wallet['balance'] ?? 0) - ($wallet['margin_used'] ?? 0), 2) ?></span>
             </div>
         </div>
+        
+        <div style="background: #0f1822; border-bottom: 1px solid #2d3a4f; padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <div style="font-size: 11px; color: #8899a6; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Current Market Info</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 12px;">
+                <div>
+                    <span style="color: #8899a6;">Asset Type:</span>
+                    <div style="color: #e0e0e0; font-weight: 600;" id="currentAssetType"><?= htmlspecialchars($market['asset_type'] ?? $market['type'] ?? 'Crypto') ?></div>
+                </div>
+                <div>
+                    <span style="color: #8899a6;">Asset Name:</span>
+                    <div style="color: #e0e0e0; font-weight: 600;" id="currentAssetName"><?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?></div>
+                </div>
+                <div>
+                    <span style="color: #8899a6;">Current Price:</span>
+                    <div style="color: #10B981; font-weight: 700;" id="currentPrice">$<?= number_format($market['price'] ?? 0, 2) ?></div>
+                </div>
+            </div>
+        </div>
 
         <form method="POST" action="/dashboard/trade/order" id="tradeForm">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">

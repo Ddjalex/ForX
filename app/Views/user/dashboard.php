@@ -55,6 +55,32 @@ $mockNotifications = [
     </div>
 </div>
 
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Market Prices - Asset Type | Name | Price</h3>
+    </div>
+    <div class="card-body" style="overflow-x: auto;">
+        <div id="marketTicker" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+            <?php foreach ($allMarkets ?? [] as $market): ?>
+                <div class="market-ticker-item" style="background: #1a2332; border: 1px solid #2d3a4f; padding: 12px; border-radius: 4px;">
+                    <div style="font-size: 11px; color: #8899a6; text-transform: uppercase; font-weight: 600;">
+                        <?= htmlspecialchars($market['asset_type'] ?? $market['type'] ?? 'Other') ?>
+                    </div>
+                    <div style="font-size: 13px; color: #e0e0e0; font-weight: 600; margin: 4px 0;">
+                        <?= htmlspecialchars($market['display_name'] ?? $market['symbol']) ?>
+                    </div>
+                    <div style="font-size: 14px; color: #10B981; font-weight: 700;">
+                        $<?= number_format($market['price'] ?? 0, 2) ?>
+                    </div>
+                    <div style="font-size: 12px; color: <?= ($market['change_24h'] ?? 0) >= 0 ? '#10B981' : '#dc3545' ?>; margin-top: 4px;">
+                        <?= ($market['change_24h'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($market['change_24h'] ?? 0, 2) ?>%
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-value"><?= $totalTrades ?></div>

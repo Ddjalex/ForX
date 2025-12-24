@@ -41,13 +41,41 @@ class ApiController
     public function prices(): void
     {
         $prices = Database::fetchAll(
-            "SELECT m.id, m.symbol, m.name, m.type, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h, p.updated_at
+            "SELECT m.id, m.symbol, m.name, m.type, m.display_name, at.name as asset_type, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h, p.updated_at
              FROM markets m 
              LEFT JOIN prices p ON m.id = p.market_id 
-             WHERE m.status = 'active'"
+             LEFT JOIN asset_types at ON m.asset_type_id = at.id
+             WHERE m.status = 'active'
+             ORDER BY at.sort_order, m.name"
         );
 
         Router::json(['success' => true, 'data' => $prices]);
+    }
+    
+    public function walletBalance(): void
+    {
+        if (!Auth::check()) {
+            Router::json(['success' => false, 'error' => 'Unauthorized'], 401);
+            return;
+        }
+
+        $user = Auth::user();
+        $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$user['id']]);
+        
+        $markets = Database::fetchAll(
+            "SELECT m.id, m.symbol, m.name, m.display_name, at.name as asset_type, p.price, p.change_24h
+             FROM markets m 
+             LEFT JOIN prices p ON m.id = p.market_id 
+             LEFT JOIN asset_types at ON m.asset_type_id = at.id
+             WHERE m.status = 'active'
+             ORDER BY at.sort_order, m.name LIMIT 50"
+        );
+
+        Router::json([
+            'success' => true,
+            'wallet' => $wallet,
+            'markets' => $markets
+        ]);
     }
 
     public function marketPrice(string $symbol): void
