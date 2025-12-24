@@ -15,6 +15,10 @@ class DashboardController
         $user = Auth::user();
         $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [$user['id']]);
         
+        // Get KYC verification status
+        $kycStatus = Database::fetch("SELECT * FROM kyc_verifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", [$user['id']]);
+        $isVerified = ($kycStatus && $kycStatus['status'] === 'approved') ? true : false;
+        
         $openPositions = Database::fetchAll(
             "SELECT p.*, m.symbol, m.name as market_name 
              FROM positions p 
@@ -97,6 +101,8 @@ class DashboardController
              ORDER BY at.sort_order, m.name"
         );
 
+        $user['kyc_status'] = $kycStatus ? $kycStatus['status'] : 'pending';
+        
         echo Router::render('user/dashboard', [
             'user' => $user,
             'wallet' => $wallet,
@@ -110,6 +116,8 @@ class DashboardController
             'assetTypes' => $assetTypes,
             'allMarkets' => $allMarkets,
             'csrf_token' => Session::generateCsrfToken(),
+            'isVerified' => $isVerified,
+            'kycStatus' => $kycStatus ? $kycStatus['status'] : 'pending',
         ]);
     }
 }
