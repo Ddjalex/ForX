@@ -1,28 +1,23 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    
-    # Remove the public from the URL if accessing /public/...
-    RewriteCond %{REQUEST_URI} ^/public/
-    RewriteRule ^public/(.*)$ /$1 [L,R=301]
-    
-    # Prevent access to certain directories
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteCond %{REQUEST_URI} !^/(public|uploads)/
-    RewriteRule ^(.*)$ - [L,F]
-    
-    # Prevent direct access to PHP files except index.php
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteCond %{REQUEST_FILENAME} !^.*\.(?:jpg|jpeg|gif|png|ico|css|js|svg|woff|woff2|ttf|eot)$ [NC]
-    RewriteCond %{REQUEST_URI} !^/index\.php$
-    RewriteRule ^(?!index\.php$).*\.php$ - [L,F]
-    
-    # Route all requests to index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php?path=$1 [QSA,L]
-</IfModule>
+RewriteEngine On
+RewriteBase /
 
-# Cache busting - disable caching for dynamic content
+# ----------------------------------------------------
+# Do not rewrite existing files or directories
+# ----------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ----------------------------------------------------
+# Route EVERYTHING (including /api/...) through index.php
+# ----------------------------------------------------
+RewriteRule ^ index.php [L,QSA]
+
+# Assets fix (only if assets are inside /public/assets/)
+RewriteRule ^assets/(.*)$ public/assets/$1 [L,NC]
+RewriteRule ^assets$ public/assets [L,NC]
+
+# Cache Control Headers
 <IfModule mod_headers.c>
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"

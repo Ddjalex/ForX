@@ -80,8 +80,98 @@ PostgreSQL with the following main tables:
 - audit_logs, login_logs, settings
 - loan_plans, loans
 - referral_links, referral_earnings
+- kyc_verifications, kyc_documents
+
+## KYC Deployment Instructions
+
+### Local Testing (Replit)
+Routes are working correctly:
+- `GET /kyc/verify` → User KYC verification form
+- `POST /kyc/submit` → Submit verification documents
+- `GET /admin/kyc` → Admin approval panel
+- `POST /admin/kyc/approve/{id}` → Approve KYC
+- `POST /admin/kyc/reject/{id}` → Reject KYC
+
+Test: Login to dashboard → Click "Verify Account" in sidebar
+
+### cPanel Production (alphacoremarkets.com)
+
+**Step 1: Upload Files**
+- Copy `public/.htaccess` to `public_html/.htaccess`
+- Copy all app files to `public_html/` (maintaining directory structure)
+
+**Step 2: Update index.php**
+In `public_html/index.php`, change line 10:
+```php
+FROM: define('ROOT_PATH', dirname(__DIR__));
+TO:   define('ROOT_PATH', __DIR__);
+```
+
+**Step 3: Create KYC Directories**
+```bash
+mkdir -p public_html/uploads/kyc
+chmod 755 public_html/uploads/kyc
+chmod 644 public_html/.htaccess
+```
+
+**Step 4: Database Migration (phpMyAdmin)**
+```sql
+CREATE TABLE IF NOT EXISTS kyc_verifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL UNIQUE,
+    full_name VARCHAR(255) NOT NULL,
+    id_type VARCHAR(50) NOT NULL,
+    id_number VARCHAR(100) NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    rejection_reason TEXT,
+    approved_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_status (status),
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS kyc_documents (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    kyc_id INT NOT NULL,
+    document_type VARCHAR(50) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (kyc_id) REFERENCES kyc_verifications(id) ON DELETE CASCADE,
+    INDEX idx_kyc_id (kyc_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS kyc_verified_at TIMESTAMP NULL;
+ALTER TABLE users ADD INDEX IF NOT EXISTS idx_kyc_verified (kyc_verified);
+```
+
+**Step 5: Test URLs**
+- `alphacoremarkets.com/kyc/verify` → Should redirect to login
+- `alphacoremarkets.com/admin/kyc` → Should redirect to login
+- After login: user sees "Verify Account" in sidebar, admin sees "KYC Approvals"
+
+**Troubleshooting 404 errors:**
+1. Verify `.htaccess` is in `public_html/` (not nested)
+2. Ask hosting provider to enable Apache `mod_rewrite`
+3. Check `.htaccess` permissions: `chmod 644 public_html/.htaccess`
+4. Verify `index.php` ROOT_PATH points to correct directory
 
 ## Recent Changes (Completed)
+- **December 24, 2024: KYC Verification System - FULLY OPERATIONAL** ✅
+  - Complete Know-Your-Customer identity verification with document upload
+  - User workflow: `/kyc/verify` page for uploading ID (front/back), passport, and face photo
+  - Admin workflow: `/admin/kyc` page for reviewing and approving/rejecting submissions
+  - Verification modal auto-shows on dashboard for unverified users
+  - Dashboard status card displays actual KYC status (Verified/Not Verified)
+  - Access control: Unverified users cannot access trading, wallet, or loans - must complete KYC first
+  - Real-time notifications when KYC is approved or rejected
+  - Database tables: `kyc_verifications`, `kyc_documents`
+  - Sidebar links added: "Verify Account" (user), "KYC Approvals" (admin)
+  - `.htaccess` configured for cPanel Apache routing
+  - Routes: GET `/kyc/verify`, POST `/kyc/submit`, GET `/admin/kyc`, POST `/admin/kyc/approve/{id}`, POST `/admin/kyc/reject/{id}`
+  - **Deployment**: Copy `.htaccess` to cPanel `public_html/`, update `index.php` ROOT_PATH for cPanel
 - **December 23, 2024: Referral System - FULLY OPERATIONAL** ✅
   - Auto-generates referral codes for every user on registration
   - Tracks referral clicks when users visit referral links
