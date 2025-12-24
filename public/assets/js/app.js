@@ -6,8 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updatePositions, 10000);
     setInterval(checkExpiredPositions, 5000);
     setInterval(updateWalletBalance, 5000);
+    setInterval(startPositionCountdowns, 1000); // Update countdowns every second
+    
     checkExpiredPositions();
     updateWalletBalance();
+    startPositionCountdowns();
     
     initSidebar();
     initLanguageToggle();
@@ -197,6 +200,65 @@ async function updatePositions() {
         }
     } catch (e) {
         console.log('Position update failed:', e);
+    }
+}
+
+/**
+ * Countdown Timer for Open Positions
+ * Updates remaining time for each active trade
+ */
+function startPositionCountdowns() {
+    try {
+        const rows = document.querySelectorAll('[data-position][data-expires]');
+        
+        rows.forEach(row => {
+            const expiresAt = row.getAttribute('data-expires');
+            if (!expiresAt) return;
+            
+            const expiryTime = new Date(expiresAt).getTime();
+            const now = new Date().getTime();
+            const timeLeft = expiryTime - now;
+            
+            // Find or create countdown element
+            let countdownEl = row.querySelector('.position-countdown');
+            if (!countdownEl) {
+                countdownEl = document.createElement('span');
+                countdownEl.className = 'position-countdown';
+                countdownEl.style.cssText = `
+                    padding: 4px 8px;
+                    background: #ff9800;
+                    color: white;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    display: inline-block;
+                `;
+                const firstCell = row.querySelector('td');
+                if (firstCell) {
+                    firstCell.appendChild(countdownEl);
+                }
+            }
+            
+            if (timeLeft > 0) {
+                const minutes = Math.floor(timeLeft / 60000);
+                const seconds = Math.floor((timeLeft % 60000) / 1000);
+                countdownEl.textContent = `⏱ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Change color as time runs out
+                if (minutes === 0 && seconds < 30) {
+                    countdownEl.style.background = '#FF4757'; // Red
+                } else if (minutes < 1) {
+                    countdownEl.style.background = '#ff9800'; // Orange
+                } else {
+                    countdownEl.style.background = '#10B981'; // Green
+                }
+            } else {
+                countdownEl.textContent = '⏱ 0:00 EXPIRED';
+                countdownEl.style.background = '#FF4757';
+            }
+        });
+    } catch (e) {
+        console.log('Position countdown update failed:', e);
     }
 }
 
