@@ -6,6 +6,7 @@ use App\Services\Auth;
 use App\Services\Database;
 use App\Services\Router;
 use App\Services\AssetService;
+use App\Services\CoinGeckoService;
 
 class ApiController
 {
@@ -115,9 +116,9 @@ class ApiController
         // Try CoinGecko for crypto assets (detect by USDT, BUSD, etc)
         if (stripos($cleanSymbol, 'USDT') !== false || stripos($cleanSymbol, 'BUSD') !== false || 
             stripos($cleanSymbol, 'USD') !== false || stripos($cleanSymbol, 'USDC') !== false) {
-            $coinId = $this->getCoinGeckoId($cleanSymbol);
+            $coinId = CoinGeckoService::getCoinIdFromSymbol($cleanSymbol);
             if ($coinId) {
-                $price = $this->fetchCoinGeckoPrice($coinId);
+                $price = CoinGeckoService::getPrice($coinId);
                 if ($price && $price > 0) {
                     try {
                         Database::update('prices', ['price' => $price, 'updated_at' => date('Y-m-d H:i:s')], 'market_id = ?', [$marketId]);

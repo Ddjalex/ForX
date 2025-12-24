@@ -5,12 +5,34 @@ namespace App\Services;
 class CoinGeckoService
 {
     private const API_URL = 'https://api.coingecko.com/api/v3';
-    private const CACHE_TTL = 300; // 5 minutes
+    private const CACHE_TTL = 300;
+
+    private static $coinMapping = [
+        'BTC' => 'bitcoin',
+        'ETH' => 'ethereum',
+        'BNB' => 'binancecoin',
+        'XRP' => 'ripple',
+        'ADA' => 'cardano',
+        'SOL' => 'solana',
+        'LINK' => 'chainlink',
+        'DOGE' => 'dogecoin',
+        'LTC' => 'litecoin',
+        'TRX' => 'tron',
+        'FTM' => 'fantom',
+        'ATOM' => 'cosmos',
+        'NEAR' => 'near',
+        'AVAX' => 'avalanche-2',
+        'MATIC' => 'matic-network',
+        'OP' => 'optimism',
+        'ARB' => 'arbitrum',
+        'USDT' => 'tether',
+        'USDC' => 'usd-coin',
+        'BUSD' => 'binance-usd',
+        'DOT' => 'polkadot',
+    ];
 
     public static function getPrices(): array
     {
-        $cacheKey = 'coingecko_prices_' . date('Hi');
-        
         $prices = [
             'BTC' => 97500,
             'ETH' => 3650,
@@ -20,61 +42,121 @@ class CoinGeckoService
             'SOL' => 225,
             'ADA' => 1.05,
             'DOT' => 35.50,
+            'ATOM' => 10.25,
+            'AVAX' => 38.50,
+            'MATIC' => 0.85,
         ];
 
         try {
-            $url = self::API_URL . '/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot&vs_currencies=usd&include_24hr_change=true';
-            $response = @file_get_contents($url);
+            $coinIds = implode(',', self::$coinMapping);
+            $apiKey = getenv('COINGECKO_API_KEY');
+            $url = self::API_URL . '/simple/price?ids=' . $coinIds . '&vs_currencies=usd&include_24hr_change=true';
+            
+            if ($apiKey) {
+                $url .= '&x_cg_pro_api_key=' . urlencode($apiKey);
+            }
+            
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 5,
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                ]
+            ]);
+            
+            $response = @file_get_contents($url, false, $context);
             
             if ($response) {
                 $data = json_decode($response, true);
                 if (is_array($data)) {
-                    return [
-                        'BTC' => $data['bitcoin']['usd'] ?? 97500,
-                        'ETH' => $data['ethereum']['usd'] ?? 3650,
-                        'USDT' => $data['tether']['usd'] ?? 1,
-                        'BNB' => $data['binancecoin']['usd'] ?? 685,
-                        'XRP' => $data['ripple']['usd'] ?? 2.35,
-                        'SOL' => $data['solana']['usd'] ?? 225,
-                        'ADA' => $data['cardano']['usd'] ?? 1.05,
-                        'DOT' => $data['polkadot']['usd'] ?? 35.50,
-                    ];
+                    $result = [];
+                    foreach (self::$coinMapping as $symbol => $coinId) {
+                        $result[$symbol] = $data[$coinId]['usd'] ?? $prices[$symbol] ?? 100;
+                    }
+                    return $result;
                 }
             }
         } catch (\Exception $e) {
-            // Fallback to default prices
+            error_log('CoinGecko getPrices error: ' . $e->getMessage());
         }
         
         return $prices;
     }
 
+    public static function getPrice(string $coinId): ?float
+    {
+        try {
+            $apiKey = getenv('COINGECKO_API_KEY');
+            $url = self::API_URL . '/simple/price?ids=' . $coinId . '&vs_currencies=usd';
+            
+            if ($apiKey) {
+                $url .= '&x_cg_pro_api_key=' . urlencode($apiKey);
+            }
+            
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 5,
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                ]
+            ]);
+            
+            $response = @file_get_contents($url, false, $context);
+            
+            if ($response) {
+                $data = json_decode($response, true);
+                if (isset($data[$coinId]['usd']) && $data[$coinId]['usd'] > 0) {
+                    return (float)$data[$coinId]['usd'];
+                }
+            }
+        } catch (\Exception $e) {
+            error_log('CoinGecko getPrice error for ' . $coinId . ': ' . $e->getMessage());
+        }
+        
+        return null;
+    }
+
     public static function getMarketData(): array
     {
         try {
-            $url = self::API_URL . '/simple/price?ids=bitcoin,ethereum,tether,binancecoin,ripple,solana,cardano,polkadot,dogecoin,avalanche-2&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true';
-            $response = @file_get_contents($url);
+            $coinIds = implode(',', self::$coinMapping);
+            $apiKey = getenv('COINGECKO_API_KEY');
+            $url = self::API_URL . '/simple/price?ids=' . $coinIds . '&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true';
+            
+            if ($apiKey) {
+                $url .= '&x_cg_pro_api_key=' . urlencode($apiKey);
+            }
+            
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 5,
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                ]
+            ]);
+            
+            $response = @file_get_contents($url, false, $context);
             
             if ($response) {
                 $data = json_decode($response, true);
                 if (is_array($data)) {
-                    return [
-                        'bitcoin' => $data['bitcoin'] ?? [],
-                        'ethereum' => $data['ethereum'] ?? [],
-                        'tether' => $data['tether'] ?? [],
-                        'binancecoin' => $data['binancecoin'] ?? [],
-                        'ripple' => $data['ripple'] ?? [],
-                        'solana' => $data['solana'] ?? [],
-                        'cardano' => $data['cardano'] ?? [],
-                        'polkadot' => $data['polkadot'] ?? [],
-                        'dogecoin' => $data['dogecoin'] ?? [],
-                        'avalanche-2' => $data['avalanche-2'] ?? [],
-                    ];
+                    return $data;
                 }
             }
         } catch (\Exception $e) {
-            // Return empty array on error
+            error_log('CoinGecko getMarketData error: ' . $e->getMessage());
         }
         
         return [];
+    }
+
+    public static function getCoinIdFromSymbol(string $symbol): ?string
+    {
+        $cleanSymbol = str_replace('/', '', strtoupper($symbol));
+        
+        foreach (self::$coinMapping as $key => $coinId) {
+            if (stripos($cleanSymbol, $key) !== false) {
+                return $coinId;
+            }
+        }
+        
+        return null;
     }
 }
