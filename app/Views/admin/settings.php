@@ -118,6 +118,43 @@ ob_start();
                 <input type="number" name="referral_min_deposit" class="form-control" step="0.01" value="<?= htmlspecialchars($settings['referral_min_deposit'] ?? '50') ?>">
             </div>
             
+            <h4 style="margin: 24px 0 16px; color: var(--text-secondary);">Profit Control Settings</h4>
+            
+            <div class="form-group">
+                <label class="form-label">Profit Control Percentage (%)</label>
+                <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+                    <input type="range" id="profitControlSlider" name="profit_control_percent" class="form-control" style="flex: 1; height: 6px; cursor: pointer;" min="-10" max="100" step="1" value="<?= htmlspecialchars($settings['profit_control_percent'] ?? '0') ?>" onchange="updateProfitCalculations()">
+                    <div id="profitControlValue" style="min-width: 80px; padding: 8px 16px; background: var(--accent-primary); border-radius: 6px; color: #000; font-weight: 600; text-align: center;">0.00%</div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-primary); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                <h5 style="margin: 0 0 12px 0; color: var(--text-primary);">How it works:</h5>
+                <div style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: var(--text-primary);">Win Multiplier:</strong> <span id="winMultiplier">× 1.0000</span>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: var(--text-primary);">Loss Multiplier:</strong> <span id="lossMultiplier">× 1.0000</span>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: var(--text-primary);">Example Win:</strong> If user wins $100 → gets <span id="winExample">$100.00</span>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary);">Example Loss:</strong> If user loses $100 → loses <span id="lossExample">$100.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(100, 116, 139, 0.15); border: 1px solid rgba(100, 116, 139, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                <h5 style="margin: 0 0 12px 0; color: var(--text-primary);">Quick Guide:</h5>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
+                    <li><span style="color: #00C853;">Positive % (1-100):</span> Users profit MORE on wins, lose LESS on losses</li>
+                    <li><span style="color: #666;">0%:</span> No adjustment - natural market results</li>
+                    <li><span style="color: #FF4757;">Negative % (-10 to 0):</span> Users profit LESS on wins, lose MORE on losses</li>
+                </ul>
+            </div>
+            
             <h4 style="margin: 24px 0 16px; color: var(--text-secondary);">Risk Controls</h4>
             
             <div class="form-group">
@@ -182,6 +219,47 @@ ob_start();
         </form>
     </div>
 </div>
+
+<script>
+function updateProfitCalculations() {
+    const slider = document.getElementById('profitControlSlider');
+    const percent = parseFloat(slider.value);
+    
+    // Update display value
+    document.getElementById('profitControlValue').textContent = (percent >= 0 ? '+' : '') + percent.toFixed(2) + '%';
+    
+    // Calculate multipliers
+    const winMultiplier = 1 + (percent / 100);
+    const lossMultiplier = 1 + (percent / 100);
+    
+    // Update multiplier displays
+    document.getElementById('winMultiplier').textContent = '× ' + winMultiplier.toFixed(4);
+    document.getElementById('lossMultiplier').textContent = '× ' + lossMultiplier.toFixed(4);
+    
+    // Update examples
+    const winExample = 100 * winMultiplier;
+    const lossExample = 100 * lossMultiplier;
+    
+    document.getElementById('winExample').textContent = '$' + winExample.toFixed(2);
+    document.getElementById('lossExample').textContent = '$' + lossExample.toFixed(2);
+    
+    // Color code the value box
+    const valueBox = document.getElementById('profitControlValue');
+    if (percent > 0) {
+        valueBox.style.background = 'rgba(0, 200, 83, 0.8)';
+        valueBox.style.color = '#fff';
+    } else if (percent < 0) {
+        valueBox.style.background = 'rgba(255, 71, 87, 0.8)';
+        valueBox.style.color = '#fff';
+    } else {
+        valueBox.style.background = 'var(--accent-primary)';
+        valueBox.style.color = '#000';
+    }
+}
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', updateProfitCalculations);
+</script>
 
 <?php
 $content = ob_get_clean();
