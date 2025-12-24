@@ -490,13 +490,15 @@ window.updateTradingViewChart = function() {
     transform: translateY(-2px);
 }
 .btn-buy {
-    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%) !important;
-    color: #000 !important;
-    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.4) !important;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5) !important;
+    font-weight: 700 !important;
 }
 .btn-buy:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(0, 212, 170, 0.5) !important;
+    box-shadow: 0 6px 28px rgba(16, 185, 129, 0.6) !important;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
 }
 .btn-sell {
     background: linear-gradient(135deg, #ff4757 0%, #dc3545 100%) !important;
