@@ -36,8 +36,18 @@ $mockNotifications = [
 
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-value">$<?= number_format($totalBalance, 2) ?></div>
-        <div class="stat-label"><?= t('total_balance') ?></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="stat-value" id="dashboardTotalBalanceValue">$<?= number_format($totalBalance, 2) ?></div>
+                <div class="stat-label"><?= t('total_balance') ?></div>
+            </div>
+            <button class="icon-btn" onclick="toggleBalanceVisibility('dashboard')" style="padding: 8px; align-self: flex-start;">
+                <svg id="dashboardBalanceEyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </button>
+        </div>
     </div>
     <div class="stat-card">
         <div class="stat-value">$<?= number_format($profit, 2) ?></div>
@@ -107,7 +117,13 @@ $mockNotifications = [
                 <?= t('live_trading') ?>
             </h3>
             <div class="card-actions">
-                <span class="balance-display"><?= t('balance') ?>: <strong>$<?= number_format($totalBalance, 2) ?></strong></span>
+                <span class="balance-display"><?= t('balance') ?>: <strong id="dashboardLiveTradeBalanceValue">$<?= number_format($totalBalance, 2) ?></strong></span>
+                <button class="icon-btn" onclick="toggleBalanceVisibility('liveTrading')" style="padding: 4px;">
+                    <svg id="liveTradeBalanceEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
                 <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
                 <svg class="collapse-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
@@ -675,7 +691,64 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         startNotifications();
     }, 1000);
+    // Load balance visibility preferences
+    loadBalanceVisibilityPreferences();
 });
+
+// Toggle balance visibility function
+function toggleBalanceVisibility(location) {
+    const settings = JSON.parse(localStorage.getItem('balanceVisibility') || '{"dashboard": true, "liveTrading": true, "tradePage": true}');
+    
+    if (location === 'dashboard') {
+        settings.dashboard = !settings.dashboard;
+        const balanceEl = document.getElementById('dashboardTotalBalanceValue');
+        const eyeIcon = document.getElementById('dashboardBalanceEyeIcon');
+        if (settings.dashboard) {
+            balanceEl.style.visibility = 'visible';
+            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        } else {
+            balanceEl.style.visibility = 'hidden';
+            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    } else if (location === 'liveTrading') {
+        settings.liveTrading = !settings.liveTrading;
+        const balanceEl = document.getElementById('dashboardLiveTradeBalanceValue');
+        const eyeIcon = document.getElementById('liveTradeBalanceEyeIcon');
+        if (settings.liveTrading) {
+            balanceEl.style.visibility = 'visible';
+            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        } else {
+            balanceEl.style.visibility = 'hidden';
+            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    }
+    localStorage.setItem('balanceVisibility', JSON.stringify(settings));
+}
+
+// Load saved balance visibility preferences
+function loadBalanceVisibilityPreferences() {
+    const settings = JSON.parse(localStorage.getItem('balanceVisibility') || '{"dashboard": true, "liveTrading": true, "tradePage": true}');
+    
+    // Apply dashboard setting
+    const dashboardBalance = document.getElementById('dashboardTotalBalanceValue');
+    const dashboardEye = document.getElementById('dashboardBalanceEyeIcon');
+    if (dashboardBalance) {
+        dashboardBalance.style.visibility = settings.dashboard ? 'visible' : 'hidden';
+        if (!settings.dashboard && dashboardEye) {
+            dashboardEye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    }
+    
+    // Apply live trading setting
+    const liveBalance = document.getElementById('dashboardLiveTradeBalanceValue');
+    const liveEye = document.getElementById('liveTradeBalanceEyeIcon');
+    if (liveBalance) {
+        liveBalance.style.visibility = settings.liveTrading ? 'visible' : 'hidden';
+        if (!settings.liveTrading && liveEye) {
+            liveEye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    }
+}
 
 let tvChart = null;
 let currentSymbol = 'BINANCE:BTCUSDT';

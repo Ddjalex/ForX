@@ -68,7 +68,13 @@ $totalBalance = $wallet['balance'] ?? 0;
             <span class="panel-title">Live Trading</span>
             <div class="balance-display">
                 <span class="balance-label">Balance:</span>
-                <span class="balance-value">$<?= number_format(($wallet['balance'] ?? 0) - ($wallet['margin_used'] ?? 0), 2) ?></span>
+                <span class="balance-value" id="tradePageBalanceValue">$<?= number_format(($wallet['balance'] ?? 0) - ($wallet['margin_used'] ?? 0), 2) ?></span>
+                <button class="icon-btn" onclick="toggleBalanceVisibility('tradePage')" style="margin-left: 8px; padding: 4px;">
+                    <svg id="tradePageBalanceEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
             </div>
         </div>
         
@@ -1230,6 +1236,9 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTradeCountdowns();
     setInterval(updateTradeCountdowns, 1000);
     
+    // Load balance visibility preferences
+    loadTradePageBalanceVisibility();
+    
     // Add leverage change listeners
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1245,6 +1254,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Toggle balance visibility function for trade page
+function toggleBalanceVisibility(location) {
+    const settings = JSON.parse(localStorage.getItem('balanceVisibility') || '{"dashboard": true, "liveTrading": true, "tradePage": true}');
+    
+    if (location === 'tradePage') {
+        settings.tradePage = !settings.tradePage;
+        const balanceEl = document.getElementById('tradePageBalanceValue');
+        const eyeIcon = document.getElementById('tradePageBalanceEyeIcon');
+        if (settings.tradePage) {
+            balanceEl.style.visibility = 'visible';
+            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        } else {
+            balanceEl.style.visibility = 'hidden';
+            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    }
+    localStorage.setItem('balanceVisibility', JSON.stringify(settings));
+}
+
+// Load saved balance visibility preference for trade page
+function loadTradePageBalanceVisibility() {
+    const settings = JSON.parse(localStorage.getItem('balanceVisibility') || '{"dashboard": true, "liveTrading": true, "tradePage": true}');
+    const balanceEl = document.getElementById('tradePageBalanceValue');
+    const eyeIcon = document.getElementById('tradePageBalanceEyeIcon');
+    if (balanceEl) {
+        balanceEl.style.visibility = settings.tradePage ? 'visible' : 'hidden';
+        if (!settings.tradePage && eyeIcon) {
+            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    }
+}
 </script>
 
 <?php
