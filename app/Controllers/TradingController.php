@@ -148,7 +148,7 @@ class TradingController
         $orderType = filter_input(INPUT_POST, 'order_type', FILTER_SANITIZE_SPECIAL_CHARS);
         $side = filter_input(INPUT_POST, 'side', FILTER_SANITIZE_SPECIAL_CHARS);
         $amount = filter_input(INPUT_POST, 'amount', FILTER_VALIDATE_FLOAT);
-        $leverage = filter_input(INPUT_POST, 'leverage', FILTER_VALIDATE_INT) ?: 1;
+        $leverage = filter_input(INPUT_POST, 'leverage', FILTER_VALIDATE_FLOAT) ?: 1;
         $price = filter_input(INPUT_POST, 'price', FILTER_VALIDATE_FLOAT);
         $stopLoss = filter_input(INPUT_POST, 'stop_loss', FILTER_VALIDATE_FLOAT);
         $takeProfit = filter_input(INPUT_POST, 'take_profit', FILTER_VALIDATE_FLOAT);
@@ -279,7 +279,7 @@ class TradingController
             if ($recentDuplicate) {
                 // Skip duplicate insertion
                 Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
-                Router::redirect('/dashboard/trade/history');
+                Router::redirect('/dashboard/trades/history');
                 return;
             }
 
@@ -323,7 +323,7 @@ class TradingController
             ]);
 
             Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
-            Router::redirect('/dashboard/trade/history');
+            Router::redirect('/dashboard/trades/history');
             return;
         } else {
             Database::insert('orders', [

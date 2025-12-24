@@ -129,7 +129,8 @@ $totalBalance = $wallet['balance'] ?? 0;
             </div>
 
             <div class="leverage-slider-container">
-                <input type="range" class="leverage-slider" id="leverageSlider" min="1" max="100" value="5" oninput="updateLeverageFromSlider(this.value)">
+                <input type="range" class="leverage-slider" id="leverageSlider" min="0.1" max="100" step="0.1" value="5" oninput="setLeverageFromSlider(this.value)">
+                <span class="leverage-value-display" id="leverageDisplay">5x</span>
             </div>
 
             <div class="form-group">
@@ -954,9 +955,83 @@ document.querySelectorAll('.close-position-btn').forEach(btn => {
 const walletBalance = <?= $wallet['balance'] ?? 0 ?>;
 const marginUsed = <?= $wallet['margin_used'] ?? 0 ?>;
 
+function setLeverage(value) {
+    const numValue = parseFloat(value);
+    document.getElementById('leverageValue').value = numValue;
+    document.getElementById('leverageSlider').value = numValue;
+    document.getElementById('leverageDisplay').textContent = numValue + 'x';
+    document.querySelectorAll('.leverage-btn').forEach(btn => {
+        const btnValue = parseInt(btn.dataset.leverage);
+        btn.classList.toggle('active', btnValue === numValue);
+    });
+    validateTradeAmount();
+}
+
+function setLeverageFromSlider(value) {
+    const numValue = parseFloat(value).toFixed(1);
+    const numValueFloat = parseFloat(numValue);
+    document.getElementById('leverageValue').value = numValueFloat;
+    document.getElementById('leverageDisplay').textContent = numValueFloat + 'x';
+    document.querySelectorAll('.leverage-btn').forEach(btn => {
+        const btnValue = parseInt(btn.dataset.leverage);
+        btn.classList.toggle('active', btnValue === numValueFloat);
+    });
+    validateTradeAmount();
+}
+
+function showConfirmModal(action) {
+    const amountInput = document.getElementById('tradeAmount');
+    const leverage = parseFloat(document.getElementById('leverageValue').value) || 5;
+    const amount = parseFloat(amountInput.value) || 0;
+    const balanceErrorDiv = document.getElementById('balanceError');
+    
+    if (!amount || amount <= 0) {
+        balanceErrorDiv.textContent = '⚠ Please enter a valid trade amount';
+        balanceErrorDiv.style.display = 'block';
+        return;
+    }
+    
+    const availableBalance = walletBalance - marginUsed;
+    const marketSelect = document.getElementById('assetName');
+    const selectedOption = marketSelect.options[marketSelect.selectedIndex];
+    const symbol = selectedOption ? selectedOption.getAttribute('data-symbol') : '';
+    
+    let estimatedPrice = 1;
+    if (symbol && symbol.includes('BTC')) estimatedPrice = 50000;
+    else if (symbol && symbol.includes('ETH')) estimatedPrice = 3000;
+    else if (symbol && symbol.includes('GOLD')) estimatedPrice = 2000;
+    else if (symbol && symbol.includes('OIL')) estimatedPrice = 100;
+    
+    const marginRequired = (amount * estimatedPrice) / leverage;
+    
+    if (marginRequired > availableBalance) {
+        balanceErrorDiv.textContent = '⚠ Insufficient balance! Required: $' + marginRequired.toFixed(2) + ' | Available: $' + availableBalance.toFixed(2);
+        balanceErrorDiv.style.display = 'block';
+        return;
+    }
+    
+    document.getElementById('confirmModalTitle').textContent = 'Confirm ' + action.toUpperCase() + ' Trade';
+    document.getElementById('confirmAmountDisplay').textContent = '$' + amount.toFixed(2);
+    document.getElementById('confirmLeverageDisplay').textContent = leverage + 'x';
+    document.getElementById('confirmDurationDisplay').textContent = document.getElementById('tradeDuration').options[document.getElementById('tradeDuration').selectedIndex].text;
+    
+    document.getElementById('tradeConfirmModal').style.display = 'flex';
+    
+    document.getElementById('confirmTradeBtn').onclick = function() {
+        document.getElementById('orderSide').value = action;
+        document.getElementById('tradeForm').submit();
+    };
+    
+    balanceErrorDiv.style.display = 'none';
+}
+
+function closeConfirmModal() {
+    document.getElementById('tradeConfirmModal').style.display = 'none';
+}
+
 function validateTradeAmount() {
     const amountInput = document.getElementById('tradeAmount');
-    const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
+    const leverage = parseFloat(document.getElementById('leverageValue').value) || 5;
     const amount = parseFloat(amountInput.value) || 0;
     const balanceErrorDiv = document.getElementById('balanceError');
     const maxAmountDiv = document.getElementById('maxAmount');

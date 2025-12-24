@@ -912,7 +912,7 @@ function validateTradeAmount() {
 
 function showConfirmModal(action) {
     const amountInput = document.getElementById('tradeAmount');
-    const leverage = parseInt(document.getElementById('leverageValue').value) || 5;
+    const leverage = parseFloat(document.getElementById('leverageValue').value) || 5;
     const amount = parseFloat(amountInput.value) || 0;
     const balanceErrorDiv = document.getElementById('balanceError');
     
