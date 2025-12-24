@@ -271,7 +271,7 @@ function updateMarketInfo() {
     
     const assetType = selectedOption.getAttribute('data-type') || 'Unknown';
     const assetName = selectedOption.getAttribute('data-display') || 'Unknown';
-    const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+    const symbol = selectedOption.getAttribute('data-symbol') || '';
     
     const typeEl = document.getElementById('currentAssetType');
     const nameEl = document.getElementById('currentAssetName');
@@ -279,7 +279,25 @@ function updateMarketInfo() {
     
     if (typeEl) typeEl.textContent = assetType;
     if (nameEl) nameEl.textContent = assetName;
-    if (priceEl) priceEl.textContent = '$' + price.toFixed(2);
+    
+    if (symbol && priceEl) {
+        fetch('/api/market/' + encodeURIComponent(symbol) + '/price')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    const livePrice = parseFloat(data.data.price) || 0;
+                    priceEl.textContent = '$' + livePrice.toFixed(2);
+                } else {
+                    const fallbackPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                    priceEl.textContent = '$' + fallbackPrice.toFixed(2);
+                }
+            })
+            .catch(error => {
+                console.log('Error fetching price:', error);
+                const fallbackPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                priceEl.textContent = '$' + fallbackPrice.toFixed(2);
+            });
+    }
 }
 
 function initTradingViewChart() {
