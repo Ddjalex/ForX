@@ -9,7 +9,30 @@ $totalTrades = $stats['total_trades'] ?? 0;
 $openTrades = $stats['open_trades'] ?? 0;
 $closedTrades = $stats['closed_trades'] ?? 0;
 $winLossRatio = $stats['win_loss_ratio'] ?? 0;
+
+// Mock notification data
+$mockNotifications = [
+    ['country' => 'Italy', 'action' => 'withdrawn', 'amount' => 40000],
+    ['country' => 'Mexico', 'action' => 'withdrawn', 'amount' => 4500],
+    ['country' => 'Turkey', 'action' => 'is trading with', 'amount' => 58623],
+    ['country' => 'USA', 'action' => 'withdrawn', 'amount' => 58623],
+    ['country' => 'Switzerland', 'action' => 'withdrawn', 'amount' => 40000],
+    ['country' => 'Spain', 'action' => 'just invested', 'amount' => 52300],
+    ['country' => 'Argentina', 'action' => 'is trading with', 'amount' => 10000],
+    ['country' => 'Panama', 'action' => 'just invested', 'amount' => 4500],
+    ['country' => 'Canada', 'action' => 'deposited', 'amount' => 15000],
+    ['country' => 'Germany', 'action' => 'withdrawn', 'amount' => 32500],
+    ['country' => 'UK', 'action' => 'just invested', 'amount' => 78900],
+    ['country' => 'Australia', 'action' => 'is trading with', 'amount' => 22300],
+];
 ?>
+
+<div id="systemNotification" class="system-notification" style="display: none;">
+    <div class="notification-content">
+        <span class="notification-text"></span>
+        <button class="notification-close-btn" onclick="closeNotification()">&times;</button>
+    </div>
+</div>
 
 <div class="stats-grid">
     <div class="stat-card">
@@ -292,6 +315,84 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <style>
+#systemNotification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+}
+
+#systemNotification.show {
+    display: block !important;
+}
+
+#systemNotification.hide {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+.notification-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.notification-text {
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.notification-close-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.notification-close-btn:hover {
+    color: #333;
+}
+
 .trade-confirm-modal {
     position: fixed;
     top: 0;
@@ -430,6 +531,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
+// System Notification Data
+const mockNotifications = <?php echo json_encode($mockNotifications); ?>;
+let notificationIndex = 0;
+let notificationTimer = null;
+
+function getRandomNotification() {
+    const notification = mockNotifications[notificationIndex % mockNotifications.length];
+    notificationIndex++;
+    return notification;
+}
+
+function showNotification(data) {
+    const notifElement = document.getElementById('systemNotification');
+    const textElement = notifElement.querySelector('.notification-text');
+    
+    textElement.innerHTML = `Someone from <strong>${data.country}</strong> has ${data.action} <strong>$${data.amount.toLocaleString()}</strong>`;
+    
+    notifElement.classList.remove('hide');
+    notifElement.classList.add('show');
+    notifElement.style.display = 'block';
+    
+    // Auto hide after 5 seconds
+    clearTimeout(notificationTimer);
+    notificationTimer = setTimeout(() => {
+        closeNotification();
+    }, 5000);
+}
+
+function closeNotification() {
+    const notifElement = document.getElementById('systemNotification');
+    notifElement.classList.remove('show');
+    notifElement.classList.add('hide');
+    setTimeout(() => {
+        notifElement.style.display = 'none';
+    }, 300);
+}
+
+// Start showing notifications every 5-6 seconds
+function startNotifications() {
+    // Show first notification immediately
+    showNotification(getRandomNotification());
+    
+    // Then show every 5-6 seconds
+    setInterval(() => {
+        showNotification(getRandomNotification());
+    }, Math.random() * 1000 + 5000);
+}
+
+// Hide trade history section
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const tradeHistoryCards = document.querySelectorAll('.card');
+        tradeHistoryCards.forEach(card => {
+            const title = card.querySelector('.card-title');
+            if (title && (title.textContent.includes('Trade History') || 
+                         title.textContent.includes('Trades Transactions') ||
+                         title.textContent.includes('trade history'))) {
+                card.style.display = 'none';
+            }
+        });
+        startNotifications();
+    }, 1000);
+});
+
 let tvChart = null;
 let currentSymbol = 'BINANCE:BTCUSDT';
 
