@@ -399,47 +399,12 @@ async function updateWalletBalance() {
                 const available = data.data.available || 0;
                 balanceValueEl.textContent = '$' + formatNumber(available, 2);
             }
-            
-            // Check if balance is low and show warning
-            if (data.data.available < 100) {
-                showLowBalanceWarning(data.data.available);
-            }
         }
     } catch (e) {
         console.log('Wallet balance update failed:', e);
     }
 }
 
-function showLowBalanceWarning(balance) {
-    const existingWarning = document.getElementById('lowBalanceWarning');
-    if (existingWarning) return;
-    
-    const warning = document.createElement('div');
-    warning.id = 'lowBalanceWarning';
-    warning.className = 'alert alert-warning';
-    warning.style.cssText = `
-        position: sticky;
-        top: 10px;
-        z-index: 100;
-        padding: 12px 16px;
-        background: linear-gradient(135deg, #ff9800, #f57c00);
-        color: white;
-        border-radius: 8px;
-        border-left: 4px solid #ff6f00;
-        margin-bottom: 16px;
-        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
-    `;
-    warning.innerHTML = `
-        <strong>⚠️ Low Balance Warning</strong><br>
-        Your available balance is only <strong>$${balance.toFixed(2)}</strong>. 
-        <a href="/wallet/deposit" style="color: white; text-decoration: underline; font-weight: bold;">Make a deposit</a>
-    `;
-    
-    const tradingPanel = document.querySelector('.trading-panel');
-    if (tradingPanel && !tradingPanel.querySelector('#lowBalanceWarning')) {
-        tradingPanel.insertBefore(warning, tradingPanel.firstChild);
-    }
-}
 
 function validateTradeAmount() {
     const amountInput = document.getElementById('tradeAmount');
