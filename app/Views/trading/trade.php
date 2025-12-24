@@ -281,10 +281,10 @@ function updateMarketInfo() {
     if (nameEl) nameEl.textContent = assetName;
     
     if (symbol && priceEl) {
-        fetch('/api/market/' + encodeURIComponent(symbol) + '/price')
+        fetch('/api/prices/' + encodeURIComponent(symbol))
             .then(response => response.json())
             .then(data => {
-                if (data.success && data.data) {
+                if (data.success && data.data && data.data.price) {
                     const livePrice = parseFloat(data.data.price) || 0;
                     priceEl.textContent = '$' + livePrice.toFixed(2);
                 } else {
