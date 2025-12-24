@@ -258,6 +258,22 @@ class ApiController
         Router::json(['success' => true, 'data' => $positions]);
     }
 
+    public function walletBalance(): void
+    {
+        if (!Auth::check()) {
+            Router::json(['success' => false, 'error' => 'Unauthorized'], 401);
+            return;
+        }
+
+        $wallet = Database::fetch("SELECT * FROM wallets WHERE user_id = ?", [Auth::id()]);
+
+        Router::json(['success' => true, 'data' => [
+            'balance' => (float) $wallet['balance'],
+            'margin_used' => (float) $wallet['margin_used'],
+            'available' => (float) ($wallet['balance'] - $wallet['margin_used']),
+        ]]);
+    }
+
     public function executeTrade(): void
     {
         if (!Auth::check()) {
