@@ -97,7 +97,7 @@ $totalBalance = $wallet['balance'] ?? 0;
 
             <div class="form-group">
                 <label class="form-label">Asset Type</label>
-                <select class="form-control" name="asset_type" id="assetType" onchange="updateAssetNames()">
+                <select class="form-control" name="asset_type" id="assetType" onchange="filterAssetNamesByType(); updateMarketInfo();">
                     <?php
                     $assetTypesByGroup = [];
                     foreach ($allMarkets ?? [] as $m) {
@@ -124,8 +124,9 @@ $totalBalance = $wallet['balance'] ?? 0;
                         <option value="<?= $m['id'] ?>" 
                             data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
                             data-symbol="<?= htmlspecialchars($m['symbol']) ?>"
-                            data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>"
                             data-display="<?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>"
+                            data-price="<?= $m['price'] ?? 0 ?>"
+                            data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>"
                             <?= $m['id'] == $market['id'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?> (<?= htmlspecialchars($m['symbol_tradingview'] ?? $m['symbol']) ?>)
                         </option>
@@ -213,19 +214,51 @@ let currentSymbol = 'BINANCE:BTCUSDT';
 
 document.addEventListener('DOMContentLoaded', function() {
     initTradingViewChart();
-    
-    const assetSelect = document.getElementById('assetName');
-    if (assetSelect) {
-        assetSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
-            if (tradingViewSymbol) {
-                currentSymbol = tradingViewSymbol;
-                updateTradingViewChart();
-            }
-        });
-    }
+    updateMarketInfo();
+    filterAssetNamesByType();
 });
+
+function filterAssetNamesByType() {
+    const assetTypeSelect = document.getElementById('assetType');
+    const assetNameSelect = document.getElementById('assetName');
+    const selectedType = assetTypeSelect.value;
+    
+    const options = assetNameSelect.querySelectorAll('option');
+    let firstVisibleOption = null;
+    
+    options.forEach(option => {
+        if (option.value === '') {
+            option.style.display = 'block';
+            return;
+        }
+        const optionType = option.getAttribute('data-type');
+        if (optionType === selectedType) {
+            option.style.display = 'block';
+            if (!firstVisibleOption) firstVisibleOption = option;
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    
+    if (firstVisibleOption && assetNameSelect.value === '') {
+        assetNameSelect.value = firstVisibleOption.value;
+    }
+}
+
+function updateMarketInfo() {
+    const assetNameSelect = document.getElementById('assetName');
+    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    
+    if (!selectedOption) return;
+    
+    const assetType = selectedOption.getAttribute('data-type');
+    const assetName = selectedOption.getAttribute('data-display');
+    const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+    
+    document.getElementById('currentAssetType').textContent = assetType || 'Unknown';
+    document.getElementById('currentAssetName').textContent = assetName || 'Unknown';
+    document.getElementById('currentPrice').textContent = '$' + price.toFixed(2);
+}
 
 function initTradingViewChart() {
     // Only initialize once
@@ -266,22 +299,22 @@ function createTradingViewWidget() {
 }
 
 function updateTradingViewChart() {
-    // Remove old chart
+    const assetNameSelect = document.getElementById('assetName');
+    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    const tradingViewSymbol = selectedOption.getAttribute('data-tradingview');
+    
+    if (tradingViewSymbol) {
+        currentSymbol = tradingViewSymbol;
+    }
+    
     const container = document.getElementById('tradingview_chart');
     if (container) {
         container.innerHTML = '';
     }
     tvChart = null;
     
-    // Create new chart with new symbol
     setTimeout(createTradingViewWidget, 100);
 }
-
-// Override the existing updateTradingViewChart from app.js
-const originalUpdateChart = window.updateTradingViewChart;
-window.updateTradingViewChart = function() {
-    updateTradingViewChart();
-};
 </script>
 
 <div class="transactions-section">
