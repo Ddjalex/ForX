@@ -98,26 +98,6 @@ $mockNotifications = [
 </div>
 
 <div class="trading-section">
-    <div class="card trading-chart-card">
-        <div class="card-header collapsible" onclick="toggleCard('chartCard')">
-            <h3 class="card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-                <?= t('live_trading_chart') ?>
-            </h3>
-            <div class="card-actions">
-                <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
-                <svg class="collapse-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-        </div>
-        <div class="card-body" id="chartCard">
-            <div class="tradingview-widget-container">
-                <div id="tradingview_chart"></div>
-            </div>
-        </div>
-    </div>
-
     <div class="card live-trading-card">
         <div class="card-header collapsible" onclick="toggleCard('tradingCard')">
             <h3 class="card-title">
@@ -234,6 +214,26 @@ $mockNotifications = [
                     <button type="button" class="trade-btn sell" onclick="showConfirmModal('sell')">Sell</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="card trading-chart-card">
+        <div class="card-header collapsible" onclick="toggleCard('chartCard')">
+            <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <?= t('live_trading_chart') ?>
+            </h3>
+            <div class="card-actions">
+                <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
+                <svg class="collapse-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+        </div>
+        <div class="card-body" id="chartCard">
+            <div class="tradingview-widget-container">
+                <div id="tradingview_chart"></div>
+            </div>
         </div>
     </div>
 </div>
