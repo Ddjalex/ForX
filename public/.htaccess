@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Remove the public from the URL if accessing /public/...
+    RewriteCond %{REQUEST_URI} ^/public/
+    RewriteRule ^public/(.*)$ /$1 [L,R=301]
+    
+    # Prevent access to certain directories
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteCond %{REQUEST_URI} !^/(public|uploads)/
+    RewriteRule ^(.*)$ - [L,F]
+    
+    # Prevent direct access to PHP files except index.php
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME} !^.*\.(?:jpg|jpeg|gif|png|ico|css|js|svg|woff|woff2|ttf|eot)$ [NC]
+    RewriteCond %{REQUEST_URI} !^/index\.php$
+    RewriteRule ^(?!index\.php$).*\.php$ - [L,F]
+    
+    # Route all requests to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?path=$1 [QSA,L]
+</IfModule>
+
+# Cache busting - disable caching for dynamic content
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</IfModule>
