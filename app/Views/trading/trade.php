@@ -119,7 +119,7 @@ $totalBalance = $wallet['balance'] ?? 0;
 
             <div class="form-group">
                 <label class="form-label">Asset Name</label>
-                <select class="form-control" name="market_id" id="assetName" onchange="updateTradingViewChart()">
+                <select class="form-control" name="market_id" id="assetName" onchange="updateMarketInfo(); updateTradingViewChart();">
                     <?php foreach ($allMarkets ?? [] as $m): ?>
                         <option value="<?= $m['id'] ?>" 
                             data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
@@ -213,9 +213,23 @@ let tvChart = null;
 let currentSymbol = 'BINANCE:BTCUSDT';
 
 document.addEventListener('DOMContentLoaded', function() {
-    initTradingViewChart();
-    updateMarketInfo();
-    filterAssetNamesByType();
+    setTimeout(function() {
+        filterAssetNamesByType();
+        updateMarketInfo();
+        initTradingViewChart();
+        
+        const assetTypeSelect = document.getElementById('assetType');
+        const assetNameSelect = document.getElementById('assetName');
+        
+        assetTypeSelect.addEventListener('change', function() {
+            filterAssetNamesByType();
+            setTimeout(updateMarketInfo, 50);
+        });
+        
+        assetNameSelect.addEventListener('change', function() {
+            updateMarketInfo();
+        });
+    }, 100);
 });
 
 function filterAssetNamesByType() {
@@ -240,24 +254,32 @@ function filterAssetNamesByType() {
         }
     });
     
-    if (firstVisibleOption && assetNameSelect.value === '') {
+    if (firstVisibleOption) {
         assetNameSelect.value = firstVisibleOption.value;
     }
 }
 
 function updateMarketInfo() {
     const assetNameSelect = document.getElementById('assetName');
-    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+    const selectedIndex = assetNameSelect.selectedIndex;
+    
+    if (selectedIndex < 0) return;
+    
+    const selectedOption = assetNameSelect.options[selectedIndex];
     
     if (!selectedOption) return;
     
-    const assetType = selectedOption.getAttribute('data-type');
-    const assetName = selectedOption.getAttribute('data-display');
+    const assetType = selectedOption.getAttribute('data-type') || 'Unknown';
+    const assetName = selectedOption.getAttribute('data-display') || 'Unknown';
     const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
     
-    document.getElementById('currentAssetType').textContent = assetType || 'Unknown';
-    document.getElementById('currentAssetName').textContent = assetName || 'Unknown';
-    document.getElementById('currentPrice').textContent = '$' + price.toFixed(2);
+    const typeEl = document.getElementById('currentAssetType');
+    const nameEl = document.getElementById('currentAssetName');
+    const priceEl = document.getElementById('currentPrice');
+    
+    if (typeEl) typeEl.textContent = assetType;
+    if (nameEl) nameEl.textContent = assetName;
+    if (priceEl) priceEl.textContent = '$' + price.toFixed(2);
 }
 
 function initTradingViewChart() {
