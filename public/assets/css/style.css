@@ -1479,7 +1479,7 @@ select.form-control {
 /* Live Trading Section Styles */
 .trading-section {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 350px 1fr;
     gap: 20px;
     margin-bottom: 24px;
 }
