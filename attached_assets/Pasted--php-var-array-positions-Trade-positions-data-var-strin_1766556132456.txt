@@ -61,7 +61,7 @@ $success = $success ?? '';
 
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title" style="font-size: 24px; text-align: center; width: 100%;">Trade History</h2>
+        <h2 class="card-title" style="font-size: 24px; text-align: center; width: 100;">Trade History</h2>
     </div>
     <div class="card-body" style="overflow-x: auto;">
         <table class="table history-table">
@@ -91,7 +91,7 @@ $success = $success ?? '';
                         $pnl = $isOpen ? ($position['unrealized_pnl'] ?? 0) : ($position['realized_pnl'] ?? 0);
                         $isWin = $pnl >= 0;
                     ?>
-                        <tr data-position="<?= $position['id'] ?>" data-expires="<?= $position['expires_at'] ?? '' ?>">
+                        <tr>
                             <td><?= $i++ ?></td>
                             <td><?= htmlspecialchars($position['symbol']) ?></td>
                             <td class="<?= $position['side'] === 'buy' ? 'action-buy' : 'action-sell' ?>">
@@ -111,7 +111,7 @@ $success = $success ?? '';
                                     <span class="result-badge result-pending">PENDING</span>
                                 <?php else: ?>
                                     <span class="result-badge <?= $isWin ? 'result-win' : 'result-loss' ?>">
-                                        <?= $isWin ? 'WIN ✓' : 'LOSS ✗' ?>
+                                        <?= $isWin ? 'WIN' : 'LOSS' ?>
                                     </span>
                                 <?php endif; ?>
                             </td>
@@ -124,13 +124,13 @@ $success = $success ?? '';
                             </td>
                             <td><?= date('Y-m-d H:i', strtotime($position['created_at'])) ?></td>
                             <td><?= $position['expires_at'] ? date('Y-m-d H:i', strtotime($position['expires_at'])) : '-' ?></td>
-                            <td class="countdown-cell" data-expires="<?= $position['expires_at'] ? strtotime($position['expires_at']) * 1000 : '' ?>" data-status="<?= $position['status'] ?>">
+                            <td class="time-left-cell" data-expires-timestamp="<?= $position['expires_at'] ? strtotime($position['expires_at']) * 1000 : '' ?>" data-status="<?= $position['status'] ?>">
                                 <?php if (!$isOpen): ?>
-                                    <span class="expired-text">-</span>
+                                    <span class="expired-text">Expired</span>
                                 <?php elseif ($position['expires_at']): ?>
-                                    <span class="countdown-timer">calculating...</span>
+                                    <span class="countdown"></span>
                                 <?php else: ?>
-                                    <span class="expired-text">-</span>
+                                    -
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -161,7 +161,6 @@ $success = $success ?? '';
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    cursor: pointer;
 }
 .success-modal-content {
     position: relative;
@@ -175,7 +174,6 @@ $success = $success ?? '';
 .success-modal-content p {
     margin-bottom: 15px;
     font-size: 14px;
-    line-height: 1.6;
 }
 .success-modal-btn {
     background: #2563eb;
@@ -185,7 +183,6 @@ $success = $success ?? '';
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.3s ease;
 }
 .success-modal-btn:hover {
     background: #1d4ed8;
@@ -209,7 +206,6 @@ $success = $success ?? '';
 }
 .history-table tbody tr {
     background: #1a2332;
-    transition: background 0.2s ease;
 }
 .history-table tbody tr:nth-child(even) {
     background: #1e2a3a;
@@ -224,7 +220,7 @@ $success = $success ?? '';
     color: #e0e0e0;
 }
 .action-buy {
-    color: #10B981 !important;
+    color: var(--accent-primary) !important;
     font-weight: 600;
 }
 .action-sell {
@@ -239,8 +235,8 @@ $success = $success ?? '';
     display: inline-block;
 }
 .status-open {
-    background: #10B981;
-    color: #fff;
+    background: var(--accent-primary);
+    color: #000;
 }
 .status-closed {
     background: #6c757d;
@@ -270,90 +266,96 @@ $success = $success ?? '';
     box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 .pnl-positive {
-    color: #10B981 !important;
+    color: var(--accent-primary) !important;
     font-weight: 600;
 }
 .pnl-negative {
     color: #dc3545 !important;
     font-weight: 600;
 }
-.countdown-timer {
-    color: #10B981;
+.countdown {
+    color: #ff6b6b;
     font-weight: 600;
     font-size: 13px;
-    display: inline-block;
-    min-width: 80px;
 }
-.countdown-timer.warning {
-    color: #ff9800;
-}
-.countdown-timer.danger {
+.countdown.active {
     color: #ff6b6b;
 }
 .expired-text {
     color: #8899a6;
     font-style: italic;
 }
-.countdown-cell {
+.time-left-cell {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-.text-center {
-    text-align: center !important;
 }
 </style>
 
 <script>
 function closeSuccessModal() {
     const modal = document.getElementById('successModal');
-    if (modal) {
-        modal.style.opacity = '0';
-        setTimeout(() => modal.remove(), 300);
-    }
+    if (modal) modal.style.display = 'none';
 }
 
-function updateTradeCountdowns() {
-    document.querySelectorAll('.countdown-cell[data-expires]').forEach(cell => {
-        const expiresTimestamp = parseInt(cell.dataset.expires);
+let hasExpired = false;
+
+function updateCountdowns() {
+    let anyExpired = false;
+    
+    document.querySelectorAll('.time-left-cell[data-expires-timestamp]').forEach(cell => {
+        const expiresTimestamp = parseInt(cell.dataset.expiresTimestamp);
         const status = cell.dataset.status;
         
         if (!expiresTimestamp || status !== 'open') return;
         
-        const timer = cell.querySelector('.countdown-timer');
-        if (!timer) return;
+        const countdown = cell.querySelector('.countdown');
+        if (!countdown) return;
         
         const now = Date.now();
         const diff = expiresTimestamp - now;
         
         if (diff <= 0) {
-            timer.textContent = '⏱ EXPIRED';
-            timer.className = 'countdown-timer danger';
+            countdown.textContent = 'Expired';
+            countdown.style.color = '#8899a6';
+            countdown.classList.remove('active');
+            anyExpired = true;
         } else {
             const minutes = Math.floor(diff / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
-            timer.textContent = `⏱ ${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (minutes === 0 && seconds < 30) {
-                timer.className = 'countdown-timer danger';
-            } else if (minutes < 1) {
-                timer.className = 'countdown-timer warning';
-            } else {
-                timer.className = 'countdown-timer';
-            }
+            countdown.textContent = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+            countdown.style.color = '#ff6b6b';
+            countdown.classList.add('active');
         }
+    });
+    
+    if (anyExpired && !hasExpired) {
+        hasExpired = true;
+        closeExpiredAndRedirect();
+    }
+}
+
+function closeExpiredAndRedirect() {
+    fetch('/api/positions/close-expired', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        setTimeout(() => {
+            window.location.href = '/dashboard/trade';
+        }, 1500);
+    })
+    .catch(err => {
+        console.error('Error closing positions:', err);
+        setTimeout(() => {
+            window.location.href = '/dashboard/trade';
+        }, 1500);
     });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        updateTradeCountdowns();
-        setInterval(updateTradeCountdowns, 1000);
-    });
-} else {
-    updateTradeCountdowns();
-    setInterval(updateTradeCountdowns, 1000);
-}
+setInterval(updateCountdowns, 1000);
+updateCountdowns();
 </script>
 
 <?php
