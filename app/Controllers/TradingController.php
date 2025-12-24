@@ -279,7 +279,7 @@ class TradingController
             if ($recentDuplicate) {
                 // Skip duplicate insertion
                 Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
-                Router::redirect('/dashboard/trades/history');
+                Router::redirect('/dashboard/trade/history');
                 return;
             }
 
@@ -323,7 +323,7 @@ class TradingController
             ]);
 
             Session::flash('success', 'Trade executed successfully. Your trade has been placed successfully. You can review the details in your trade history.');
-            Router::redirect('/dashboard/trades/history');
+            Router::redirect('/dashboard/trade/history');
             return;
         } else {
             Database::insert('orders', [
