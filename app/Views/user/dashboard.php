@@ -695,6 +695,12 @@ document.addEventListener('DOMContentLoaded', function() {
     loadBalanceVisibilityPreferences();
 });
 
+// Store original balance values
+let originalBalanceValues = {
+    dashboard: '',
+    liveTrading: ''
+};
+
 // Toggle balance visibility function
 function toggleBalanceVisibility(location) {
     const settings = JSON.parse(localStorage.getItem('balanceVisibility') || '{"dashboard": true, "liveTrading": true, "tradePage": true}');
@@ -703,23 +709,29 @@ function toggleBalanceVisibility(location) {
         settings.dashboard = !settings.dashboard;
         const balanceEl = document.getElementById('dashboardTotalBalanceValue');
         const eyeIcon = document.getElementById('dashboardBalanceEyeIcon');
-        if (settings.dashboard) {
-            balanceEl.style.visibility = 'visible';
-            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-        } else {
-            balanceEl.style.visibility = 'hidden';
-            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        if (balanceEl) {
+            if (settings.dashboard) {
+                balanceEl.textContent = originalBalanceValues.dashboard;
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            } else {
+                originalBalanceValues.dashboard = balanceEl.textContent;
+                balanceEl.textContent = '***';
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
         }
     } else if (location === 'liveTrading') {
         settings.liveTrading = !settings.liveTrading;
         const balanceEl = document.getElementById('dashboardLiveTradeBalanceValue');
         const eyeIcon = document.getElementById('liveTradeBalanceEyeIcon');
-        if (settings.liveTrading) {
-            balanceEl.style.visibility = 'visible';
-            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-        } else {
-            balanceEl.style.visibility = 'hidden';
-            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        if (balanceEl) {
+            if (settings.liveTrading) {
+                balanceEl.textContent = originalBalanceValues.liveTrading;
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            } else {
+                originalBalanceValues.liveTrading = balanceEl.textContent;
+                balanceEl.textContent = '***';
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
         }
     }
     localStorage.setItem('balanceVisibility', JSON.stringify(settings));
@@ -733,9 +745,12 @@ function loadBalanceVisibilityPreferences() {
     const dashboardBalance = document.getElementById('dashboardTotalBalanceValue');
     const dashboardEye = document.getElementById('dashboardBalanceEyeIcon');
     if (dashboardBalance) {
-        dashboardBalance.style.visibility = settings.dashboard ? 'visible' : 'hidden';
-        if (!settings.dashboard && dashboardEye) {
-            dashboardEye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        originalBalanceValues.dashboard = dashboardBalance.textContent;
+        if (!settings.dashboard) {
+            dashboardBalance.textContent = '***';
+            if (dashboardEye) {
+                dashboardEye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
         }
     }
     
@@ -743,9 +758,12 @@ function loadBalanceVisibilityPreferences() {
     const liveBalance = document.getElementById('dashboardLiveTradeBalanceValue');
     const liveEye = document.getElementById('liveTradeBalanceEyeIcon');
     if (liveBalance) {
-        liveBalance.style.visibility = settings.liveTrading ? 'visible' : 'hidden';
-        if (!settings.liveTrading && liveEye) {
-            liveEye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        originalBalanceValues.liveTrading = liveBalance.textContent;
+        if (!settings.liveTrading) {
+            liveBalance.textContent = '***';
+            if (liveEye) {
+                liveEye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            }
         }
     }
 }
