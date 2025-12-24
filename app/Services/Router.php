@@ -37,7 +37,7 @@ class Router
         $uri = parse_url($rawUri, PHP_URL_PATH);
         $uri = rtrim($uri, '/') ?: '/';
         
-        // Remove /public_html prefix if it exists (cPanel hosting)
+        // Remove domain-based prefixes if they exist
         if (strpos($uri, '/public_html') === 0) {
             $uri = substr($uri, strlen('/public_html'));
             $uri = rtrim($uri, '/') ?: '/';
@@ -90,11 +90,7 @@ class Router
         // No route matched - log available routes and return 404
         self::logNotFound($method, $uri);
         http_response_code(404);
-        echo self::render('errors/404', [
-            'requested_uri' => $uri,
-            'request_method' => $method,
-            'available_routes' => self::getAvailableRoutes($method)
-        ]);
+        echo self::render('errors/404');
     }
 
     private static function convertToRegex(string $path): string
@@ -135,10 +131,8 @@ class Router
 
     private static function logDispatch(string $method, string $rawUri, string $cleanUri): void
     {
-        $logDir = dirname(__DIR__) . '/../storage/logs';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0755, true);
-        }
+        $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
+        @mkdir($logDir, 0755, true);
         
         $message = date('[Y-m-d H:i:s] ') . "Dispatch: $method $rawUri (cleaned: $cleanUri)\n";
         error_log($message, 3, $logDir . '/routing.log');
@@ -146,10 +140,8 @@ class Router
 
     private static function logNotFound(string $method, string $uri): void
     {
-        $logDir = dirname(__DIR__) . '/../storage/logs';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0755, true);
-        }
+        $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
+        @mkdir($logDir, 0755, true);
         
         $message = date('[Y-m-d H:i:s] ') . "404 Not Found: $method $uri\n";
         error_log($message, 3, $logDir . '/routing.log');
@@ -157,10 +149,8 @@ class Router
 
     private static function logError(string $message): void
     {
-        $logDir = dirname(__DIR__) . '/../storage/logs';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0755, true);
-        }
+        $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
+        @mkdir($logDir, 0755, true);
         
         error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, $logDir . '/routing.log');
     }
