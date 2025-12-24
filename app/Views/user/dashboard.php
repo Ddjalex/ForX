@@ -55,25 +55,6 @@ $mockNotifications = [
     </div>
 </div>
 
-
-<div style="background: #0f1822; border: 1px solid #2d3a4f; padding: 16px; margin-bottom: 20px; border-radius: 6px;">
-    <div style="font-size: 11px; color: #8899a6; text-transform: uppercase; font-weight: 600; margin-bottom: 12px;">Current Market Info</div>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px;">
-        <div>
-            <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Type:</span>
-            <div style="color: #e0e0e0; font-weight: 600;" id="currentAssetType"><?= htmlspecialchars($allMarkets[0]['asset_type'] ?? $allMarkets[0]['type'] ?? 'Crypto') ?></div>
-        </div>
-        <div>
-            <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Name:</span>
-            <div style="color: #e0e0e0; font-weight: 600;" id="currentAssetName"><?= htmlspecialchars($allMarkets[0]['display_name'] ?? $allMarkets[0]['symbol'] ?? 'BTC/USD') ?></div>
-        </div>
-        <div>
-            <span style="color: #8899a6; display: block; margin-bottom: 6px;">Current Price:</span>
-            <div style="color: #10B981; font-weight: 700;" id="currentPrice">$<?= number_format($allMarkets[0]['price'] ?? 0, 2) ?></div>
-        </div>
-    </div>
-</div>
-
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-value"><?= $totalTrades ?></div>
@@ -152,6 +133,23 @@ $mockNotifications = [
             </div>
         </div>
         <div class="card-body" id="tradingCard">
+            <div style="background: #0f1822; border: 1px solid #2d3a4f; padding: 16px; margin-bottom: 20px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #8899a6; text-transform: uppercase; font-weight: 600; margin-bottom: 12px;">Current Market Info</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px;">
+                    <div>
+                        <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Type:</span>
+                        <div style="color: #e0e0e0; font-weight: 600;" id="dashboardCurrentAssetType"><?= htmlspecialchars($allMarkets[0]['asset_type'] ?? $allMarkets[0]['type'] ?? 'Crypto') ?></div>
+                    </div>
+                    <div>
+                        <span style="color: #8899a6; display: block; margin-bottom: 6px;">Asset Name:</span>
+                        <div style="color: #e0e0e0; font-weight: 600;" id="dashboardCurrentAssetName"><?= htmlspecialchars($allMarkets[0]['display_name'] ?? $allMarkets[0]['symbol'] ?? 'BTC/USD') ?></div>
+                    </div>
+                    <div>
+                        <span style="color: #8899a6; display: block; margin-bottom: 6px;">Current Price:</span>
+                        <div style="color: #10B981; font-weight: 700;" id="dashboardCurrentPrice">$<?= number_format($allMarkets[0]['price'] ?? 0, 2) ?></div>
+                    </div>
+                </div>
+            </div>
             <form method="POST" action="/dashboard/trade/order" id="tradeForm" class="trading-form">
                 <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
                 <input type="hidden" name="side" id="orderSide" value="buy">
@@ -176,6 +174,7 @@ $mockNotifications = [
                             <option value="<?= $m['id'] ?>" 
                                 data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
                                 data-symbol="<?= htmlspecialchars($m['symbol']) ?>"
+                                data-price="<?= $m['price'] ?? 0 ?>"
                                 data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>">
                                 <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>
                             </option>
@@ -724,6 +723,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize TradingView chart
     initTradingViewChart();
     
+    // Initialize market info
+    updateMarketInfo();
+    
+    // Sync prices every 30 seconds
+    setInterval(syncDashboardPrices, 30000);
+    
     // Update chart when asset type changes
     const assetTypeSelect = document.getElementById('assetType');
     if (assetTypeSelect) {
@@ -812,13 +817,39 @@ function updateMarketInfo() {
     const assetName = selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
     const assetPrice = selectedOption.getAttribute('data-price') || '0.00';
     
-    const currentAssetTypeEl = document.getElementById('currentAssetType');
-    const currentAssetNameEl = document.getElementById('currentAssetName');
-    const currentPriceEl = document.getElementById('currentPrice');
+    const currentAssetTypeEl = document.getElementById('dashboardCurrentAssetType');
+    const currentAssetNameEl = document.getElementById('dashboardCurrentAssetName');
+    const currentPriceEl = document.getElementById('dashboardCurrentPrice');
     
     if (currentAssetTypeEl) currentAssetTypeEl.textContent = assetType;
     if (currentAssetNameEl) currentAssetNameEl.textContent = assetName;
     if (currentPriceEl) currentPriceEl.textContent = '$' + parseFloat(assetPrice).toFixed(2);
+}
+
+// Real-time price sync for dashboard
+async function syncDashboardPrices() {
+    try {
+        const response = await fetch('/api/prices');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            const assetNameSelect = document.getElementById('assetName');
+            if (!assetNameSelect) return;
+            
+            data.data.forEach(priceData => {
+                const options = assetNameSelect.querySelectorAll('option');
+                options.forEach(option => {
+                    if (option.getAttribute('data-symbol') === priceData.symbol) {
+                        option.setAttribute('data-price', priceData.price);
+                    }
+                });
+            });
+            
+            updateMarketInfo();
+        }
+    } catch (e) {
+        console.log('Price sync failed:', e);
+    }
 }
 
 function updateTradingViewChart() {
