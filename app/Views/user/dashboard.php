@@ -326,6 +326,38 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
+<!-- KYC Verification Modal -->
+<div id="kycVerificationModal" class="kyc-verification-modal" style="display: none;">
+    <div class="kyc-verification-overlay"></div>
+    <div class="kyc-verification-content">
+        <div class="kyc-verification-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="1.5">
+                <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zm0-9a1 1 0 011 1v4a1 1 0 11-2 0v-4a1 1 0 011-1zm0-3a1 1 0 110-2 1 1 0 010 2z"></path>
+            </svg>
+        </div>
+        <h2 class="kyc-verification-title">Complete Identity Verification</h2>
+        <p class="kyc-verification-message">
+            To unlock full trading features and access advanced tools, please complete your identity verification (KYC) process.
+        </p>
+        <div class="kyc-verification-info">
+            <ul>
+                <li>✓ Quick and easy process</li>
+                <li>✓ Secure document upload</li>
+                <li>✓ Admin approval within 24 hours</li>
+                <li>✓ Full access to all trading features</li>
+            </ul>
+        </div>
+        <div class="kyc-verification-buttons">
+            <button type="button" class="kyc-verification-btn verify-now" onclick="window.location.href='/kyc/verify'">
+                Verify Now
+            </button>
+            <button type="button" class="kyc-verification-btn verify-later" onclick="closeKYCModal()">
+                I'll Do It Later
+            </button>
+        </div>
+    </div>
+</div>
+
 <div id="tradeConfirmModal" class="trade-confirm-modal" style="display: none;">
     <div class="trade-confirm-overlay"></div>
     <div class="trade-confirm-content">
@@ -634,6 +666,133 @@ document.addEventListener('DOMContentLoaded', function() {
     min-width: 45px;
     text-align: right;
 }
+
+.kyc-verification-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kyc-verification-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.kyc-verification-content {
+    position: relative;
+    background: linear-gradient(135deg, #0f1822 0%, #1a2a3a 100%);
+    border-radius: 16px;
+    padding: 50px 45px;
+    text-align: center;
+    max-width: 520px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 212, 170, 0.2);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+}
+
+.kyc-verification-icon {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.kyc-verification-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--accent-primary), #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.kyc-verification-message {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.kyc-verification-info {
+    background: rgba(0, 212, 170, 0.08);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.kyc-verification-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.kyc-verification-info li {
+    padding: 10px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.kyc-verification-info li:before {
+    content: '✓ ';
+    color: var(--accent-primary);
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.kyc-verification-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    margin-top: 30px;
+    width: 100%;
+}
+
+.kyc-verification-btn {
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.verify-now {
+    background: linear-gradient(135deg, var(--accent-primary), #00e6b8);
+    color: #000;
+}
+
+.verify-now:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+}
+
+.verify-later {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.verify-later:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
 </style>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
@@ -693,7 +852,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
     // Load balance visibility preferences
     loadBalanceVisibilityPreferences();
+    // Show KYC modal if user not verified
+    checkAndShowKYCModal();
 });
+
+function checkAndShowKYCModal() {
+    const isVerified = <?= $isVerified ? 'true' : 'false' ?>;
+    if (!isVerified) {
+        const kycModal = document.getElementById('kycVerificationModal');
+        if (kycModal) {
+            kycModal.style.display = 'flex';
+        }
+    }
+}
+
+function closeKYCModal() {
+    const kycModal = document.getElementById('kycVerificationModal');
+    if (kycModal) {
+        kycModal.style.display = 'none';
+    }
+}
 
 // Store original balance values
 let originalBalanceValues = {

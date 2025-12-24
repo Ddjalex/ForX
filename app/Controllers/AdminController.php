@@ -564,4 +564,46 @@ class AdminController
         Session::flash('success', 'Password changed successfully.');
         Router::redirect('/admin/settings');
     }
+
+    public function kyc(): void
+    {
+        $kycVerifications = Database::fetchAll(
+            "SELECT kv.*, u.name as user_name, u.email as user_email,
+                    (SELECT GROUP_CONCAT(CONCAT(document_type, ':', file_path) SEPARATOR '|') 
+                     FROM kyc_documents WHERE kyc_id = kv.id) as docs
+             FROM kyc_verifications kv
+             JOIN users u ON kv.user_id = u.id
+             ORDER BY kv.created_at DESC"
+        );
+
+        // Parse documents
+        foreach ($kycVerifications as &$kyc) {
+            $kyc['documents'] = [];
+            if ($kyc['docs']) {
+                $docPairs = explode('|', $kyc['docs']);
+                foreach ($docPairs as $pair) {
+                    [$type, $path] = explode(':', $pair);
+                    $kyc['documents'][] = [
+                        'document_type' => $type,
+                        'file_path' => $path
+                    ];
+                }
+            }
+            unset($kyc['docs']);
+        }
+
+        $stats = [
+            'pending_count' => Database::fetch("SELECT COUNT(*) as count FROM kyc_verifications WHERE status = 'pending'")['count'],
+            'approved_count' => Database::fetch("SELECT COUNT(*) as count FROM kyc_verifications WHERE status = 'approved'")['count'],
+            'rejected_count' => Database::fetch("SELECT COUNT(*) as count FROM kyc_verifications WHERE status = 'rejected'")['count'],
+        ];
+
+        echo Router::render('admin/kyc-approvals', [
+            'kyc_verifications' => $kycVerifications,
+            'pending_count' => $stats['pending_count'],
+            'approved_count' => $stats['approved_count'],
+            'rejected_count' => $stats['rejected_count'],
+            'csrf_token' => Session::generateCsrfToken(),
+        ]);
+    }
 }

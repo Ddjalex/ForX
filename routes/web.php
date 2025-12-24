@@ -10,6 +10,7 @@ use App\Controllers\ApiController;
 use App\Controllers\AccountsController;
 use App\Controllers\FeatureController;
 use App\Controllers\NotificationController;
+use App\Controllers\KYCController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\GuestMiddleware;
@@ -107,3 +108,10 @@ Router::post('/api/notifications/read', [NotificationController::class, 'markAsR
 Router::post('/api/notifications/read-all', [NotificationController::class, 'markAllAsRead'], [AuthMiddleware::class]);
 Router::post('/api/notifications/delete', [NotificationController::class, 'delete'], [AuthMiddleware::class]);
 Router::post('/api/notifications/delete-all', [NotificationController::class, 'deleteAll'], [AuthMiddleware::class]);
+
+// KYC Verification routes
+Router::get('/kyc/verify', [KYCController::class, 'verify'], [AuthMiddleware::class]);
+Router::post('/kyc/submit', [KYCController::class, 'submitVerification'], [AuthMiddleware::class]);
+Router::get('/admin/kyc', [AdminController::class, 'kyc'], [AdminMiddleware::class]);
+Router::post('/admin/kyc/approve/{id}', [KYCController::class, 'approveKyc'], [AdminMiddleware::class]);
+Router::post('/admin/kyc/reject/{id}', [KYCController::class, 'rejectKyc'], [AdminMiddleware::class]);
