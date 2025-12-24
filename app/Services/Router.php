@@ -6,6 +6,7 @@ class Router
 {
     private static array $routes = [];
     private static array $middleware = [];
+    private static bool $debug = false;
 
     public static function get(string $path, $handler, array $middleware = []): void
     {
@@ -30,9 +31,22 @@ class Router
     public static function dispatch(): void
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $rawUri = $_SERVER['REQUEST_URI'];
+        
+        // Clean up URI - remove query string and trailing slash
+        $uri = parse_url($rawUri, PHP_URL_PATH);
         $uri = rtrim($uri, '/') ?: '/';
-
+        
+        // Remove /public_html prefix if it exists (cPanel hosting)
+        if (strpos($uri, '/public_html') === 0) {
+            $uri = substr($uri, strlen('/public_html'));
+            $uri = rtrim($uri, '/') ?: '/';
+        }
+        
+        // Log dispatch attempt
+        self::logDispatch($method, $rawUri, $uri);
+        
+        // Try to match routes
         foreach (self::$routes as $route) {
             if ($route['method'] !== $method) {
                 continue;
@@ -43,29 +57,44 @@ class Router
             if (preg_match($pattern, $uri, $matches)) {
                 array_shift($matches);
                 
-                foreach ($route['middleware'] as $middlewareClass) {
-                    $middlewareInstance = new $middlewareClass();
-                    if (!$middlewareInstance->handle()) {
-                        return;
+                try {
+                    // Execute middleware
+                    foreach ($route['middleware'] as $middlewareClass) {
+                        $middlewareInstance = new $middlewareClass();
+                        if (!$middlewareInstance->handle()) {
+                            return;
+                        }
                     }
-                }
 
-                $handler = $route['handler'];
-                
-                if (is_array($handler)) {
-                    [$class, $method] = $handler;
-                    $controller = new $class();
-                    call_user_func_array([$controller, $method], $matches);
-                } elseif (is_callable($handler)) {
-                    call_user_func_array($handler, $matches);
+                    // Execute handler
+                    $handler = $route['handler'];
+                    
+                    if (is_array($handler)) {
+                        [$class, $method] = $handler;
+                        $controller = new $class();
+                        call_user_func_array([$controller, $method], $matches);
+                    } elseif (is_callable($handler)) {
+                        call_user_func_array($handler, $matches);
+                    }
+                    
+                    return;
+                } catch (Throwable $e) {
+                    self::logError("Route handler error: " . $e->getMessage());
+                    http_response_code(500);
+                    echo self::render('errors/500', ['error' => $e->getMessage()]);
+                    return;
                 }
-                
-                return;
             }
         }
 
+        // No route matched - log available routes and return 404
+        self::logNotFound($method, $uri);
         http_response_code(404);
-        echo self::render('errors/404');
+        echo self::render('errors/404', [
+            'requested_uri' => $uri,
+            'request_method' => $method,
+            'available_routes' => self::getAvailableRoutes($method)
+        ]);
     }
 
     private static function convertToRegex(string $path): string
@@ -84,7 +113,7 @@ class Router
         if (file_exists($viewPath)) {
             include $viewPath;
         } else {
-            echo "View not found: {$view}";
+            echo "<!-- View not found: {$view} -->";
         }
         
         return ob_get_clean();
@@ -102,5 +131,48 @@ class Router
         header('Content-Type: application/json');
         echo json_encode($data);
         exit;
+    }
+
+    private static function logDispatch(string $method, string $rawUri, string $cleanUri): void
+    {
+        $logDir = dirname(__DIR__) . '/../storage/logs';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
+        
+        $message = date('[Y-m-d H:i:s] ') . "Dispatch: $method $rawUri (cleaned: $cleanUri)\n";
+        error_log($message, 3, $logDir . '/routing.log');
+    }
+
+    private static function logNotFound(string $method, string $uri): void
+    {
+        $logDir = dirname(__DIR__) . '/../storage/logs';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
+        
+        $message = date('[Y-m-d H:i:s] ') . "404 Not Found: $method $uri\n";
+        error_log($message, 3, $logDir . '/routing.log');
+    }
+
+    private static function logError(string $message): void
+    {
+        $logDir = dirname(__DIR__) . '/../storage/logs';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
+        
+        error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, $logDir . '/routing.log');
+    }
+
+    private static function getAvailableRoutes(string $method): array
+    {
+        $available = [];
+        foreach (self::$routes as $route) {
+            if ($route['method'] === $method) {
+                $available[] = $route['path'];
+            }
+        }
+        return array_unique($available);
     }
 }
