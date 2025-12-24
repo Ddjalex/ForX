@@ -80,11 +80,8 @@ class ApiController
 
     public function marketPrice(string $symbol): void
     {
-        // Clean symbol - remove slashes and standardize
         $cleanSymbol = str_replace('/', '', $symbol);
-        $originalSymbol = $symbol;
         
-        // Try multiple formats to find the market
         $price = Database::fetch(
             "SELECT m.*, p.price, p.change_24h, p.high_24h, p.low_24h, p.volume_24h, p.updated_at
              FROM markets m 
@@ -94,11 +91,10 @@ class ApiController
         );
 
         if (!$price) {
-            Router::json(['success' => false, 'error' => 'Market not found: ' . $symbol, 'debug' => true], 404);
+            Router::json(['success' => false, 'error' => 'Market not found: ' . $symbol], 404);
             return;
         }
 
-        // Always try to fetch fresh price
         $freshPrice = $this->fetchLivePrice($price['symbol'], $price['id']);
         if ($freshPrice !== null && $freshPrice > 0) {
             $price['price'] = $freshPrice;
@@ -109,10 +105,8 @@ class ApiController
 
     private function fetchLivePrice(string $symbol, int $marketId): ?float
     {
-        // Remove slashes from symbol for cleaner checks
         $cleanSymbol = str_replace('/', '', $symbol);
         
-        // Try CoinGecko for crypto assets (detect by USDT, BUSD, etc)
         if (stripos($cleanSymbol, 'USDT') !== false || stripos($cleanSymbol, 'BUSD') !== false || 
             stripos($cleanSymbol, 'USD') !== false || stripos($cleanSymbol, 'USDC') !== false) {
             $coinId = $this->getCoinGeckoId($cleanSymbol);
@@ -122,14 +116,12 @@ class ApiController
                     try {
                         Database::update('prices', ['price' => $price, 'updated_at' => date('Y-m-d H:i:s')], 'market_id = ?', [$marketId]);
                     } catch (\Exception $e) {
-                        // Silently ignore DB update errors
                     }
                     return $price;
                 }
             }
         }
         
-        // Try Finnhub for stocks/forex
         $market = Database::fetch("SELECT symbol_api FROM markets WHERE id = ?", [$marketId]);
         if ($market && $market['symbol_api']) {
             $price = $this->fetchFinnhubPrice($market['symbol_api']);
@@ -137,7 +129,6 @@ class ApiController
                 try {
                     Database::update('prices', ['price' => $price, 'updated_at' => date('Y-m-d H:i:s')], 'market_id = ?', [$marketId]);
                 } catch (\Exception $e) {
-                    // Silently ignore DB update errors
                 }
                 return $price;
             }
@@ -148,7 +139,6 @@ class ApiController
 
     private function getCoinGeckoId(string $symbol): ?string
     {
-        // Extended mapping with more crypto assets
         $mapping = [
             'BTC' => 'bitcoin',
             'ETH' => 'ethereum',
@@ -193,7 +183,6 @@ class ApiController
         
         $response = @file_get_contents($url, false, $context);
         if ($response === false) {
-            error_log("CoinGecko API failed for $coinId");
             return null;
         }
         
@@ -211,7 +200,6 @@ class ApiController
     {
         $apiKey = getenv('FINNHUB_API_KEY');
         if (!$apiKey) {
-            // Try fallback prices for common forex/stocks
             return $this->getFallbackForexPrice($symbol);
         }
         
@@ -226,7 +214,6 @@ class ApiController
         
         $response = @file_get_contents($url, false, $context);
         if ($response === false) {
-            error_log("Finnhub API failed for $symbol");
             return $this->getFallbackForexPrice($symbol);
         }
         
@@ -240,7 +227,6 @@ class ApiController
     
     private function getFallbackForexPrice(string $symbol): ?float
     {
-        // Fallback prices for common forex pairs when API is not available
         $fallbacks = [
             'EURUSD' => 1.0875,
             'GBPUSD' => 1.2650,
@@ -295,7 +281,6 @@ class ApiController
             $currentPrice = Database::fetch("SELECT price FROM prices WHERE market_id = ?", [$position['market_id']]);
             $price = $currentPrice['price'] ?? $position['entry_price'];
             
-            // Apply profit control formula
             $profitControlPercent = Database::fetch(
                 "SELECT value FROM settings WHERE setting_key = ?", 
                 ['profit_control_percent']
@@ -308,7 +293,6 @@ class ApiController
                 $pnl = ($position['entry_price'] - $price) * $position['amount'];
             }
 
-            // If control percent is 0, use real market pnl
             if ($controlPercent == 0) {
                 $position['unrealized_pnl'] = $pnl;
             } else {
@@ -321,7 +305,6 @@ class ApiController
                 }
             }
 
-            // Fallback to real PnL if calculation results in 0 but there's a difference
             if ($position['unrealized_pnl'] == 0 && $pnl != 0) {
                 $position['unrealized_pnl'] = $pnl;
             }
@@ -396,8 +379,6 @@ class ApiController
         }
 
         $expiresAt = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
-
-        $marginRequired = $amount / $leverage;
         
         Database::insert('positions', [
             'user_id' => $userId,
@@ -466,7 +447,7 @@ class ApiController
             'TSLA' => 248.00,
             'MSFT' => 378.00,
             'XAUUSD' => 2025.00,
-            'XAGUSD' => 24.50,
+            'XAGUUSD' => 24.50,
             'USOIL' => 72.50
         ];
         return $defaultPrices[$symbol] ?? 100.00;
@@ -484,7 +465,6 @@ class ApiController
             $closedCount = 0;
             $results = [];
 
-            // Check for expired positions - handle if table doesn't have expires_at column
             try {
                 $expiredPositions = Database::fetchAll(
                     "SELECT p.*, m.symbol, m.spread 
@@ -507,7 +487,6 @@ class ApiController
                         ? $exitPrice * (1 - $spread) 
                         : $exitPrice * (1 + $spread);
 
-                    // Apply profit control formula
                     $profitControlPercent = Database::fetch(
                         "SELECT value FROM settings WHERE setting_key = ?", 
                         ['profit_control_percent']
@@ -520,7 +499,6 @@ class ApiController
                         $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
                     }
 
-                    // If control percent is 0, use real market pnl
                     if ($controlPercent == 0) {
                         $adjustedPnl = $pnl;
                     } else {
@@ -533,7 +511,6 @@ class ApiController
                         }
                     }
 
-                    // Fallback to real PnL if calculation results in 0 but there's a difference
                     if ($adjustedPnl == 0 && $pnl != 0) {
                         $adjustedPnl = $pnl;
                     }
@@ -563,7 +540,6 @@ class ApiController
                         'profit_control_percent' => $controlPercent
                     ];
                 } catch (\Exception $itemError) {
-                    error_log('Error closing position ' . ($position['id'] ?? 'unknown') . ': ' . $itemError->getMessage());
                     continue;
                 }
             }
@@ -574,7 +550,6 @@ class ApiController
                 'positions' => $results
             ]);
         } catch (\Exception $e) {
-            error_log('closeExpiredPositions error: ' . $e->getMessage());
             Router::json(['success' => true, 'closed_count' => 0, 'positions' => []]);
         }
     }
@@ -620,14 +595,12 @@ class ApiController
             $pnl = ($position['entry_price'] - $exitPrice) * $position['amount'];
         }
 
-        // Apply asymmetric profit control formula
         $profitControlPercent = Database::fetch(
             "SELECT value FROM settings WHERE setting_key = ?", 
             ['profit_control_percent']
         );
         $controlPercent = $profitControlPercent ? floatval($profitControlPercent['value']) : 0;
         
-        // If control percent is 0, use real market pnl
         if ($controlPercent == 0) {
             $adjustedPnl = $pnl;
         } else {
@@ -640,7 +613,6 @@ class ApiController
             }
         }
 
-        // Fallback to real PnL if calculation results in 0 but there's a difference
         if ($adjustedPnl == 0 && $pnl != 0) {
             $adjustedPnl = $pnl;
         }
