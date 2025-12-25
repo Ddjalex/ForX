@@ -55,19 +55,25 @@ class AdminController
 
     public function users(): void
     {
-        $users = Database::fetchAll(
-            "SELECT u.*, w.balance, w.margin_used 
-             FROM users u 
-             LEFT JOIN wallets w ON u.id = w.user_id 
-             ORDER BY u.created_at DESC"
-        );
+        try {
+            $users = Database::fetchAll(
+                "SELECT u.*, w.balance, w.margin_used 
+                 FROM users u 
+                 LEFT JOIN wallets w ON u.id = w.user_id 
+                 ORDER BY u.created_at DESC"
+            );
 
-        echo Router::render('admin/users', [
-            'users' => $users,
-            'csrf_token' => Session::generateCsrfToken(),
-            'success' => Session::getFlash('success'),
-            'error' => Session::getFlash('error'),
-        ]);
+            echo Router::render('admin/users', [
+                'users' => $users,
+                'csrf_token' => Session::generateCsrfToken(),
+                'success' => Session::getFlash('success'),
+                'error' => Session::getFlash('error'),
+            ]);
+        } catch (\Throwable $e) {
+            error_log("Admin Users View Error: " . $e->getMessage());
+            Session::flash('error', 'Unable to load users.');
+            Router::redirect('/admin');
+        }
     }
 
     public function updateUser(): void
@@ -411,14 +417,20 @@ class AdminController
 
     public function markets(): void
     {
-        $markets = Database::fetchAll("SELECT * FROM markets ORDER BY type, symbol");
+        try {
+            $markets = Database::fetchAll("SELECT * FROM markets ORDER BY type, symbol");
 
-        echo Router::render('admin/markets', [
-            'markets' => $markets,
-            'csrf_token' => Session::generateCsrfToken(),
-            'success' => Session::getFlash('success'),
-            'error' => Session::getFlash('error'),
-        ]);
+            echo Router::render('admin/markets', [
+                'markets' => $markets,
+                'csrf_token' => Session::generateCsrfToken(),
+                'success' => Session::getFlash('success'),
+                'error' => Session::getFlash('error'),
+            ]);
+        } catch (\Throwable $e) {
+            error_log("Admin Markets View Error: " . $e->getMessage());
+            Session::flash('error', 'Unable to load markets.');
+            Router::redirect('/admin');
+        }
     }
 
     public function updateMarket(): void
@@ -465,9 +477,23 @@ class AdminController
             }
 
             // Check if table exists before querying
-            $tableExists = Database::fetch("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'deposit_networks')");
+            $tableExists = false;
+            try {
+                // MySQL/MariaDB compatible check
+                $check = Database::fetch("SHOW TABLES LIKE 'deposit_networks'");
+                $tableExists = !empty($check);
+            } catch (\Throwable $e) {
+                // Fallback for PostgreSQL (Replit environment)
+                try {
+                    $check = Database::fetch("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'deposit_networks')");
+                    $tableExists = $check && ($check['exists'] === true || $check['exists'] === 't');
+                } catch (\Throwable $e2) {
+                    $tableExists = false;
+                }
+            }
+
             $depositNetworks = [];
-            if ($tableExists && ($tableExists['exists'] === true || $tableExists['exists'] === 't')) {
+            if ($tableExists) {
                 $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
             }
 
