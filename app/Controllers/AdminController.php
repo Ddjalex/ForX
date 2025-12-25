@@ -534,15 +534,19 @@ class AdminController
 
         $qrCodePath = null;
         if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = 'public/uploads/qr_codes/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+            $uploadDir = 'uploads/qr_codes/';
+            $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
+            
+            if (!is_dir($fullUploadDir)) {
+                mkdir($fullUploadDir, 0755, true);
             }
+            
             $extension = pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION);
             $fileName = uniqid('qr_') . '.' . $extension;
-            $targetPath = $uploadDir . $fileName;
+            $targetPath = $fullUploadDir . $fileName;
+            
             if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
-                $qrCodePath = '/uploads/qr_codes/' . $fileName;
+                $qrCodePath = '/' . $uploadDir . $fileName;
             }
         }
 
