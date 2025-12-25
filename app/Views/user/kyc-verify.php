@@ -386,14 +386,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <?php
 $content = ob_get_clean();
-// Direct reliable path for cPanel
-$fileDir = __DIR__;
-$layoutFile = '/../layouts/dashboard.php';
-if (file_exists($fileDir . $layoutFile)) {
-    include $fileDir . $layoutFile;
-} else if (defined('ROOT_PATH')) {
-    include ROOT_PATH . '/app/Views/layouts/dashboard.php';
-} else {
-    include dirname(__DIR__) . '/layouts/dashboard.php';
-}
+include __DIR__ . '/../layouts/main.php';
 ?>
