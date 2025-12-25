@@ -63,11 +63,11 @@ class AuthController
 
         $result = Auth::attempt($email, $password);
         
-        // If Auth service says unverified, double check the database directly
+        // If Auth service says unverified, double check the database directly for EMAIL verification
         if ($result === 'unverified' || $result === true) {
             $user = Database::fetch("SELECT id, name, email_verified FROM users WHERE email = ?", [$email]);
             if ($user && $user['email_verified']) {
-                // User is verified in database, force login even if service was unsure
+                // User is EMAIL verified in database, force login
                 Auth::login($user['id']);
                 RateLimiter::clear($rateLimitKey);
                 AuditLog::log('login', 'user', $user['id']);
@@ -80,7 +80,7 @@ class AuthController
                 return;
             }
             
-            // If they really are unverified, show the verification prompt
+            // If they really are EMAIL unverified, show the registration verification prompt
             if ($result === 'unverified') {
                 $verificationCode = EmailService::generateVerificationCode();
                 $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
@@ -93,9 +93,9 @@ class AuthController
                 $emailSent = EmailService::sendVerificationCode($email, $user['name'], $verificationCode);
                 
                 if ($emailSent) {
-                    Session::flash('error', 'Please verify your email first. A new code has been sent.');
+                    Session::flash('error', 'Please verify your registration email. A new code has been sent.');
                 } else {
-                    Session::flash('error', 'Please verify your email. Unable to send verification code, please try again later.');
+                    Session::flash('error', 'Please verify your registration email. Unable to send verification code.');
                 }
                 Router::redirect('/verify-email?email=' . urlencode($email));
                 return;
