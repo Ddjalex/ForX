@@ -1245,25 +1245,41 @@ const walletBalance = <?= $wallet['balance'] ?? 0 ?>;
 const marginUsed = <?= $wallet['margin_used'] ?? 0 ?>;
 
 function setLeverage(value) {
-    const numValue = parseFloat(value);
-    document.getElementById('leverageValue').value = numValue;
-    document.getElementById('leverageSlider').value = numValue;
-    document.getElementById('leverageDisplay').textContent = numValue + 'x';
+    const numValue = parseInt(value);
+    const leverageValueEl = document.getElementById('leverageValue');
+    const sliderEl = document.getElementById('leverageSlider');
+    const displayEl = document.getElementById('leverageDisplay');
+    
+    if (leverageValueEl) leverageValueEl.value = numValue;
+    if (sliderEl) sliderEl.value = numValue;
+    if (displayEl) displayEl.textContent = numValue + 'x';
+    
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         const btnValue = parseInt(btn.dataset.leverage);
-        btn.classList.toggle('active', btnValue === numValue);
+        if (btnValue === numValue) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
     });
     validateTradeAmount();
 }
 
 function setLeverageFromSlider(value) {
-    const numValue = parseFloat(value).toFixed(1);
-    const numValueFloat = parseFloat(numValue);
-    document.getElementById('leverageValue').value = numValueFloat;
-    document.getElementById('leverageDisplay').textContent = numValueFloat + 'x';
+    const numValue = parseFloat(value);
+    const leverageValueEl = document.getElementById('leverageValue');
+    const displayEl = document.getElementById('leverageDisplay');
+    
+    if (leverageValueEl) leverageValueEl.value = numValue;
+    if (displayEl) displayEl.textContent = numValue.toFixed(1) + 'x';
+    
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         const btnValue = parseInt(btn.dataset.leverage);
-        btn.classList.toggle('active', btnValue === numValueFloat);
+        if (btnValue === Math.round(numValue)) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
     });
     validateTradeAmount();
 }
