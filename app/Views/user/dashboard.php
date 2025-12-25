@@ -160,7 +160,7 @@ $mockNotifications = [
 
                 <div class="form-group">
                     <label>Asset Name</label>
-                    <select name="market_id" id="assetName" class="form-control" onchange="updateMarketInfo(); updateTradingViewChart();">
+                    <select name="market_id" id="assetName" class="form-control" onchange="updateMarketInfo(); if(typeof updateTradingViewChart === 'function') updateTradingViewChart();">
                         <?php foreach ($allMarkets ?? [] as $m): ?>
                             <option value="<?= $m['id'] ?>" 
                                 data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"

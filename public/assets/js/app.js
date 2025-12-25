@@ -383,7 +383,8 @@ function updateMarketInfo() {
     const displayPrice = document.getElementById('dashboardCurrentPrice');
     
     if (assetTypeSelect && displayAssetType) {
-        displayAssetType.textContent = assetTypeSelect.value;
+        const typeOption = assetTypeSelect.options[assetTypeSelect.selectedIndex];
+        displayAssetType.textContent = typeOption ? typeOption.text : assetTypeSelect.value;
     }
     
     if (assetNameSelect && displayAssetName) {
@@ -407,14 +408,17 @@ function updateAssetNames() {
     const assetType = assetTypeEl.value;
     
     // Hide all options first
+    let firstMatch = null;
     Array.from(assetNameSelect.options).forEach(option => {
-        option.style.display = option.getAttribute('data-type') === assetType ? 'block' : 'none';
+        const isMatch = option.getAttribute('data-type') === assetType;
+        option.style.display = isMatch ? 'block' : 'none';
+        if (isMatch && !firstMatch) firstMatch = option;
     });
     
     // Select first visible option
-    const firstVisible = Array.from(assetNameSelect.options).find(option => option.style.display !== 'none');
-    if (firstVisible) {
-        assetNameSelect.value = firstVisible.value;
+    if (firstMatch) {
+        assetNameSelect.value = firstMatch.value;
+        updateMarketInfo();
         if (typeof updateTradingViewChart === 'function') {
             updateTradingViewChart();
         }
