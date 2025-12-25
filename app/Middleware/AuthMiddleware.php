@@ -24,7 +24,16 @@ class AuthMiddleware
         );
         
         // Allowed paths for unverified users
-        $allowedForUnverified = ['/dashboard', '/kyc/verify', '/logout', '/accounts', '/api/notifications/unread', '/api/notifications'];
+        $allowedForUnverified = [
+            '/dashboard', 
+            '/kyc/verify', 
+            '/logout', 
+            '/accounts', 
+            '/api/notifications/unread', 
+            '/api/notifications',
+            '/api/positions/close-expired',
+            '/api/positions/close'
+        ];
         $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $currentPath = rtrim($currentPath, '/') ?: '/';
         
