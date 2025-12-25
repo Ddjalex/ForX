@@ -46,7 +46,7 @@ class WalletController
             }
         }
         
-        $networks = Database::fetchAll("SELECT * FROM deposit_networks WHERE status = 'active' ORDER BY name ASC");
+        $networks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY name ASC");
         
         echo Router::render('user/deposit', [
             'settings' => $settings,
@@ -114,15 +114,16 @@ class WalletController
                 return;
             }
             
-            $uploadDir = __DIR__ . '/../../storage/uploads/proofs/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+            $uploadDir = 'uploads/proofs/';
+            $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
+            if (!is_dir($fullUploadDir)) {
+                mkdir($fullUploadDir, 0755, true);
             }
             
             $filename = bin2hex(random_bytes(16)) . '.' . $ext;
-            $proofPath = 'proofs/' . $filename;
+            $proofPath = '/' . $uploadDir . $filename;
             
-            move_uploaded_file($_FILES['proof']['tmp_name'], $uploadDir . $filename);
+            move_uploaded_file($_FILES['proof']['tmp_name'], $fullUploadDir . $filename);
         }
 
         Database::insert('deposits', [
