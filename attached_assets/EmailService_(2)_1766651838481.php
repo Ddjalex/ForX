@@ -9,7 +9,7 @@ class EmailService
 
     public static function init(): void
     {
-        self::$apiKey = getenv('BREVO_API_KEY') ?: '';
+        self::$apiKey = getenv('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') ?: '';
     }
 
     public static function sendVerificationCode(string $email, string $name, string $code): bool

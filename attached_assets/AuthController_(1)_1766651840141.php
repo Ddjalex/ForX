@@ -66,7 +66,8 @@ class AuthController
         if ($result === 'unverified') {
             $user = Database::fetch("SELECT id, name, email_verified FROM users WHERE email = ?", [$email]);
             if ($user) {
-                // FIX: Check database status directly to bypass unnecessary verification prompts
+                // If the user is actually verified in the database, but session/auth says unverified,
+                // we should trust the database and log them in.
                 if ($user['email_verified']) {
                     Auth::login($user['id']);
                     RateLimiter::clear($rateLimitKey);
