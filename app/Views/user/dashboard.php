@@ -165,6 +165,7 @@ $mockNotifications = [
                             <option value="<?= $m['id'] ?>" 
                                 data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
                                 data-symbol="<?= htmlspecialchars($m['symbol']) ?>"
+                                data-display="<?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>"
                                 data-price="<?= $m['price'] ?? 0 ?>"
                                 data-tradingview="<?= htmlspecialchars($m['symbol_tradingview'] ?? '') ?>">
                                 <?= htmlspecialchars($m['display_name'] ?? $m['symbol']) ?>
@@ -1145,7 +1146,7 @@ function updateMarketInfo() {
     const assetTypeRaw = selectedOption.getAttribute('data-type') || 'crypto';
     const assetTypeSelect = document.getElementById('assetType');
     const assetType = assetTypeSelect ? assetTypeSelect.options[assetTypeSelect.selectedIndex].text : capitalizeAssetType(assetTypeRaw);
-    const assetName = selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
+    const assetName = selectedOption.getAttribute('data-display') || selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
     const assetPriceRaw = selectedOption.getAttribute('data-price') || '0';
     const assetPrice = parseFloat(assetPriceRaw);
     
