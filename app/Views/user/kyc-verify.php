@@ -886,5 +886,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <?php
 $content = ob_get_clean();
-include ROOT_PATH . '/app/Views/layouts/dashboard.php';
+include dirname(__DIR__) . '/layouts/dashboard.php';
 ?>
