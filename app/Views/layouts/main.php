@@ -12,7 +12,7 @@ if (!function_exists('t')) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?= $currentLanguage ?>"><?php // Changed from "en" ?>
+<html lang="<?= $currentLanguage ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,8 +33,8 @@ if (!function_exists('t')) {
             --bg-secondary: #0f1822;
             --text-color: #ffffff;
         }
-        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow: hidden; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); transform: translateX(-260px); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
-        .sidebar.active { transform: translateX(0); }
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow: hidden; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); transform: translateX(-260px); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; opacity: 0; visibility: hidden; }
+        .sidebar.active { transform: translateX(0); opacity: 1; visibility: visible; }
         .sidebar-header { flex-shrink: 0; background: #0a1628; padding: 20px; border-bottom: 1px solid rgba(0, 212, 170, 0.1); display: flex; align-items: center; justify-content: space-between; }
         .sidebar-user { display: flex; align-items: center; gap: 12px; }
         .sidebar-user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); overflow: hidden; }
@@ -51,9 +51,9 @@ if (!function_exists('t')) {
         
         .sidebar-nav { list-style: none; padding: 0; margin: 0; }
         .sidebar-nav li { margin: 4px 12px; }
-        .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #8899a6; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
-        .sidebar-nav a:hover { background: rgba(0, 212, 170, 0.05); color: #fff; }
-        .sidebar-nav a.active { background: rgba(0, 212, 170, 0.1); color: var(--primary); }
+        .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #8899a6 !important; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
+        .sidebar-nav a:hover { background: rgba(0, 212, 170, 0.05); color: #fff !important; }
+        .sidebar-nav a.active { background: rgba(0, 212, 170, 0.1); color: var(--primary) !important; }
         .sidebar-nav svg { color: inherit; flex-shrink: 0; }
         
         .sidebar-dropdown { margin: 4px 12px; }
@@ -61,10 +61,11 @@ if (!function_exists('t')) {
         .sidebar-dropdown-header:hover { background: rgba(0, 212, 170, 0.05); color: #fff; }
         .sidebar-dropdown-content { display: none; padding-left: 28px; margin-top: 4px; }
         .sidebar-dropdown-content.show { display: block; }
-        .sidebar-dropdown-content a { padding: 10px 16px; font-size: 13px; }
+        .sidebar-dropdown-content a { padding: 10px 16px; font-size: 13px; color: #8899a6 !important; }
+        .sidebar-dropdown-content a:hover { color: #fff !important; }
 
-        .main-content { margin-left: 0; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .main-content.shifted { margin-left: 260px; }
+        .main-content { margin-left: 0; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; }
+        .main-content.shifted { margin-left: 260px; width: calc(100% - 260px); }
         
         .top-header { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .top-header.shifted { left: 260px; }
@@ -77,29 +78,20 @@ if (!function_exists('t')) {
         .header-subtitle { font-size: 10px; color: var(--primary); margin: 0; text-transform: uppercase; font-weight: 600; }
         
         .header-controls { position: fixed; top: 0; right: 0; height: 70px; display: flex; align-items: center; padding: 0 20px; z-index: 10001; }
-        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 4px; padding: 8px; cursor: pointer; color: #00D4AA; display: flex; align-items: center; justify-content: center; }
+        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 4px; padding: 8px; cursor: pointer; color: #00D4AA; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .sidebar-toggle:hover { background: rgba(0, 212, 170, 0.2); }
+        .sidebar-toggle.active { left: 275px; }
         
         .notification-btn { background: none; border: none; color: #8899a6; cursor: pointer; padding: 8px; border-radius: 4px; position: relative; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .notification-btn:hover { color: var(--primary); background: rgba(0, 212, 170, 0.05); }
         .notification-badge { position: absolute; top: 2px; right: 2px; background: #ff4757; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 10px; border: 2px solid #0a1628; }
         
         .notification-panel { display: none; position: fixed; right: 20px; top: 75px; z-index: 100000; width: 350px; background: #0f1822; border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); overflow: hidden; }
-        .notification-modal-header { padding: 15px 20px; background: rgba(0, 212, 170, 0.05); border-bottom: 1px solid rgba(0, 212, 170, 0.1); display: flex; align-items: center; justify-content: space-between; }
-        .notification-modal-header h2 { font-size: 15px; font-weight: 600; color: #fff; margin: 0; }
-        .notification-list { max-height: 400px; overflow-y: auto; }
-        .notification-item { padding: 15px 20px; display: flex; gap: 15px; border-bottom: 1px solid rgba(0, 212, 170, 0.05); cursor: pointer; transition: background 0.2s; }
-        .notification-item:hover { background: rgba(0, 212, 170, 0.02); }
-        .notification-item.unread { background: rgba(0, 212, 170, 0.05); border-left: 3px solid var(--primary); }
-        .notification-item-icon { width: 35px; height: 35px; border-radius: 50%; background: rgba(0, 212, 170, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .notification-item-content { flex-grow: 1; }
-        .notification-item-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-        .notification-item-message { font-size: 12px; color: #8899a6; line-height: 1.4; }
-        .notification-item-time { font-size: 11px; color: #556677; margin-top: 6px; }
 
         @media (max-width: 768px) { 
-            .main-content.shifted { margin-left: 0; }
+            .main-content.shifted { margin-left: 0; width: 100%; }
             .top-header.shifted { left: 0; }
+            .sidebar-toggle.active { left: 15px; }
             .notification-panel { width: calc(100% - 40px); right: 20px; left: 20px; }
             .top-header-content { margin-left: 45px; }
             .header-title { font-size: 14px; }
@@ -430,348 +422,70 @@ if (!function_exists('t')) {
                         <span class="ticker-price" id="price-aapl">$248.92</span>
                         <span class="ticker-change positive" id="change-aapl">+1.45%</span>
                     </div>
-                    <div class="ticker-item" data-symbol="MSFT">
-                        <span class="ticker-symbol">MSFT</span>
-                        <span class="ticker-price" id="price-msft">$438.56</span>
-                        <span class="ticker-change positive" id="change-msft">+0.92%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="GOOGL">
-                        <span class="ticker-symbol">GOOGL</span>
-                        <span class="ticker-price" id="price-googl">$192.34</span>
-                        <span class="ticker-change positive" id="change-googl">+2.18%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="AMZN">
-                        <span class="ticker-symbol">AMZN</span>
-                        <span class="ticker-price" id="price-amzn">$225.67</span>
-                        <span class="ticker-change negative" id="change-amzn">-0.34%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="NVDA">
-                        <span class="ticker-symbol">NVDA</span>
-                        <span class="ticker-price" id="price-nvda">$138.45</span>
-                        <span class="ticker-change positive" id="change-nvda">+3.67%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="TSLA">
-                        <span class="ticker-symbol">TSLA</span>
-                        <span class="ticker-price" id="price-tsla">$478.92</span>
-                        <span class="ticker-change positive" id="change-tsla">+4.23%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="META">
-                        <span class="ticker-symbol">META</span>
-                        <span class="ticker-price" id="price-meta">$612.34</span>
-                        <span class="ticker-change positive" id="change-meta">+1.56%</span>
-                    </div>
-                </div>
-                <div class="pro-ticker-content">
-                    <div class="ticker-category">
-                        <span class="category-label indices">INDICES</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="SPX500">
-                        <span class="ticker-symbol">S&P 500</span>
-                        <span class="ticker-price">5,892.45</span>
-                        <span class="ticker-change positive">+0.82%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="NASDAQ">
-                        <span class="ticker-symbol">NASDAQ</span>
-                        <span class="ticker-price">18,542.18</span>
-                        <span class="ticker-change positive">+1.24%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="DJI">
-                        <span class="ticker-symbol">DOW JONES</span>
-                        <span class="ticker-price">42,156.89</span>
-                        <span class="ticker-change negative">-0.18%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="FTSE">
-                        <span class="ticker-symbol">FTSE 100</span>
-                        <span class="ticker-price">8,245.67</span>
-                        <span class="ticker-change positive">+0.45%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="DAX">
-                        <span class="ticker-symbol">DAX</span>
-                        <span class="ticker-price">18,892.34</span>
-                        <span class="ticker-change positive">+0.67%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="NIKKEI">
-                        <span class="ticker-symbol">NIKKEI 225</span>
-                        <span class="ticker-price">38,456.12</span>
-                        <span class="ticker-change negative">-0.32%</span>
-                    </div>
-                    
-                    <div class="ticker-divider"></div>
-                    
-                    <div class="ticker-category">
-                        <span class="category-label crypto">CRYPTO</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="BTC">
-                        <span class="ticker-symbol">BTC/USD</span>
-                        <span class="ticker-price">$104,256.78</span>
-                        <span class="ticker-change positive">+3.45%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="ETH">
-                        <span class="ticker-symbol">ETH/USD</span>
-                        <span class="ticker-price">$3,892.45</span>
-                        <span class="ticker-change positive">+2.18%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="XRP">
-                        <span class="ticker-symbol">XRP/USD</span>
-                        <span class="ticker-price">$2.3456</span>
-                        <span class="ticker-change positive">+5.67%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="SOL">
-                        <span class="ticker-symbol">SOL/USD</span>
-                        <span class="ticker-price">$218.92</span>
-                        <span class="ticker-change negative">-1.23%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="BNB">
-                        <span class="ticker-symbol">BNB/USD</span>
-                        <span class="ticker-price">$712.34</span>
-                        <span class="ticker-change positive">+0.89%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="ADA">
-                        <span class="ticker-symbol">ADA/USD</span>
-                        <span class="ticker-price">$1.0234</span>
-                        <span class="ticker-change positive">+4.12%</span>
-                    </div>
-                    
-                    <div class="ticker-divider"></div>
-                    
-                    <div class="ticker-category">
-                        <span class="category-label forex">FOREX</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="EURUSD">
-                        <span class="ticker-symbol">EUR/USD</span>
-                        <span class="ticker-price">1.0523</span>
-                        <span class="ticker-change negative">-0.15%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="GBPUSD">
-                        <span class="ticker-symbol">GBP/USD</span>
-                        <span class="ticker-price">1.2678</span>
-                        <span class="ticker-change positive">+0.23%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="USDJPY">
-                        <span class="ticker-symbol">USD/JPY</span>
-                        <span class="ticker-price">153.45</span>
-                        <span class="ticker-change positive">+0.42%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="AUDUSD">
-                        <span class="ticker-symbol">AUD/USD</span>
-                        <span class="ticker-price">0.6342</span>
-                        <span class="ticker-change negative">-0.31%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="USDCAD">
-                        <span class="ticker-symbol">USD/CAD</span>
-                        <span class="ticker-price">1.4234</span>
-                        <span class="ticker-change positive">+0.18%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="USDCHF">
-                        <span class="ticker-symbol">USD/CHF</span>
-                        <span class="ticker-price">0.8923</span>
-                        <span class="ticker-change negative">-0.08%</span>
-                    </div>
-                    
-                    <div class="ticker-divider"></div>
-                    
-                    <div class="ticker-category">
-                        <span class="category-label commodities">COMMODITIES</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="XAUUSD">
-                        <span class="ticker-symbol">GOLD</span>
-                        <span class="ticker-price">$2,678.45</span>
-                        <span class="ticker-change positive">+0.56%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="XAGUSD">
-                        <span class="ticker-symbol">SILVER</span>
-                        <span class="ticker-price">$31.23</span>
-                        <span class="ticker-change positive">+1.12%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="WTICOUSD">
-                        <span class="ticker-symbol">CRUDE OIL</span>
-                        <span class="ticker-price">$71.45</span>
-                        <span class="ticker-change negative">-0.89%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="NATGAS">
-                        <span class="ticker-symbol">NAT GAS</span>
-                        <span class="ticker-price">$3.245</span>
-                        <span class="ticker-change positive">+2.34%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="COPPER">
-                        <span class="ticker-symbol">COPPER</span>
-                        <span class="ticker-price">$4.12</span>
-                        <span class="ticker-change positive">+0.78%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="PLATINUM">
-                        <span class="ticker-symbol">PLATINUM</span>
-                        <span class="ticker-price">$956.78</span>
-                        <span class="ticker-change negative">-0.45%</span>
-                    </div>
-                    
-                    <div class="ticker-divider"></div>
-                    
-                    <div class="ticker-category">
-                        <span class="category-label stocks">STOCKS</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="AAPL">
-                        <span class="ticker-symbol">AAPL</span>
-                        <span class="ticker-price">$248.92</span>
-                        <span class="ticker-change positive">+1.45%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="MSFT">
-                        <span class="ticker-symbol">MSFT</span>
-                        <span class="ticker-price">$438.56</span>
-                        <span class="ticker-change positive">+0.92%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="GOOGL">
-                        <span class="ticker-symbol">GOOGL</span>
-                        <span class="ticker-price">$192.34</span>
-                        <span class="ticker-change positive">+2.18%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="AMZN">
-                        <span class="ticker-symbol">AMZN</span>
-                        <span class="ticker-price">$225.67</span>
-                        <span class="ticker-change negative">-0.34%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="NVDA">
-                        <span class="ticker-symbol">NVDA</span>
-                        <span class="ticker-price">$138.45</span>
-                        <span class="ticker-change positive">+3.67%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="TSLA">
-                        <span class="ticker-symbol">TSLA</span>
-                        <span class="ticker-price">$478.92</span>
-                        <span class="ticker-change positive">+4.23%</span>
-                    </div>
-                    <div class="ticker-item" data-symbol="META">
-                        <span class="ticker-symbol">META</span>
-                        <span class="ticker-price">$612.34</span>
-                        <span class="ticker-change positive">+1.56%</span>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="username-bar">
-            <div class="icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </div>
-            <span>Username: <strong><?= htmlspecialchars($user['username'] ?? $user['name'] ?? 'User') ?></strong></span>
-        </div>
-
-        <div class="content-area">
-            <?= $content ?? '' ?>
-        </div>
+        <?= $content ?>
     </main>
 
     <a href="https://wa.me/1234567890" target="_blank" class="whatsapp-btn">
-        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.767 5.767 0 1.267.405 2.436 1.094 3.388l-.71 2.593 2.656-.697a5.727 5.727 0 002.727.682c3.181 0 5.767-2.586 5.767-5.767 0-3.181-2.586-5.767-5.767-5.767zm3.39 8.13c-.147.414-.733.754-1.012.795-.27.041-.532.063-.844-.067-.204-.085-.86-.341-1.637-1.033-.604-.539-1.012-1.206-1.13-1.408-.118-.202-.013-.311.088-.411.091-.09.202-.236.303-.354.101-.118.135-.202.202-.337.067-.135.034-.253-.017-.354-.051-.101-.455-1.095-.624-1.503-.164-.397-.33-.343-.455-.349-.118-.006-.253-.007-.388-.007s-.354.051-.539.253c-.185.202-.708.691-.708 1.684s.725 1.954.826 2.089c.101.135 1.425 2.177 3.453 3.054.482.209.859.333 1.151.426.485.154.926.132 1.275.08.389-.058 1.2-.491 1.369-.965.169-.473.169-.878.118-.965-.051-.087-.185-.135-.37-.236z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.551 4.118 1.516 5.85L0 24l6.335-1.662C8.01 23.407 10.123 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.875 0-3.644-.486-5.187-1.336L2.68 21.727l1.094-3.996C2.923 16.204 2.4 14.161 2.4 12c0-5.302 4.298-9.6 9.6-9.6s9.6 4.298 9.6 9.6-4.298 9.6-9.6 9.6z"/>
+        </svg>
     </a>
 
-    <div class="language-selector" id="languageSelector">
-        <span><?= strtoupper($currentLanguage) ?></span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-    </div>
-
-    <script src="/assets/js/app.js"></script>
-    
     <script>
-        const notificationBtn = document.getElementById('notificationBtn');
-        const notificationPanel = document.getElementById('notificationPanel');
-        const notificationClose = document.getElementById('notificationClose');
-        const notificationBackdrop = document.getElementById('notificationBackdrop');
-        const notificationBadge = document.getElementById('notificationBadge');
-        const notificationList = document.getElementById('notificationList');
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const close = document.getElementById('sidebarClose');
+        const mainContent = document.querySelector('.main-content');
+        const topHeader = document.querySelector('.top-header');
+        const dropdownToggles = document.querySelectorAll('.sidebar-dropdown-header');
 
-        // Initialize badge count from localStorage
-        function initializeBadgeCount() {
-            let storedCount = localStorage.getItem('notificationCount');
-            if (storedCount === null) {
-                storedCount = 3; // Default count
-                localStorage.setItem('notificationCount', storedCount);
-            }
-            updateBadgeDisplay(parseInt(storedCount));
+        function toggleSidebar() {
+            const isActive = sidebar.classList.toggle('active');
+            mainContent.classList.toggle('shifted');
+            topHeader.classList.toggle('shifted');
+            toggle.classList.toggle('active');
         }
 
-        // Update badge display
-        function updateBadgeDisplay(count) {
-            if (notificationBadge) {
-                count = Math.max(0, count);
-                if (count > 0) {
-                    notificationBadge.textContent = count;
-                    notificationBadge.style.display = 'inline-flex';
-                } else {
-                    notificationBadge.style.display = 'none';
-                }
+        toggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+
+        close?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                sidebar.classList.contains('active') && 
+                !sidebar.contains(e.target) && 
+                !toggle.contains(e.target)) {
+                toggleSidebar();
             }
-        }
+        });
 
-        // Initialize on page load
-        initializeBadgeCount();
-
-        if (notificationBtn && notificationPanel) {
-            notificationBtn.addEventListener('click', (e) => {
+        // Dropdown toggles
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
                 e.stopPropagation();
-                notificationPanel.style.display = notificationPanel.style.display === 'none' ? 'flex' : 'none';
-            });
-
-            notificationClose.addEventListener('click', (e) => {
-                e.stopPropagation();
-                notificationPanel.style.display = 'none';
-            });
-
-            if (notificationBackdrop) {
-                notificationBackdrop.addEventListener('click', () => {
-                    notificationPanel.style.display = 'none';
-                });
-            }
-
-            document.addEventListener('click', (e) => {
-                if (notificationPanel.style.display === 'flex' && 
-                    !notificationBtn.contains(e.target) && 
-                    !notificationPanel.contains(e.target)) {
-                    notificationPanel.style.display = 'none';
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('svg');
+                content.classList.toggle('show');
+                if (icon) {
+                    icon.style.transform = content.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    icon.style.transition = 'transform 0.3s ease';
                 }
             });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && notificationPanel.style.display === 'flex') {
-                    notificationPanel.style.display = 'none';
-                }
-            });
-
-            if (notificationList) {
-                notificationList.addEventListener('click', (e) => {
-                    const notificationItem = e.target.closest('.notification-item');
-                    if (notificationItem) {
-                        const action = notificationItem.getAttribute('data-action');
-                        let targetUrl = '/dashboard';
-
-                        switch(action) {
-                            case 'deposit':
-                                targetUrl = '/wallet/deposit';
-                                break;
-                            case 'news':
-                                targetUrl = '/news';
-                                break;
-                            case 'dashboard':
-                                targetUrl = '/dashboard';
-                                break;
-                        }
-
-                        // Fade out notification
-                        notificationItem.style.opacity = '0.5';
-                        notificationItem.style.pointerEvents = 'none';
-                        
-                        // Update and save badge count
-                        let currentCount = parseInt(localStorage.getItem('notificationCount')) || 0;
-                        currentCount = Math.max(0, currentCount - 1);
-                        localStorage.setItem('notificationCount', currentCount);
-                        updateBadgeDisplay(currentCount);
-
-                        setTimeout(() => {
-                            window.location.href = targetUrl;
-                        }, 300);
-                    }
-                });
-            }
-        }
+        });
+    });
     </script>
     
     <footer class="footer">
@@ -822,29 +536,5 @@ if (!function_exists('t')) {
     </script>
     <!-- End Tawk.to Script -->
     <script src="/assets/js/app.js"></script>
-    <script>
-        // Set initial sidebar state for mobile
-        if (window.innerWidth <= 1024) {
-            document.body.classList.add('sidebar-collapsed');
-        }
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const toggle = document.getElementById('sidebarToggle');
-            const close = document.getElementById('sidebarClose');
-            const mainContent = document.querySelector('.main-content');
-            const topHeader = document.querySelector('.top-header');
-
-            function toggleSidebar() {
-                sidebar.classList.toggle('active');
-                mainContent.classList.toggle('shifted');
-                topHeader.classList.toggle('shifted');
-            }
-
-            toggle?.addEventListener('click', toggleSidebar);
-            close?.addEventListener('click', toggleSidebar);
-        });
-    </script>
 </body>
 </html>

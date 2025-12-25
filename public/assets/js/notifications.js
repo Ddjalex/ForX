@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isVisible) {
             // Position panel under the button
             const rect = notificationBtn.getBoundingClientRect();
-            notificationPanel.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+            notificationPanel.style.top = (rect.bottom + window.scrollY + 10) + 'px';
             notificationPanel.style.right = (window.innerWidth - rect.right) + 'px';
             notificationPanel.style.left = 'auto';
             notificationPanel.style.position = 'fixed';
