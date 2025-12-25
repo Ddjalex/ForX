@@ -2,87 +2,227 @@
 ob_start();
 ?>
 
-<div class="admin-kyc-section">
-    <div class="page-header">
-        <h1>KYC Verification Approvals</h1>
-        <p>Review and approve user identity verifications</p>
-    </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="filterKYC('pending')">Pending (<?= $pending_count ?>)</button>
-        <button class="tab-btn" onclick="filterKYC('approved')">Approved (<?= $approved_count ?>)</button>
-        <button class="tab-btn" onclick="filterKYC('rejected')">Rejected (<?= $rejected_count ?>)</button>
-    </div>
-
-    <div class="kyc-list">
-        <?php if (empty($kyc_verifications)): ?>
-            <div class="empty-state">
-                <p>No KYC verifications found</p>
+<div class="admin-kyc-wrapper">
+    <div class="admin-kyc-container">
+        <!-- Enhanced Header -->
+        <div class="admin-header-section">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>KYC Verification Management</h1>
+                    <p>Review and approve user identity verification documents</p>
+                </div>
             </div>
-        <?php else: ?>
-            <?php foreach ($kyc_verifications as $kyc): ?>
-                <div class="kyc-card" data-status="<?= $kyc['status'] ?>">
-                    <div class="kyc-header-info">
-                        <div>
-                            <h3><?= htmlspecialchars($kyc['full_name']) ?></h3>
-                            <p class="user-email"><?= htmlspecialchars($kyc['user_email']) ?></p>
-                            <p class="id-info"><?= strtoupper($kyc['id_type']) ?> • <?= htmlspecialchars($kyc['id_number']) ?></p>
-                        </div>
-                        <div class="status-badge" style="background: <?php 
-                            if ($kyc['status'] === 'pending') echo 'rgba(255, 193, 7, 0.2); color: #ffc107;';
-                            elseif ($kyc['status'] === 'approved') echo 'rgba(16, 185, 129, 0.2); color: #10b981;';
-                            else echo 'rgba(220, 53, 69, 0.2); color: #dc3545;';
-                        ?>">
-                            <?= ucfirst($kyc['status']) ?>
-                        </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card pending">
+                    <div class="stat-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
                     </div>
-
-                    <div class="kyc-documents">
-                        <h4>Documents</h4>
-                        <div class="doc-grid">
-                            <?php foreach ($kyc['documents'] as $doc): ?>
-                                <div class="doc-item">
-                                    <div class="doc-preview">
-                                        <img src="<?= htmlspecialchars($doc['file_path']) ?>" alt="<?= $doc['document_type'] ?>" onclick="showDocumentModal('<?= htmlspecialchars($doc['file_path']) ?>')">
-                                    </div>
-                                    <p><?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?></p>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <?php if ($kyc['status'] === 'pending'): ?>
-                        <div class="kyc-actions">
-                            <button class="btn btn-success" onclick="approveKYC(<?= $kyc['id'] ?>)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                                Approve
-                            </button>
-                            <button class="btn btn-danger" onclick="showRejectModal(<?= $kyc['id'] ?>)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                                Reject
-                            </button>
-                        </div>
-                    <?php elseif ($kyc['status'] === 'rejected'): ?>
-                        <div class="rejection-reason">
-                            <strong>Rejection Reason:</strong>
-                            <p><?= htmlspecialchars($kyc['rejection_reason']) ?></p>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="kyc-meta">
-                        <span>Submitted: <?= date('M d, Y H:i', strtotime($kyc['created_at'])) ?></span>
-                        <?php if ($kyc['status'] === 'approved'): ?>
-                            <span>Approved: <?= date('M d, Y H:i', strtotime($kyc['approved_at'])) ?></span>
-                        <?php endif; ?>
+                    <div class="stat-content">
+                        <p class="stat-label">Pending Review</p>
+                        <h3 class="stat-number"><?= $pending_count ?></h3>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+
+                <div class="stat-card approved">
+                    <div class="stat-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Approved</p>
+                        <h3 class="stat-number"><?= $approved_count ?></h3>
+                    </div>
+                </div>
+
+                <div class="stat-card rejected">
+                    <div class="stat-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Rejected</p>
+                        <h3 class="stat-number"><?= $rejected_count ?></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Tabs -->
+        <div class="kyc-tabs-section">
+            <div class="tabs-wrapper">
+                <button class="tab-btn active" onclick="filterKYC('pending')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Pending</span>
+                    <span class="tab-badge"><?= $pending_count ?></span>
+                </button>
+                <button class="tab-btn" onclick="filterKYC('approved')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Approved</span>
+                    <span class="tab-badge"><?= $approved_count ?></span>
+                </button>
+                <button class="tab-btn" onclick="filterKYC('rejected')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <span>Rejected</span>
+                    <span class="tab-badge"><?= $rejected_count ?></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- KYC List -->
+        <div class="kyc-list">
+            <?php if (empty($kyc_verifications)): ?>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <p class="empty-title">No KYC Verifications</p>
+                    <p class="empty-desc">No users to review at the moment</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($kyc_verifications as $kyc): ?>
+                    <div class="kyc-card" data-status="<?= $kyc['status'] ?>">
+                        <!-- Card Header -->
+                        <div class="kyc-card-header">
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    <?= substr($kyc['full_name'], 0, 1) ?>
+                                </div>
+                                <div class="user-details">
+                                    <h3><?= htmlspecialchars($kyc['full_name']) ?></h3>
+                                    <p class="user-email"><?= htmlspecialchars($kyc['user_email']) ?></p>
+                                    <p class="id-info">
+                                        <span class="id-type"><?= strtoupper(str_replace('_', ' ', $kyc['id_type'])) ?></span>
+                                        <span class="id-separator">•</span>
+                                        <span class="id-number"><?= htmlspecialchars($kyc['id_number']) ?></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="card-meta">
+                                <div class="status-badge" data-status="<?= $kyc['status'] ?>">
+                                    <?php if ($kyc['status'] === 'pending'): ?>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <circle cx="12" cy="12" r="1"></circle>
+                                        </svg>
+                                        <span>Pending Review</span>
+                                    <?php elseif ($kyc['status'] === 'approved'): ?>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
+                                        </svg>
+                                        <span>Approved</span>
+                                    <?php else: ?>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        </svg>
+                                        <span>Rejected</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="submission-date">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <?= date('M d, Y', strtotime($kyc['created_at'])) ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Documents Section -->
+                        <div class="kyc-documents-section">
+                            <h4 class="section-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                    <polyline points="13 2 13 9 20 9"></polyline>
+                                </svg>
+                                Submitted Documents
+                            </h4>
+                            <div class="doc-grid">
+                                <?php foreach ($kyc['documents'] as $doc): ?>
+                                    <div class="doc-item">
+                                        <div class="doc-preview">
+                                            <img src="<?= htmlspecialchars($doc['file_path']) ?>" alt="<?= $doc['document_type'] ?>" onclick="showDocumentModal('<?= htmlspecialchars($doc['file_path']) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')">
+                                            <div class="doc-overlay">
+                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <p class="doc-name"><?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <!-- Action Section -->
+                        <?php if ($kyc['status'] === 'pending'): ?>
+                            <div class="kyc-actions-section">
+                                <button class="btn btn-approve" onclick="approveKYC(<?= $kyc['id'] ?>)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Approve
+                                </button>
+                                <button class="btn btn-reject" onclick="showRejectModal(<?= $kyc['id'] ?>)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                    </svg>
+                                    Reject
+                                </button>
+                            </div>
+                        <?php elseif ($kyc['status'] === 'rejected'): ?>
+                            <div class="rejection-reason-section">
+                                <h4 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                    Rejection Reason
+                                </h4>
+                                <p><?= htmlspecialchars($kyc['rejection_reason']) ?></p>
+                            </div>
+                        <?php elseif ($kyc['status'] === 'approved'): ?>
+                            <div class="approval-info-section">
+                                <h4 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Approved
+                                </h4>
+                                <p class="approval-date">Approved on <?= date('M d, Y \a\t H:i', strtotime($kyc['approved_at'])) ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 
@@ -90,67 +230,210 @@ ob_start();
 <div id="documentModal" class="modal" style="display: none;">
     <div class="modal-overlay" onclick="closeDocumentModal()"></div>
     <div class="modal-content">
-        <button class="modal-close" onclick="closeDocumentModal()">&times;</button>
-        <img id="modalImage" src="" alt="Document">
+        <button class="modal-close" onclick="closeDocumentModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="modal-body">
+            <p class="doc-title" id="docTitle"></p>
+            <img id="modalImage" src="" alt="Document">
+        </div>
     </div>
 </div>
 
 <!-- Reject Modal -->
 <div id="rejectModal" class="modal" style="display: none;">
     <div class="modal-overlay" onclick="closeRejectModal()"></div>
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content modal-form">
+        <button class="modal-close" onclick="closeRejectModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
         <h2>Reject KYC Verification</h2>
+        <p class="modal-description">Please provide a clear reason for rejecting this verification</p>
         <form id="rejectForm">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" id="rejectKycId" name="kyc_id">
             
             <div class="form-group">
-                <label>Rejection Reason</label>
-                <textarea name="rejection_reason" class="form-control" rows="4" required placeholder="Explain why the documents were rejected..."></textarea>
+                <label>Rejection Reason <span class="required">*</span></label>
+                <textarea name="rejection_reason" class="form-control" rows="5" required placeholder="Explain why the documents were rejected. Be specific to help the user resubmit correctly."></textarea>
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
-                <button type="submit" class="btn btn-danger">Reject</button>
+                <button type="button" class="btn btn-cancel" onclick="closeRejectModal()">Cancel</button>
+                <button type="submit" class="btn btn-reject">Reject</button>
             </div>
         </form>
     </div>
 </div>
 
 <style>
-.admin-kyc-section {
+* {
+    box-sizing: border-box;
+}
+
+.admin-kyc-wrapper {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.03) 0%, rgba(0, 150, 136, 0.01) 100%);
+    min-height: 100vh;
     padding: 20px;
 }
 
-.page-header {
+.admin-kyc-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header Section */
+.admin-header-section {
+    margin-bottom: 40px;
+    animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header-content {
+    margin-bottom: 25px;
+}
+
+.header-title h1 {
+    font-size: 32px;
+    margin: 0 0 8px;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.header-title p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.stat-card {
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-primary);
+    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.1);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card.pending .stat-icon {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.stat-card.approved .stat-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.stat-card.rejected .stat-icon {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-number {
+    margin: 5px 0 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Tabs Section */
+.kyc-tabs-section {
     margin-bottom: 30px;
 }
 
-.page-header h1 {
-    font-size: 28px;
-    margin-bottom: 5px;
-}
-
-.page-header p {
-    color: var(--text-secondary);
-}
-
-.tabs {
+.tabs-wrapper {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
+    overflow-x: auto;
+    padding-bottom: 0;
 }
 
 .tab-btn {
-    padding: 12px 20px;
+    padding: 14px 20px;
     background: none;
     border: none;
     color: var(--text-secondary);
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     border-bottom: 3px solid transparent;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    position: relative;
+    margin-bottom: -2px;
+}
+
+.tab-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.tab-badge {
+    background: rgba(0, 212, 170, 0.15);
+    color: var(--accent-primary);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .tab-btn.active {
@@ -158,6 +441,16 @@ ob_start();
     border-bottom-color: var(--accent-primary);
 }
 
+.tab-btn.active .tab-badge {
+    background: var(--accent-primary);
+    color: #000;
+}
+
+.tab-btn:hover {
+    color: var(--accent-primary);
+}
+
+/* KYC List */
 .kyc-list {
     display: grid;
     gap: 20px;
@@ -166,52 +459,148 @@ ob_start();
 .kyc-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 14px;
+    overflow: hidden;
+    animation: slideUp 0.6s ease-out;
+    transition: all 0.3s;
 }
 
-.kyc-header-info {
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.kyc-card:hover {
+    border-color: rgba(0, 212, 170, 0.3);
+    box-shadow: 0 15px 40px rgba(0, 212, 170, 0.08);
+}
+
+/* Card Header */
+.kyc-card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.kyc-header-info h3 {
+.user-info {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+}
+
+.user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent-primary), #00c9b7);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.user-details h3 {
     margin: 0 0 5px;
     color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .user-email {
+    margin: 0 0 4px;
     color: var(--accent-primary);
-    font-size: 14px;
-    margin: 3px 0;
+    font-size: 13px;
 }
 
 .id-info {
+    margin: 0;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 12px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.id-separator {
+    opacity: 0.5;
+}
+
+.card-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
 }
 
 .status-badge {
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 8px;
     font-size: 13px;
+    font-weight: 600;
 }
 
-.kyc-documents {
-    margin: 20px 0;
+.status-badge[data-status="pending"] {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
 }
 
-.kyc-documents h4 {
-    margin-bottom: 15px;
+.status-badge[data-status="approved"] {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.status-badge[data-status="rejected"] {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+.submission-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Documents Section */
+.kyc-documents-section {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+    margin: 0 0 16px;
     color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-title svg {
+    color: var(--accent-primary);
 }
 
 .doc-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 15px;
 }
 
@@ -220,109 +609,164 @@ ob_start();
 }
 
 .doc-preview {
+    position: relative;
     margin-bottom: 10px;
-    cursor: pointer;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     background: var(--bg-primary);
+    aspect-ratio: 1;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
 .doc-preview img {
     width: 100%;
-    height: 150px;
+    height: 100%;
     object-fit: cover;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 
-.doc-preview img:hover {
-    transform: scale(1.05);
-}
-
-.doc-item p {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.kyc-actions {
+.doc-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
-    gap: 10px;
-    margin: 20px 0;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.doc-overlay svg {
+    color: white;
+}
+
+.doc-preview:hover img {
+    transform: scale(1.1);
+}
+
+.doc-preview:hover .doc-overlay {
+    opacity: 1;
+}
+
+.doc-name {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Actions Section */
+.kyc-actions-section {
+    padding: 20px 24px;
+    display: flex;
+    gap: 12px;
+    border-top: 1px solid var(--border-color);
 }
 
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 11px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
     font-size: 14px;
 }
 
-.btn-success {
-    background: #10b981;
+.btn-approve {
+    background: linear-gradient(135deg, #10b981, #059669);
     color: white;
+    flex: 1;
 }
 
-.btn-success:hover {
-    background: #059669;
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
 }
 
-.btn-danger {
-    background: #dc3545;
+.btn-reject {
+    background: linear-gradient(135deg, #dc3545, #c82333);
     color: white;
+    flex: 1;
 }
 
-.btn-danger:hover {
-    background: #c82333;
+.btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
 }
 
-.btn-secondary {
+.btn-cancel {
     background: var(--border-color);
     color: var(--text-primary);
 }
 
-.btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.2);
+.btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.1);
 }
 
-.rejection-reason {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.2);
-    padding: 15px;
-    border-radius: 6px;
-    margin: 20px 0;
+/* Rejection & Approval Info */
+.rejection-reason-section,
+.approval-info-section {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border-color);
 }
 
-.rejection-reason strong {
-    color: #dc3545;
-    display: block;
-    margin-bottom: 8px;
+.rejection-reason-section {
+    background: rgba(220, 53, 69, 0.05);
 }
 
-.rejection-reason p {
+.approval-info-section {
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.rejection-reason-section p,
+.approval-info-section p {
     margin: 0;
     color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
 }
 
-.kyc-meta {
-    display: flex;
-    gap: 20px;
-    padding-top: 15px;
-    border-top: 1px solid var(--border-color);
-    font-size: 13px;
-    color: var(--text-secondary);
+.approval-date {
+    color: #10b981;
+    font-weight: 500;
 }
 
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: var(--text-secondary);
+    padding: 80px 20px;
 }
 
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    color: var(--text-secondary);
+    opacity: 0.3;
+}
+
+.empty-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+}
+
+.empty-desc {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Modals */
 .modal {
     position: fixed;
     top: 0;
@@ -333,6 +777,16 @@ ob_start();
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-overlay {
@@ -341,35 +795,79 @@ ob_start();
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.6);
     cursor: pointer;
+    backdrop-filter: blur(4px);
 }
 
 .modal-content {
     position: relative;
     background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 800px;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 700px;
     width: 95%;
     max-height: 90vh;
     overflow-y: auto;
+    animation: slideUp 0.4s ease-out;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.modal-form {
+    max-width: 500px;
+}
+
+.modal-content h2 {
+    margin: 0 0 8px;
+    color: var(--text-primary);
+    font-size: 22px;
+}
+
+.modal-description {
+    margin: 0 0 25px;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .modal-close {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 28px;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
     color: var(--text-secondary);
     cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: rgba(0, 212, 170, 0.1);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.modal-body {
+    text-align: center;
+}
+
+.doc-title {
+    margin: 0 0 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
 #modalImage {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 12px;
+    max-height: 70vh;
+    object-fit: contain;
 }
 
 .form-group {
@@ -378,32 +876,71 @@ ob_start();
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: 600;
     color: var(--text-primary);
+    font-size: 14px;
+}
+
+.required {
+    color: #dc3545;
 }
 
 .form-control {
     width: 100%;
     padding: 12px 15px;
     background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
     color: var(--text-primary);
     font-size: 14px;
     font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s;
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--accent-primary);
+    background: rgba(0, 212, 170, 0.02);
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.08);
 }
 
 .modal-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .kyc-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .card-meta {
+        align-items: flex-start;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .doc-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .kyc-actions-section {
+        flex-direction: column;
+    }
+
+    .modal-content {
+        padding: 30px 20px;
+    }
 }
 </style>
 
@@ -413,21 +950,24 @@ function filterKYC(status) {
     const buttons = document.querySelectorAll('.tab-btn');
     
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
 
     cards.forEach(card => {
         if (card.dataset.status === status) {
             card.style.display = '';
+            setTimeout(() => card.style.opacity = '1', 10);
         } else {
             card.style.display = 'none';
         }
     });
 }
 
-function showDocumentModal(imagePath) {
+function showDocumentModal(imagePath, docTitle = 'Document') {
     const modal = document.getElementById('documentModal');
     const img = document.getElementById('modalImage');
+    const title = document.getElementById('docTitle');
     img.src = imagePath;
+    title.textContent = docTitle;
     modal.style.display = 'flex';
 }
 
@@ -455,14 +995,14 @@ async function approveKYC(kycId) {
         const data = await response.json();
 
         if (data.success) {
-            showAlert('KYC approved successfully', 'success');
+            showNotification('KYC approved successfully', 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
-            showAlert(data.error || 'Failed to approve KYC', 'error');
+            showNotification(data.error || 'Failed to approve KYC', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('An error occurred', 'error');
+        showNotification('An error occurred', 'error');
     }
 }
 
@@ -470,8 +1010,13 @@ document.getElementById('rejectForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const kycId = document.getElementById('rejectKycId').value;
     const formData = new FormData(e.target);
+    const submitBtn = e.target.querySelector('[type="submit"]');
+    const originalText = submitBtn.innerHTML;
 
     try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Rejecting...';
+
         const response = await fetch(`/admin/kyc/reject/${kycId}`, {
             method: 'POST',
             body: formData
@@ -480,32 +1025,75 @@ document.getElementById('rejectForm')?.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (data.success) {
-            showAlert('KYC rejected', 'success');
+            showNotification('KYC rejected successfully', 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
-            showAlert(data.error || 'Failed to reject KYC', 'error');
+            showNotification(data.error || 'Failed to reject KYC', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('An error occurred', 'error');
+        showNotification('An error occurred', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
     }
 });
 
-function showAlert(message, type) {
-    const alert = document.createElement('div');
-    alert.style.cssText = `
+function showNotification(message, type = 'info') {
+    const existingNotif = document.getElementById('adminNotification');
+    if (existingNotif) existingNotif.remove();
+
+    const notif = document.createElement('div');
+    notif.id = 'adminNotification';
+    
+    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#dc3545' : '#3b82f6';
+    
+    notif.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        padding: 15px 20px;
-        border-radius: 6px;
+        background: ${bgColor};
         color: white;
-        font-weight: 600;
+        padding: 15px 20px;
+        border-radius: 8px;
         z-index: 10000;
-        background: ${type === 'success' ? '#10b981' : '#dc3545'};
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        animation: slideInRight 0.3s ease-out;
+        font-weight: 600;
     `;
-    alert.textContent = message;
-    document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 4000);
+    notif.textContent = message;
+    
+    document.body.appendChild(notif);
+    setTimeout(() => {
+        notif.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notif.remove(), 300);
+    }, 4000);
 }
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    }
+`;
+document.head.appendChild(style);
 </script>
