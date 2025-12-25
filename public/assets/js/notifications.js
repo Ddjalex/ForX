@@ -52,14 +52,17 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchNotifications() {
         try {
             const response = await fetch('/api/notifications');
+            if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
-            if (data.success) {
+            if (data && data.success) {
                 renderNotifications(data.notifications);
-                updateBadge(data.notifications.filter(n => !n.is_read).length);
+                updateBadge(data.notifications ? data.notifications.filter(n => !n.is_read).length : 0);
+            } else {
+                notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">No notifications yet</div>';
             }
         } catch (error) {
             console.error('Error fetching notifications:', error);
-            notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Error loading notifications</div>';
+            notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">No notifications yet</div>';
         }
     }
 

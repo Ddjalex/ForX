@@ -10,6 +10,22 @@ $totalTrades = $stats['total_trades'] ?? 0;
 $openTrades = $stats['open_trades'] ?? 0;
 $closedTrades = $stats['closed_trades'] ?? 0;
 $winLossRatio = $stats['win_loss_ratio'] ?? 0;
+
+// Mock notification data
+$mockNotifications = [
+    ['country' => 'Italy', 'action' => 'withdrawn', 'amount' => 40000],
+    ['country' => 'Mexico', 'action' => 'withdrawn', 'amount' => 4500],
+    ['country' => 'Turkey', 'action' => 'is trading with', 'amount' => 58623],
+    ['country' => 'USA', 'action' => 'withdrawn', 'amount' => 58623],
+    ['country' => 'Switzerland', 'action' => 'withdrawn', 'amount' => 40000],
+    ['country' => 'Spain', 'action' => 'just invested', 'amount' => 52300],
+    ['country' => 'Argentina', 'action' => 'is trading with', 'amount' => 10000],
+    ['country' => 'Panama', 'action' => 'just invested', 'amount' => 4500],
+    ['country' => 'Canada', 'action' => 'deposited', 'amount' => 15000],
+    ['country' => 'Germany', 'action' => 'withdrawn', 'amount' => 32500],
+    ['country' => 'UK', 'action' => 'just invested', 'amount' => 78900],
+    ['country' => 'Australia', 'action' => 'is trading with', 'amount' => 22300],
+];
 ?>
 
 <div id="systemNotification" class="system-notification" style="display: none;">
@@ -368,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function() {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 100000;
+    z-index: 10000;
     animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -377,17 +393,17 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 #systemNotification.hide {
-    animation: slideOut 0.3s ease-in forwards;
+    animation: slideOut 0.4s ease-out forwards;
 }
 
 @keyframes slideIn {
-    from { transform: translateX(120%) scale(0.8); opacity: 0; }
-    to { transform: translateX(0) scale(1); opacity: 1; }
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes slideOut {
-    from { transform: translateX(0) scale(1); opacity: 1; }
-    to { transform: translateX(120%) scale(0.8); opacity: 0; }
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
 }
 
 .notification-content {
@@ -400,15 +416,15 @@ document.addEventListener('DOMContentLoaded', function() {
     justify-content: space-between;
     gap: 20px;
     min-width: 350px;
-    max-width: 450px;
     border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
 }
 
 .notification-text {
     color: #1a1a1a;
     font-size: 15px;
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .notification-text strong {
@@ -416,27 +432,83 @@ document.addEventListener('DOMContentLoaded', function() {
     font-weight: 700;
 }
 
+.notification-text .amount {
+    color: #00D4AA;
+    font-weight: 700;
+    display: block;
+    font-size: 18px;
+    margin-top: 5px;
+}
+
 .notification-close-btn {
-    background: #f0f2f5;
+    background: none;
     border: none;
-    color: #65676b;
+    color: #999;
     font-size: 20px;
     cursor: pointer;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    padding: 5px;
+    line-height: 1;
+    transition: color 0.2s;
 }
 
 .notification-close-btn:hover {
-    background: #e4e6eb;
-    color: #050505;
+    color: #333;
 }
 
+.notification-icon-bell {
+    color: #8899a6;
+    margin-left: 10px;
+}
+</style>
+
+<script>
+const mockNotifications = <?= json_encode($mockNotifications) ?>;
+let currentNotificationIndex = 0;
+
+function showNextNotification() {
+    const notification = mockNotifications[currentNotificationIndex];
+    const notificationEl = document.getElementById('systemNotification');
+    const textEl = notificationEl.querySelector('.notification-text');
+    
+    let actionText = notification.action;
+    let amountClass = 'amount';
+    
+    const amountFormatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0
+    }).format(notification.amount);
+
+    textEl.innerHTML = `Someone from <strong>${notification.country}</strong> ${actionText} <span class="${amountClass}">${amountFormatted}</span>`;
+    
+    notificationEl.style.display = 'block';
+    notificationEl.classList.remove('hide');
+    notificationEl.classList.add('show');
+    
+    currentNotificationIndex = (currentNotificationIndex + 1) % mockNotifications.length;
+    
+    setTimeout(() => {
+        closeNotification();
+    }, 5000);
+}
+
+function closeNotification() {
+    const notificationEl = document.getElementById('systemNotification');
+    notificationEl.classList.remove('show');
+    notificationEl.classList.add('hide');
+    setTimeout(() => {
+        notificationEl.style.display = 'none';
+    }, 400);
+}
+
+// Start notification loop
+setTimeout(() => {
+    showNextNotification();
+    setInterval(showNextNotification, 12000);
+}, 3000);
+</script>
+
+<style>
 .trade-confirm-modal {
     position: fixed;
     top: 0;
