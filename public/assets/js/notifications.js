@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!notificationBtn) return;
 
-    function togglePanel() {
+    function togglePanel(e) {
+        if (e) e.stopPropagation();
         const isVisible = notificationPanel.style.display === 'block';
         notificationPanel.style.display = isVisible ? 'none' : 'block';
         if (!isVisible) {
@@ -18,8 +19,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     notificationBtn.addEventListener('click', togglePanel);
-    notificationClose?.addEventListener('click', togglePanel);
-    notificationBackdrop?.addEventListener('click', togglePanel);
+    notificationClose?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notificationPanel.style.display = 'none';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!notificationPanel.contains(e.target) && !notificationBtn.contains(e.target)) {
+            notificationPanel.style.display = 'none';
+        }
+    });
+
+    function updateClock() {
+        const headerClock = document.getElementById('headerClock');
+        if (!headerClock) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        const dateStr = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        headerClock.innerHTML = `<div style="text-align: right;">${timeStr}</div><div style="font-size: 10px; opacity: 0.8; font-weight: 400;">${dateStr}</div>`;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
 
     async function fetchNotifications() {
         try {

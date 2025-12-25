@@ -26,6 +26,11 @@ if (!function_exists('t')) {
     <script src="/assets/js/market-data.js" defer></script>
     <script src="/assets/js/tradingview-market-data.js" defer></script>
     <script src="/assets/js/notifications.js" defer></script>
+    <style>
+        .sidebar { position: fixed; height: 100vh; overflow-y: auto; }
+        .main-content { margin-left: 260px; }
+        @media (max-width: 768px) { .main-content { margin-left: 0; } }
+    </style>
 </head>
 <body>
     <button class="sidebar-toggle" id="sidebarToggle">
@@ -164,6 +169,7 @@ if (!function_exists('t')) {
         </div>
 
         <div class="header-controls">
+            <div id="headerClock" style="color: #00D4AA; font-family: 'Inter', sans-serif; font-size: 14px; margin-right: 15px; font-weight: 600;"></div>
             <button class="notification-btn" id="notificationBtn" title="Notifications">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -173,14 +179,13 @@ if (!function_exists('t')) {
             </button>
         </div>
 
-        <div class="notification-panel" id="notificationPanel" style="display: none;">
-            <div class="notification-backdrop" id="notificationBackdrop"></div>
-            <div class="notification-modal">
+        <div class="notification-panel" id="notificationPanel" style="display: none; position: absolute; right: 20px; top: 70px; z-index: 10001; width: 350px;">
+            <div class="notification-modal" style="position: relative; right: auto; top: auto; width: 100%; height: auto; max-height: 500px; border: 1px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                 <div class="notification-modal-header">
                     <h2>Notifications</h2>
                     <div style="display: flex; gap: 10px;">
                         <button id="markAllReadBtn" style="background: none; border: 1px solid var(--primary); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Mark all read</button>
-                        <button class="notification-close" id="notificationClose">
+                        <button class="notification-close" id="notificationClose" style="background: none; border: none; cursor: pointer; color: var(--text-color);">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -188,7 +193,7 @@ if (!function_exists('t')) {
                         </button>
                     </div>
                 </div>
-                <div class="notification-list" id="notificationList">
+                <div class="notification-list" id="notificationList" style="max-height: 400px; overflow-y: auto;">
                     <div style="padding: 20px; text-align: center; color: #888;">Loading notifications...</div>
                 </div>
             </div>
