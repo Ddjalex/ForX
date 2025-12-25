@@ -160,7 +160,7 @@ $mockNotifications = [
 
                 <div class="form-group">
                     <label>Asset Name</label>
-                    <select name="market_id" id="assetName" class="form-control" onchange="updateTradingViewChart()">
+                    <select name="market_id" id="assetName" class="form-control" onchange="updateMarketInfo(); updateTradingViewChart();">
                         <?php foreach ($allMarkets ?? [] as $m): ?>
                             <option value="<?= $m['id'] ?>" 
                                 data-type="<?= htmlspecialchars($m['asset_type'] ?? $m['type']) ?>"
@@ -1067,13 +1067,6 @@ function updateAssetNames() {
     const assetNameSelect = document.getElementById('assetName');
     const options = assetNameSelect.querySelectorAll('option');
     
-    // Update Asset Type in Market Info
-    const assetTypeSelect = document.getElementById('assetType');
-    const currentAssetTypeEl = document.getElementById('dashboardCurrentAssetType');
-    if (currentAssetTypeEl && assetTypeSelect) {
-        currentAssetTypeEl.textContent = assetTypeSelect.options[assetTypeSelect.selectedIndex].text;
-    }
-    
     let firstVisible = null;
     options.forEach(option => {
         const optionType = option.getAttribute('data-type');
@@ -1087,9 +1080,10 @@ function updateAssetNames() {
     
     if (firstVisible) {
         assetNameSelect.value = firstVisible.value;
-        updateMarketInfo();
-        updateTradingViewChart();
     }
+    
+    updateMarketInfo();
+    updateTradingViewChart();
 }
 
 function initTradingViewChart() {
