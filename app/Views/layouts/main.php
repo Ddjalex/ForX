@@ -185,51 +185,68 @@ if (!function_exists('t')) {
                     </button>
                 </div>
                 <div class="notification-list" id="notificationList">
-                    <div class="notification-item" data-action="deposit">
-                        <div class="notification-item-icon success">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </div>
-                        <div class="notification-item-content">
-                            <div class="notification-item-title">Deposit Confirmed</div>
-                            <div class="notification-item-message">Your deposit of $500 has been processed</div>
-                            <div class="notification-item-time">2 hours ago</div>
-                        </div>
-                    </div>
-
-                    <div class="notification-item" data-action="news">
-                        <div class="notification-item-icon info">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                            </svg>
-                        </div>
-                        <div class="notification-item-content">
-                            <div class="notification-item-title">New Market Update</div>
-                            <div class="notification-item-message">EUR/USD has reached new support level</div>
-                            <div class="notification-item-time">5 hours ago</div>
-                        </div>
-                    </div>
-
-                    <div class="notification-item" data-action="dashboard">
-                        <div class="notification-item-icon warning">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                                <line x1="12" y1="9" x2="12" y2="13"></line>
-                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                            </svg>
-                        </div>
-                        <div class="notification-item-content">
-                            <div class="notification-item-title">Position Alert</div>
-                            <div class="notification-item-message">Your BTC position is nearing stop loss</div>
-                            <div class="notification-item-time">1 day ago</div>
-                        </div>
+                    <!-- Notifications will be loaded here dynamically -->
+                    <div class="notification-empty" style="padding: 20px; text-align: center; opacity: 0.6;">
+                        No new notifications
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+        async function refreshNotifications() {
+            try {
+                const response = await fetch('/api/notifications/unread');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const badge = document.getElementById('notificationBadge');
+                    const list = document.getElementById('notificationList');
+                    
+                    if (badge) {
+                        badge.textContent = data.count;
+                        badge.style.display = data.count > 0 ? 'flex' : 'none';
+                    }
+                    
+                    if (list && data.notifications.length > 0) {
+                        list.innerHTML = data.notifications.map(n => `
+                            <div class="notification-item" data-id="${n.id}">
+                                <div class="notification-item-icon info">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                </div>
+                                <div class="notification-item-content">
+                                    <div class="notification-item-title">${n.title}</div>
+                                    <div class="notification-item-message">${n.message}</div>
+                                    <div class="notification-item-time">${formatTime(n.created_at)}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        }
+
+        function formatTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+            return date.toLocaleDateString();
+        }
+
+        // Refresh every 30 seconds
+        setInterval(refreshNotifications, 30000);
+        document.addEventListener('DOMContentLoaded', refreshNotifications);
+        </script>
 
         <?php if (($_SERVER['REQUEST_URI'] ?? '') !== '/kyc/verify'): ?>
         <div class="pro-ticker-wrapper">
