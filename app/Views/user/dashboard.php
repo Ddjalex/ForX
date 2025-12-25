@@ -1043,8 +1043,11 @@ document.addEventListener('DOMContentLoaded', function() {
     syncDashboardPrices();
     setInterval(syncDashboardPrices, 30000);
     
-    // Initialize market info with current selection
-    setTimeout(updateMarketInfo, 100);
+    // Initialize market info with current selection - use longer delay
+    setTimeout(() => {
+        updateMarketInfo();
+        console.log('Initial market info loaded');
+    }, 300);
     
     // Update chart when asset type changes
     const assetTypeSelect = document.getElementById('assetType');
@@ -1058,6 +1061,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const assetSelect = document.getElementById('assetName');
     if (assetSelect) {
         assetSelect.addEventListener('change', function() {
+            updateMarketInfo();
             updateTradingViewChart();
         });
     }
@@ -1136,31 +1140,57 @@ function capitalizeAssetType(type) {
 }
 
 function updateMarketInfo() {
-    const assetNameSelect = document.getElementById('assetName');
-    if (!assetNameSelect) return;
-    
-    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
-    if (!selectedOption || selectedOption.style.display === 'none') return;
-    
     const assetTypeSelect = document.getElementById('assetType');
-    const assetTypeRaw = assetTypeSelect ? assetTypeSelect.value : (selectedOption.getAttribute('data-type') || 'crypto');
-    const assetType = assetTypeSelect ? assetTypeSelect.options[assetTypeSelect.selectedIndex].text : capitalizeAssetType(assetTypeRaw);
-    const assetName = selectedOption.getAttribute('data-display') || selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
+    const assetNameSelect = document.getElementById('assetName');
+    
+    if (!assetTypeSelect || !assetNameSelect) return;
+    
+    // Get the currently selected values
+    const currentAssetType = assetTypeSelect.value;
+    const currentAssetName = assetNameSelect.value;
+    
+    // Find the selected option by value
+    let selectedOption = null;
+    for (let i = 0; i < assetNameSelect.options.length; i++) {
+        const option = assetNameSelect.options[i];
+        if (option.value === currentAssetName && option.style.display !== 'none') {
+            selectedOption = option;
+            break;
+        }
+    }
+    
+    if (!selectedOption) return;
+    
+    // Get asset type display name
+    const assetTypeDisplayName = assetTypeSelect.options[assetTypeSelect.selectedIndex].text;
+    
+    // Get asset name from data-display attribute
+    const assetName = selectedOption.getAttribute('data-display') || selectedOption.textContent.split('(')[0].trim() || 'N/A';
+    
+    // Get price
     const assetPriceRaw = selectedOption.getAttribute('data-price') || '0';
     const assetPrice = parseFloat(assetPriceRaw);
     
+    // Update DOM
     const currentAssetTypeEl = document.getElementById('dashboardCurrentAssetType');
     const currentAssetNameEl = document.getElementById('dashboardCurrentAssetName');
     const currentPriceEl = document.getElementById('dashboardCurrentPrice');
     
-    if (currentAssetTypeEl) currentAssetTypeEl.textContent = assetType;
-    if (currentAssetNameEl) currentAssetNameEl.textContent = assetName;
+    if (currentAssetTypeEl) {
+        currentAssetTypeEl.textContent = assetTypeDisplayName;
+        console.log('Updated asset type to:', assetTypeDisplayName);
+    }
+    if (currentAssetNameEl) {
+        currentAssetNameEl.textContent = assetName;
+        console.log('Updated asset name to:', assetName);
+    }
     if (currentPriceEl) {
         if (assetPrice > 0 && isFinite(assetPrice)) {
             currentPriceEl.textContent = '$' + assetPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         } else {
             currentPriceEl.textContent = '$0.00';
         }
+        console.log('Updated price to:', assetPrice);
     }
 }
 
@@ -1245,7 +1275,11 @@ function setLeverage(value) {
     const displayEl = document.getElementById('leverageDisplay');
     
     if (leverageValueEl) leverageValueEl.value = numValue;
-    if (sliderEl) sliderEl.value = numValue;
+    if (sliderEl) {
+        sliderEl.value = numValue;
+        // Force slider to update visual position
+        sliderEl.style.backgroundSize = ((numValue - 0.1) / (100 - 0.1) * 100) + '% 100%';
+    }
     if (displayEl) displayEl.textContent = numValue + 'x';
     
     document.querySelectorAll('.leverage-btn').forEach(btn => {
@@ -1256,6 +1290,7 @@ function setLeverage(value) {
             btn.classList.remove('active');
         }
     });
+    console.log('Leverage set to:', numValue + 'x');
     validateTradeAmount();
 }
 
@@ -1276,6 +1311,7 @@ function setLeverageFromSlider(value) {
             btn.classList.remove('active');
         }
     });
+    console.log('Leverage from slider set to:', roundedValue + 'x');
     validateTradeAmount();
 }
 
