@@ -770,13 +770,13 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .verify-now {
-    background: linear-gradient(135deg, var(--accent-primary), #00e6b8);
-    color: #000;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: #ffffff;
 }
 
 .verify-now:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.4);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
 }
 
 .verify-later {
