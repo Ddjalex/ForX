@@ -31,88 +31,80 @@
             <!-- Section: Deposit Networks -->
             <div id="section-deposit-networks" class="settings-section active">
                 <div class="section-header">
-                    <h3 class="section-title">Deposit Network Settings</h3>
-                    <p class="section-desc">Manage your crypto wallet addresses and network types for deposits.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 class="section-title">Deposit Network Settings</h3>
+                            <p class="section-desc">Manage your crypto wallet addresses and network types for deposits.</p>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="showAddNetworkModal()">Add Network</button>
+                    </div>
                 </div>
 
                 <div class="settings-grid">
+                    <?php foreach ($depositNetworks as $network): ?>
                     <div class="settings-card">
-                        <div class="card-title-sm">Bitcoin (BTC)</div>
+                        <div class="card-title-sm" style="display: flex; justify-content: space-between; align-items: center;">
+                            <?= htmlspecialchars($network['name']) ?> (<?= htmlspecialchars($network['symbol']) ?>)
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="action-btn-icon" onclick="showEditNetworkModal(<?= htmlspecialchars(json_encode($network)) ?>)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <form method="POST" action="/admin/settings/networks" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
+                                    <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="<?= $network['id'] ?>">
+                                    <button type="submit" class="action-btn-icon delete">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label class="form-label">Wallet Address</label>
-                            <input type="text" name="deposit_btc_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_btc_address'] ?? '') ?>" placeholder="bc1q...">
+                            <input type="text" class="form-control" value="<?= htmlspecialchars($network['wallet_address']) ?>" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Network Type</label>
-                            <select name="deposit_btc_network" class="form-control">
-                                <option value="BTC" <?= ($settings['deposit_btc_network'] ?? '') === 'BTC' ? 'selected' : '' ?>>BTC (Native)</option>
-                                <option value="BEP20" <?= ($settings['deposit_btc_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
-                            </select>
+                            <input type="text" class="form-control" value="<?= htmlspecialchars($network['network_type']) ?>" readonly>
                         </div>
                     </div>
-
-                    <div class="settings-card">
-                        <div class="card-title-sm">Ethereum (ETH)</div>
-                        <div class="form-group">
-                            <label class="form-label">Wallet Address</label>
-                            <input type="text" name="deposit_eth_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_eth_address'] ?? '') ?>" placeholder="0x...">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Network Type</label>
-                            <select name="deposit_eth_network" class="form-control">
-                                <option value="ERC20" <?= ($settings['deposit_eth_network'] ?? '') === 'ERC20' ? 'selected' : '' ?>>ERC20 (Ethereum)</option>
-                                <option value="BEP20" <?= ($settings['deposit_eth_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
-                                <option value="ARB" <?= ($settings['deposit_eth_network'] ?? '') === 'ARB' ? 'selected' : '' ?>>Arbitrum</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <div class="card-title-sm">USDT (Tether)</div>
-                        <div class="form-group">
-                            <label class="form-label">Wallet Address</label>
-                            <input type="text" name="deposit_usdt_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_usdt_address'] ?? '') ?>" placeholder="TRX/0x...">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Network Type</label>
-                            <select name="deposit_usdt_network" class="form-control">
-                                <option value="TRC20" <?= ($settings['deposit_usdt_network'] ?? '') === 'TRC20' ? 'selected' : '' ?>>TRC20 (Tron)</option>
-                                <option value="ERC20" <?= ($settings['deposit_usdt_network'] ?? '') === 'ERC20' ? 'selected' : '' ?>>ERC20 (Ethereum)</option>
-                                <option value="BEP20" <?= ($settings['deposit_usdt_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <div class="card-title-sm">Litecoin (LTC)</div>
-                        <div class="form-group">
-                            <label class="form-label">Wallet Address</label>
-                            <input type="text" name="deposit_ltc_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_ltc_address'] ?? '') ?>" placeholder="LTC address">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Network Type</label>
-                            <select name="deposit_ltc_network" class="form-control">
-                                <option value="LTC" <?= ($settings['deposit_ltc_network'] ?? '') === 'LTC' ? 'selected' : '' ?>>LTC (Native)</option>
-                                <option value="BEP20" <?= ($settings['deposit_ltc_network'] ?? '') === 'BEP20' ? 'selected' : '' ?>>BEP20 (BSC)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <div class="card-title-sm">Solana (SOL)</div>
-                        <div class="form-group">
-                            <label class="form-label">Wallet Address</label>
-                            <input type="text" name="deposit_sol_address" class="form-control" value="<?= htmlspecialchars($settings['deposit_sol_address'] ?? '') ?>" placeholder="SOL address">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Network Type</label>
-                            <select name="deposit_sol_network" class="form-control">
-                                <option value="SOL" <?= ($settings['deposit_sol_network'] ?? '') === 'SOL' ? 'selected' : '' ?>>SOL (Native)</option>
-                            </select>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
+
+<!-- Modal for Adding/Editing Network -->
+<div class="modal-overlay" id="networkModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
+            <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
+        </div>
+        <form method="POST" action="/admin/settings/networks">
+            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="action" id="networkAction" value="add">
+            <input type="hidden" name="id" id="networkId">
+            
+            <div class="form-group">
+                <label class="form-label">Network Name</label>
+                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Symbol</label>
+                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Wallet Address</label>
+                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Network Type</label>
+                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Save Network</button>
+        </form>
+    </div>
+</div>
 
             <!-- Section: General Settings -->
             <div id="section-general-settings" class="settings-section">
@@ -369,6 +361,28 @@
     border-top: 1px solid rgba(255,255,255,0.05);
 }
 
+.action-btn-icon {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #94a3b8;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.action-btn-icon:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--accent-primary);
+}
+
+.action-btn-icon.delete:hover {
+    color: #ef4444;
+}
+
 @media (max-width: 1024px) {
     .settings-container {
         flex-direction: column;
@@ -390,6 +404,32 @@
 </style>
 
 <script>
+function showAddNetworkModal() {
+    document.getElementById('networkModalTitle').textContent = 'Add Deposit Network';
+    document.getElementById('networkAction').value = 'add';
+    document.getElementById('networkId').value = '';
+    document.getElementById('networkName').value = '';
+    document.getElementById('networkSymbol').value = '';
+    document.getElementById('networkWallet').value = '';
+    document.getElementById('networkType').value = '';
+    document.getElementById('networkModal').classList.add('active');
+}
+
+function showEditNetworkModal(network) {
+    document.getElementById('networkModalTitle').textContent = 'Edit Deposit Network';
+    document.getElementById('networkAction').value = 'update';
+    document.getElementById('networkId').value = network.id;
+    document.getElementById('networkName').value = network.name;
+    document.getElementById('networkSymbol').value = network.symbol;
+    document.getElementById('networkWallet').value = network.wallet_address;
+    document.getElementById('networkType').value = network.network_type;
+    document.getElementById('networkModal').classList.add('active');
+}
+
+function hideNetworkModal() {
+    document.getElementById('networkModal').classList.remove('active');
+}
+
 function switchSection(sectionId) {
     // Update nav buttons
     document.querySelectorAll('.nav-item').forEach(btn => {

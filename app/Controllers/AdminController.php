@@ -461,12 +461,58 @@ class AdminController
             $settingsArray[$setting['setting_key']] = $setting['value'];
         }
 
+        $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
+
         echo Router::render('admin/settings', [
             'settings' => $settingsArray,
+            'depositNetworks' => $depositNetworks,
             'csrf_token' => Session::generateCsrfToken(),
             'success' => Session::getFlash('success'),
             'error' => Session::getFlash('error'),
         ]);
+    }
+
+    public function manageDepositNetworks(): void
+    {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/admin/settings');
+            return;
+        }
+
+        $action = $_POST['action'] ?? '';
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+        $symbol = filter_input(INPUT_POST, 'symbol', FILTER_SANITIZE_SPECIAL_CHARS);
+        $wallet_address = filter_input(INPUT_POST, 'wallet_address', FILTER_SANITIZE_SPECIAL_CHARS);
+        $network_type = filter_input(INPUT_POST, 'network_type', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        switch ($action) {
+            case 'add':
+                Database::insert('deposit_networks', [
+                    'name' => $name,
+                    'symbol' => $symbol,
+                    'wallet_address' => $wallet_address,
+                    'network_type' => $network_type
+                ]);
+                Session::flash('success', 'Deposit network added.');
+                break;
+            case 'update':
+                Database::update('deposit_networks', [
+                    'name' => $name,
+                    'symbol' => $symbol,
+                    'wallet_address' => $wallet_address,
+                    'network_type' => $network_type
+                ], 'id = ?', [$id]);
+                Session::flash('success', 'Deposit network updated.');
+                break;
+            case 'delete':
+                Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
+                Session::flash('success', 'Deposit network deleted.');
+                break;
+        }
+
+        Router::redirect('/admin/settings');
     }
 
     public function updateSettings(): void
