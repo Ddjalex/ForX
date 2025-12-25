@@ -164,7 +164,10 @@ ob_start();
                                 <?php foreach ($kyc['documents'] as $doc): ?>
                                     <div class="doc-item">
                                         <div class="doc-preview">
-                                            <img src="<?= htmlspecialchars($doc['file_path']) ?>" alt="<?= $doc['document_type'] ?>" onclick="showDocumentModal('<?= htmlspecialchars($doc['file_path']) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')">
+                                            <?php
+                                            $imagePath = strpos($doc['file_path'], 'http') === 0 ? $doc['file_path'] : $doc['file_path'];
+                                            ?>
+                                            <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= $doc['document_type'] ?>" onclick="showDocumentModal('<?= htmlspecialchars($imagePath) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%22200%22 y=%22150%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EImage Not Found%3C/text%3E%3C/svg%3E'">
                                             <div class="doc-overlay">
                                                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -238,7 +241,7 @@ ob_start();
         </button>
         <div class="modal-body">
             <p class="doc-title" id="docTitle"></p>
-            <img id="modalImage" src="" alt="Document">
+            <img id="modalImage" src="" alt="Document" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%22200%22 y=%22150%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EImage Not Found%3C/text%3E%3C/svg%3E'">
         </div>
     </div>
 </div>
