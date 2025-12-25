@@ -24,7 +24,7 @@ ob_start();
                     </div>
                     <div class="stat-content">
                         <p class="stat-label">Pending Review</p>
-                        <h3 class="stat-number"><?= $pending_count ?></h3>
+                        <h3 class="stat-number"><?= $pending_count ?? 0 ?></h3>
                     </div>
                 </div>
 
@@ -36,7 +36,7 @@ ob_start();
                     </div>
                     <div class="stat-content">
                         <p class="stat-label">Approved</p>
-                        <h3 class="stat-number"><?= $approved_count ?></h3>
+                        <h3 class="stat-number"><?= $approved_count ?? 0 ?></h3>
                     </div>
                 </div>
 
@@ -50,7 +50,7 @@ ob_start();
                     </div>
                     <div class="stat-content">
                         <p class="stat-label">Rejected</p>
-                        <h3 class="stat-number"><?= $rejected_count ?></h3>
+                        <h3 class="stat-number"><?= $rejected_count ?? 0 ?></h3>
                     </div>
                 </div>
             </div>
@@ -65,14 +65,14 @@ ob_start();
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                     <span>Pending</span>
-                    <span class="tab-badge"><?= $pending_count ?></span>
+                    <span class="tab-badge"><?= $pending_count ?? 0 ?></span>
                 </button>
                 <button class="tab-btn" onclick="filterKYC('approved')">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span>Approved</span>
-                    <span class="tab-badge"><?= $approved_count ?></span>
+                    <span class="tab-badge"><?= $approved_count ?? 0 ?></span>
                 </button>
                 <button class="tab-btn" onclick="filterKYC('rejected')">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -81,14 +81,14 @@ ob_start();
                         <line x1="9" y1="9" x2="15" y2="15"></line>
                     </svg>
                     <span>Rejected</span>
-                    <span class="tab-badge"><?= $rejected_count ?></span>
+                    <span class="tab-badge"><?= $rejected_count ?? 0 ?></span>
                 </button>
             </div>
         </div>
 
         <!-- KYC List -->
         <div class="kyc-list">
-            <?php if (empty($kyc_verifications)): ?>
+            <?php if (empty($kyc_verifications ?? [])): ?>
                 <div class="empty-state">
                     <div class="empty-icon">
                         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
@@ -100,7 +100,7 @@ ob_start();
                     <p class="empty-desc">No users to review at the moment</p>
                 </div>
             <?php else: ?>
-                <?php foreach ($kyc_verifications as $kyc): ?>
+                <?php foreach (($kyc_verifications ?? []) as $kyc): ?>
                     <div class="kyc-card" data-status="<?= $kyc['status'] ?>">
                         <!-- Card Header -->
                         <div class="kyc-card-header">
@@ -270,7 +270,7 @@ ob_start();
         <h2>Reject KYC Verification</h2>
         <p class="modal-description">Please provide a clear reason for rejecting this verification</p>
         <form id="rejectForm">
-            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
             <input type="hidden" id="rejectKycId" name="kyc_id">
             
             <div class="form-group">

@@ -16,17 +16,17 @@ ob_start();
             
             <!-- Progress Steps -->
             <div class="progress-steps">
-                <div class="step <?= ($kyc_status === 'approved' || $kyc_status === 'pending' || $kyc_status === 'rejected') ? 'active' : '' ?>" data-step="1">
+                <div class="step <?= (($kyc_status ?? '') === 'approved' || ($kyc_status ?? '') === 'pending' || ($kyc_status ?? '') === 'rejected') ? 'active' : '' ?>" data-step="1">
                     <span>1</span>
                     <p>Personal Info</p>
                 </div>
                 <div class="step-line"></div>
-                <div class="step <?= ($kyc_status === 'approved' || $kyc_status === 'pending') ? 'active' : '' ?>" data-step="2">
+                <div class="step <?= (($kyc_status ?? '') === 'approved' || ($kyc_status ?? '') === 'pending') ? 'active' : '' ?>" data-step="2">
                     <span>2</span>
                     <p>Documents</p>
                 </div>
                 <div class="step-line"></div>
-                <div class="step <?= ($kyc_status === 'approved') ? 'active' : '' ?>" data-step="3">
+                <div class="step <?= (($kyc_status ?? '') === 'approved') ? 'active' : '' ?>" data-step="3">
                     <span>3</span>
                     <p>Submit</p>
                 </div>
@@ -34,7 +34,7 @@ ob_start();
         </div>
 
         <!-- Status Alerts -->
-        <?php if ($kyc_status === 'rejected'): ?>
+        <?php if (($kyc_status ?? '') === 'rejected'): ?>
             <div class="alert-card alert-danger-enhanced">
                 <div class="alert-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -43,11 +43,11 @@ ob_start();
                 </div>
                 <div class="alert-content">
                     <h3>Verification Rejected</h3>
-                    <p><?= htmlspecialchars($kyc_rejection_reason) ?></p>
+                    <p><?= htmlspecialchars($kyc_rejection_reason ?? 'No reason provided') ?></p>
                     <small>Please review the requirements below and resubmit with correct documents.</small>
                 </div>
             </div>
-        <?php elseif ($kyc_status === 'pending'): ?>
+        <?php elseif (($kyc_status ?? '') === 'pending'): ?>
             <div class="alert-card alert-warning-enhanced">
                 <div class="alert-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -63,7 +63,7 @@ ob_start();
         <?php endif; ?>
 
         <!-- Main Content -->
-        <?php if ($kyc_status === 'approved'): ?>
+        <?php if (($kyc_status ?? '') === 'approved'): ?>
             <div class="verification-complete-container" style="text-align: center; padding: 60px 20px; background: #112236; border-radius: 16px; border: 1px solid #00d4aa; margin-top: 30px;">
                 <div class="verified-icon" style="font-size: 64px; color: #00d4aa; margin-bottom: 20px;">✔️</div>
                 <h2 style="color: #ffffff; font-size: 28px; margin-bottom: 10px;">KYC VERIFIED ✔️</h2>
@@ -78,7 +78,7 @@ ob_start();
                     </h2>
                     
                     <form id="kycForm" enctype="multipart/form-data">
-                        <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                        <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
 
                         <!-- Personal Information Section -->
                         <div class="form-section">
