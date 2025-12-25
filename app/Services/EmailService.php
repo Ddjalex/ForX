@@ -44,6 +44,7 @@ class EmailService
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'accept: application/json',
             'api-key: ' . self::$apiKey,
@@ -126,6 +127,7 @@ class EmailService
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'accept: application/json',
             'api-key: ' . self::$apiKey,
@@ -140,7 +142,7 @@ class EmailService
             return true;
         }
 
-        error_log('Brevo API error: ' . $response);
+        error_log('Brevo API error (' . $httpCode . '): ' . $response);
         return false;
     }
 

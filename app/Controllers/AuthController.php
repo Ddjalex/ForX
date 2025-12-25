@@ -211,6 +211,10 @@ class AuthController
 
         $emailSent = EmailService::sendVerificationCode($email, $name, $verificationCode);
         
+        if (!$emailSent) {
+             error_log("CRITICAL: Failed to send initial registration email to $email");
+        }
+        
         Router::redirect('/verify-email?email=' . urlencode($email));
     }
 
