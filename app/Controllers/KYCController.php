@@ -134,6 +134,11 @@ class KYCController
 
     public function approveKyc($kycId): void
     {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Router::json(['success' => false, 'error' => 'CSRF token invalid'], 403);
+            return;
+        }
+
         $admin = Auth::user();
         if (!$admin || !in_array($admin['role'], ['admin', 'moderator'])) {
             Router::json(['success' => false, 'error' => 'Unauthorized'], 403);

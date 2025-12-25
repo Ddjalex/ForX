@@ -47,10 +47,10 @@ if (!function_exists('t')) {
                         <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['name'] ?? 'User') ?>&background=00D4AA&color=0a1628" alt="User">
                     <?php endif; ?>
                 </div>
-                    <div class="sidebar-user-info">
-                        <span class="sidebar-user-name" style="display: block; font-weight: 600;"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
-                        <span class="sidebar-user-status" style="font-size: 11px; opacity: 0.8;"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? t('verified') : t('not_verified') ?></span>
-                    </div>
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
+                    <span class="sidebar-user-status"><?= ($user['kyc_status'] ?? 'pending') === 'approved' ? t('verified') : t('not_verified') ?></span>
+                </div>
             </div>
             <button class="sidebar-close" id="sidebarClose">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
