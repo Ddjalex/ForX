@@ -1081,10 +1081,9 @@ function updateAssetNames() {
     
     if (firstVisible) {
         assetNameSelect.value = firstVisible.value;
+        // Trigger change event to ensure all sync happens
+        assetNameSelect.dispatchEvent(new Event('change', { bubbles: true }));
     }
-    
-    updateMarketInfo();
-    updateTradingViewChart();
 }
 
 function initTradingViewChart() {
@@ -1141,10 +1140,10 @@ function updateMarketInfo() {
     if (!assetNameSelect) return;
     
     const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
-    if (!selectedOption) return;
+    if (!selectedOption || selectedOption.style.display === 'none') return;
     
-    const assetTypeRaw = selectedOption.getAttribute('data-type') || 'crypto';
     const assetTypeSelect = document.getElementById('assetType');
+    const assetTypeRaw = assetTypeSelect ? assetTypeSelect.value : (selectedOption.getAttribute('data-type') || 'crypto');
     const assetType = assetTypeSelect ? assetTypeSelect.options[assetTypeSelect.selectedIndex].text : capitalizeAssetType(assetTypeRaw);
     const assetName = selectedOption.getAttribute('data-display') || selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
     const assetPriceRaw = selectedOption.getAttribute('data-price') || '0';
@@ -1264,13 +1263,14 @@ function setLeverageFromSlider(value) {
     const numValue = parseFloat(value);
     const leverageValueEl = document.getElementById('leverageValue');
     const displayEl = document.getElementById('leverageDisplay');
+    const roundedValue = Math.round(numValue);
     
-    if (leverageValueEl) leverageValueEl.value = numValue;
-    if (displayEl) displayEl.textContent = numValue.toFixed(1) + 'x';
+    if (leverageValueEl) leverageValueEl.value = roundedValue;
+    if (displayEl) displayEl.textContent = roundedValue + 'x';
     
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         const btnValue = parseInt(btn.dataset.leverage);
-        if (btnValue === Math.round(numValue)) {
+        if (btnValue === roundedValue) {
             btn.classList.add('active');
         } else {
             btn.classList.remove('active');
