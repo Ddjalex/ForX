@@ -23,6 +23,10 @@ class NotificationController
         $notifications = NotificationService::getUnreadNotifications($userId, 10);
         $unreadCount = NotificationService::getUnreadCount($userId);
 
+        foreach ($notifications as &$n) {
+            $n['time_ago'] = NotificationService::timeAgo($n['created_at']);
+        }
+
         echo json_encode([
             'success' => true,
             'count' => $unreadCount,
@@ -42,6 +46,10 @@ class NotificationController
 
         $userId = Auth::id();
         $notifications = NotificationService::getNotifications($userId, 20);
+
+        foreach ($notifications as &$n) {
+            $n['time_ago'] = NotificationService::timeAgo($n['created_at']);
+        }
 
         echo json_encode([
             'success' => true,

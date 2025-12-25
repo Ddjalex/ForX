@@ -1,255 +1,114 @@
-class NotificationManager {
-    constructor() {
-        this.pollInterval = 5000; // Poll every 5 seconds
-        this.notificationBell = document.getElementById('notification-bell');
-        this.notificationPanel = document.getElementById('notification-panel');
-        this.notificationList = document.getElementById('notification-list');
-        this.notificationBadge = document.getElementById('notification-badge');
-        this.closeBtn = document.getElementById('close-notifications');
-        this.clearBtn = document.getElementById('clear-notifications');
-        this.deleteAllBtn = document.getElementById('delete-all-notifications');
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const notificationClose = document.getElementById('notificationClose');
+    const notificationBackdrop = document.getElementById('notificationBackdrop');
+    const notificationList = document.getElementById('notificationList');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
 
-        this.setupEventListeners();
-        this.startPolling();
-    }
+    if (!notificationBtn) return;
 
-    setupEventListeners() {
-        this.notificationBell?.addEventListener('click', () => this.togglePanel());
-        this.closeBtn?.addEventListener('click', () => this.closePanel());
-        this.clearBtn?.addEventListener('click', () => this.markAllAsRead());
-        this.deleteAllBtn?.addEventListener('click', () => this.deleteAll());
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.notification-container')) {
-                this.closePanel();
-            }
-        });
-    }
-
-    togglePanel() {
-        if (this.notificationPanel.style.display === 'flex') {
-            this.closePanel();
-        } else {
-            this.openPanel();
+    function togglePanel() {
+        const isVisible = notificationPanel.style.display === 'block';
+        notificationPanel.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible) {
+            fetchNotifications();
         }
     }
 
-    openPanel() {
-        this.notificationPanel.style.display = 'flex';
-        this.loadNotifications();
-    }
+    notificationBtn.addEventListener('click', togglePanel);
+    notificationClose?.addEventListener('click', togglePanel);
+    notificationBackdrop?.addEventListener('click', togglePanel);
 
-    closePanel() {
-        this.notificationPanel.style.display = 'none';
-    }
-
-    startPolling() {
-        this.loadUnreadCount();
-        setInterval(() => this.loadUnreadCount(), this.pollInterval);
-    }
-
-    async loadUnreadCount() {
-        try {
-            const response = await fetch('/api/notifications/unread');
-            const data = await response.json();
-
-            if (data.success) {
-                this.updateBadge(data.count);
-            }
-        } catch (error) {
-            console.error('Error loading unread count:', error);
-        }
-    }
-
-    async loadNotifications() {
+    async function fetchNotifications() {
         try {
             const response = await fetch('/api/notifications');
             const data = await response.json();
-
             if (data.success) {
-                this.renderNotifications(data.notifications);
+                renderNotifications(data.notifications);
+                updateBadge(data.notifications.filter(n => !n.is_read).length);
             }
         } catch (error) {
-            console.error('Error loading notifications:', error);
-            this.notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Error loading notifications</div>';
+            console.error('Error fetching notifications:', error);
+            notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Error loading notifications</div>';
         }
     }
 
-    renderNotifications(notifications) {
+    function renderNotifications(notifications) {
         if (!notifications || notifications.length === 0) {
-            this.notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">No notifications yet</div>';
+            notificationList.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">No notifications yet</div>';
             return;
         }
 
-        const html = notifications.map(notif => this.createNotificationHTML(notif)).join('');
-        this.notificationList.innerHTML = html;
-
-        // Add click handlers
-        this.notificationList.querySelectorAll('.notification-item').forEach(item => {
-            const notifId = item.dataset.id;
-            item.addEventListener('click', () => {
-                this.handleNotificationClick(notifId, item.dataset.url);
-            });
-        });
-
-        // Add delete handlers
-        this.notificationList.querySelectorAll('.notification-delete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.deleteNotification(btn.dataset.id);
-            });
-        });
-    }
-
-    createNotificationHTML(notif) {
-        const isUnread = !notif.is_read;
-        const time = this.formatTime(notif.created_at);
-        const iconMap = {
-            'check-circle': '✓',
-            'x-circle': '✕',
-            'gift': '🎁',
-            'eye': '👁️',
-            'arrow-down': '⬇️',
-            'newspaper': '📰',
-            'star': '⭐',
-            'image': '🖼️',
-            'credit-card': '💳',
-            'alert-circle': '⚠️',
-            'trending-up': '📈',
-            'bell': '🔔'
-        };
-        const icon = iconMap[notif.icon] || '🔔';
-
-        return `
-            <div class="notification-item ${isUnread ? 'unread' : ''}" data-id="${notif.id}" data-url="${notif.action_url || '#'}">
-                <div class="notification-item-header">
-                    <span style="font-size: 1.2rem; margin-right: 8px;">${icon}</span>
-                    <div style="flex: 1;">
-                        <h5 class="notification-item-title">${this.escapeHtml(notif.title)}</h5>
-                    </div>
-                    <button type="button" class="notification-delete" data-id="${notif.id}" style="
-                        background: none;
-                        border: none;
-                        color: #666;
-                        cursor: pointer;
-                        font-size: 1rem;
-                    ">×</button>
+        notificationList.innerHTML = notifications.map(n => `
+            <div class="notification-item ${!n.is_read ? 'unread' : ''}" onclick="markAsRead(${n.id}, '${n.action_url || '#'}')">
+                <div class="notification-item-icon ${n.type}">
+                    ${getIcon(n.icon)}
                 </div>
-                <p class="notification-item-message">${this.escapeHtml(notif.message)}</p>
-                <div class="notification-item-time">${time}</div>
+                <div class="notification-item-content">
+                    <div class="notification-item-title">${n.title}</div>
+                    <div class="notification-item-message">${n.message}</div>
+                    <div class="notification-item-time">${n.time_ago}</div>
+                </div>
             </div>
-        `;
+        `).join('');
     }
 
-    async handleNotificationClick(notifId, url) {
-        await this.markAsRead(notifId);
-        if (url && url !== '#') {
-            window.location.href = url;
-        }
+    function getIcon(iconName) {
+        // Simple icon mapper
+        const icons = {
+            'check-circle': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            'x-circle': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+            'newspaper': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path></svg>',
+            'trending-up': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>'
+        };
+        return icons[iconName] || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path></svg>';
     }
 
-    async markAsRead(notifId) {
+    window.markAsRead = async function(id, url) {
         try {
             await fetch('/api/notifications/read', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ notification_id: notifId })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `notification_id=${id}`
             });
-            this.loadUnreadCount();
+            if (url && url !== '#') window.location.href = url;
+            else fetchNotifications();
         } catch (error) {
-            console.error('Error marking notification as read:', error);
+            console.error('Error marking as read:', error);
         }
-    }
+    };
 
-    async markAllAsRead() {
+    markAllReadBtn?.addEventListener('click', async () => {
         try {
-            await fetch('/api/notifications/read-all', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            this.loadNotifications();
-            this.loadUnreadCount();
+            await fetch('/api/notifications/read-all', { method: 'POST' });
+            fetchNotifications();
         } catch (error) {
             console.error('Error marking all as read:', error);
         }
-    }
+    });
 
-    async deleteNotification(notifId) {
-        try {
-            await fetch('/api/notifications/delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ notification_id: notifId })
-            });
-            this.loadNotifications();
-            this.loadUnreadCount();
-        } catch (error) {
-            console.error('Error deleting notification:', error);
-        }
-    }
-
-    async deleteAll() {
-        if (!confirm('Delete all notifications?')) return;
-
-        try {
-            await fetch('/api/notifications/delete-all', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            this.loadNotifications();
-            this.loadUnreadCount();
-        } catch (error) {
-            console.error('Error deleting all notifications:', error);
-        }
-    }
-
-    updateBadge(count) {
+    function updateBadge(count) {
         if (count > 0) {
-            this.notificationBadge.textContent = count > 9 ? '9+' : count;
-            this.notificationBadge.style.display = 'flex';
+            notificationBadge.textContent = count;
+            notificationBadge.style.display = 'block';
         } else {
-            this.notificationBadge.style.display = 'none';
+            notificationBadge.style.display = 'none';
         }
     }
 
-    formatTime(timestamp) {
-        const date = new Date(timestamp);
-        const now = new Date();
-        const diff = now - date;
-
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-
-        return date.toLocaleDateString();
+    // Initial unread count poll
+    async function pollUnread() {
+        try {
+            const response = await fetch('/api/notifications/unread');
+            const data = await response.json();
+            if (data.success) {
+                updateBadge(data.count);
+            }
+        } catch (e) {}
     }
-
-    escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
-}
-
-// Initialize notification manager when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new NotificationManager();
+    
+    pollUnread();
+    setInterval(pollUnread, 30000);
 });
