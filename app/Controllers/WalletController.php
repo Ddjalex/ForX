@@ -46,8 +46,11 @@ class WalletController
             }
         }
         
+        $networks = Database::fetchAll("SELECT * FROM deposit_networks WHERE status = 'active' ORDER BY name ASC");
+        
         echo Router::render('user/deposit', [
             'settings' => $settings,
+            'networks' => $networks,
             'csrf_token' => Session::generateCsrfToken(),
             'error' => Session::getFlash('error'),
             'success' => Session::getFlash('success'),
