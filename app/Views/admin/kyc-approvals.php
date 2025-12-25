@@ -165,7 +165,11 @@ ob_start();
                                     <div class="doc-item">
                                         <div class="doc-preview">
                                             <?php
-                                            $imagePath = strpos($doc['file_path'], 'http') === 0 ? $doc['file_path'] : $doc['file_path'];
+                                            $imagePath = $doc['file_path'];
+                                            // Ensure the path is correct for the web server
+                                            if (strpos($imagePath, '/') !== 0 && strpos($imagePath, 'http') !== 0) {
+                                                $imagePath = '/' . $imagePath;
+                                            }
                                             ?>
                                             <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= $doc['document_type'] ?>" onclick="showDocumentModal('<?= htmlspecialchars($imagePath) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%22200%22 y=%22150%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EImage Not Found%3C/text%3E%3C/svg%3E'">
                                             <div class="doc-overlay">

@@ -1019,7 +1019,14 @@ async function submitKYC(e) {
             body: formData
         });
 
-        const data = await response.json();
+        let data;
+        const text = await response.text();
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Server response:', text);
+            throw new Error('Invalid server response');
+        }
 
         if (data.success) {
             showNotification('Verification submitted successfully! Admin will review within 24 hours.', 'success');
