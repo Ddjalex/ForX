@@ -54,7 +54,7 @@ if (!function_exists('t')) {
         .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #8899a6 !important; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
         .sidebar-nav a:hover { background: rgba(0, 212, 170, 0.05); color: #fff !important; }
         .sidebar-nav a.active { background: rgba(0, 212, 170, 0.1); color: var(--primary) !important; }
-        .sidebar-nav svg { color: inherit; flex-shrink: 0; }
+        .sidebar-nav a svg { color: inherit !important; flex-shrink: 0; display: inline-block !important; visibility: visible !important; opacity: 1 !important; }
         
         .sidebar-dropdown { margin: 4px 12px; }
         .sidebar-dropdown-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; color: #8899a6; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
