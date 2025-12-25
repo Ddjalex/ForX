@@ -7,8 +7,8 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-// app/, routes/, config/ are inside public_html (ROOT_PATH = current directory)
-define('ROOT_PATH', __DIR__);
+// ROOT_PATH points to the project root (parent of public)
+define('ROOT_PATH', dirname(__DIR__));
 
 // Create logs directory
 @mkdir(ROOT_PATH . '/storage/logs', 0755, true);
