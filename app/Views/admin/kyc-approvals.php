@@ -1028,7 +1028,7 @@ async function approveKYC(kycId) {
             data = JSON.parse(cleanText);
         } catch (e) {
             console.error('Server response:', text);
-            if (cleanText.includes('"success":true')) {
+            if (cleanText.indexOf('"success":true') !== -1) {
                 data = { success: true };
             } else {
                 throw new Error('Invalid server response');
@@ -1074,7 +1074,7 @@ document.getElementById('rejectForm')?.addEventListener('submit', async (e) => {
             data = JSON.parse(cleanText);
         } catch (e) {
             console.error('Server response:', text);
-            if (cleanText.includes('"success":true')) {
+            if (cleanText.indexOf('"success":true') !== -1) {
                 data = { success: true };
             } else {
                 throw new Error('Invalid server response');

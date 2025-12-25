@@ -1032,8 +1032,8 @@ async function submitKYC(e) {
             data = JSON.parse(cleanText);
         } catch (e) {
             console.error('Server response:', text);
-            // Even if JSON fails, if the text indicates success, treat it as such
-            if (cleanText.includes('"success":true')) {
+            // Handle cases where PHP might output extra whitespace/warnings
+            if (cleanText.indexOf('"success":true') !== -1) {
                 data = { success: true };
             } else {
                 throw new Error('Invalid server response');
