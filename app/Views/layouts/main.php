@@ -28,6 +28,7 @@ if (!function_exists('t')) {
     <script src="/assets/js/notifications.js" defer></script>
     <style>
         .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow-y: auto; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); }
+        .sidebar-header { position: sticky; top: 0; background: #0a1628; z-index: 10; padding: 20px; border-bottom: 1px solid rgba(0, 212, 170, 0.1); }
         .main-content { margin-left: 260px; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; }
         .top-header { position: fixed; top: 0; left: 260px; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); }
         .header-controls { position: fixed; top: 0; right: 0; height: 70px; display: flex; align-items: center; padding: 0 20px; z-index: 10001; }
@@ -39,6 +40,7 @@ if (!function_exists('t')) {
             .sidebar.active { transform: translateX(0); }
         }
         .notification-panel { position: fixed !important; right: 20px !important; top: 70px !important; }
+        .sidebar-nav-scroll { height: calc(100vh - 120px); overflow-y: auto; }
     </style>
 </head>
 <body>
