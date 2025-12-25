@@ -68,7 +68,7 @@ class AuthController
             $user = Database::fetch("SELECT id, name, email_verified FROM users WHERE email = ?", [$email]);
             if ($user && $user['email_verified']) {
                 // User is EMAIL verified in database, force login
-                Auth::login($user['id']);
+                Auth::login($user);
                 RateLimiter::clear($rateLimitKey);
                 AuditLog::log('login', 'user', $user['id']);
                 
