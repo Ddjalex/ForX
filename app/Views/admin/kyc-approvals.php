@@ -1014,10 +1014,20 @@ async function approveKYC(kycId) {
 
     try {
         const response = await fetch(`/admin/kyc/approve/${kycId}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
 
-        const data = await response.json();
+        let data;
+        const text = await response.text();
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Server response:', text);
+            throw new Error('Invalid server response');
+        }
 
         if (data.success) {
             showNotification('KYC approved successfully', 'success');
@@ -1027,7 +1037,7 @@ async function approveKYC(kycId) {
         }
     } catch (error) {
         console.error('Error:', error);
-        showNotification('An error occurred', 'error');
+        showNotification('An error occurred: ' + error.message, 'error');
     }
 }
 
@@ -1044,10 +1054,20 @@ document.getElementById('rejectForm')?.addEventListener('submit', async (e) => {
 
         const response = await fetch(`/admin/kyc/reject/${kycId}`, {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
 
-        const data = await response.json();
+        let data;
+        const text = await response.text();
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Server response:', text);
+            throw new Error('Invalid server response');
+        }
 
         if (data.success) {
             showNotification('KYC rejected successfully', 'success');
@@ -1059,7 +1079,7 @@ document.getElementById('rejectForm')?.addEventListener('submit', async (e) => {
         }
     } catch (error) {
         console.error('Error:', error);
-        showNotification('An error occurred', 'error');
+        showNotification('An error occurred: ' + error.message, 'error');
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
     }

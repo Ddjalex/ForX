@@ -159,6 +159,11 @@ class KYCController
             'kyc_verified' => 'true',
         ], 'id = ?', [$kyc['user_id']]);
 
+        // Also update users table status if needed
+        Database::update('users', [
+            'kyc_verified' => true
+        ], 'id = ?', [$kyc['user_id']]);
+
         // Send notification
         NotificationService::create($kyc['user_id'], 'KYC Approved', 'Your KYC verification has been approved! You can now access all features.', 'kyc', $kycId);
 
