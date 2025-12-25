@@ -27,9 +27,16 @@ if (!function_exists('t')) {
     <script src="/assets/js/tradingview-market-data.js" defer></script>
     <script src="/assets/js/notifications.js" defer></script>
     <style>
-        .sidebar { position: fixed; height: 100vh; overflow-y: auto; }
-        .main-content { margin-left: 260px; }
-        @media (max-width: 768px) { .main-content { margin-left: 0; } }
+        .sidebar { position: fixed; height: 100vh; overflow-y: auto; z-index: 10002; }
+        .main-content { margin-left: 260px; padding-top: 70px; }
+        .top-header { position: fixed; top: 0; left: 260px; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); }
+        .header-controls { position: fixed; top: 0; right: 0; height: 70px; display: flex; align-items: center; padding: 0 20px; z-index: 10001; }
+        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; }
+        @media (max-width: 768px) { 
+            .main-content { margin-left: 0; }
+            .top-header { left: 0; }
+        }
+        .notification-panel { position: fixed !important; right: 20px !important; top: 70px !important; }
     </style>
 </head>
 <body>
