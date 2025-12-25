@@ -149,9 +149,9 @@ ob_start();
             <div style="background: rgba(100, 116, 139, 0.15); border: 1px solid rgba(100, 116, 139, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
                 <h5 style="margin: 0 0 12px 0; color: var(--text-primary);">Quick Guide:</h5>
                 <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
-                    <li><span style="color: #00C853;">Positive % (1-100):</span> Users profit MORE on wins, lose LESS on losses</li>
+                    <li><span style="color: #00C853;">Positive % (1-100):</span> Users profit MORE on wins, lose MORE on losses</li>
                     <li><span style="color: #666;">0%:</span> No adjustment - natural market results</li>
-                    <li><span style="color: #FF4757;">Negative % (-10 to 0):</span> Users profit LESS on wins, lose MORE on losses</li>
+                    <li><span style="color: #FF4757;">Negative % (-10 to 0):</span> Users profit LESS on wins, lose LESS on losses</li>
                 </ul>
             </div>
             
