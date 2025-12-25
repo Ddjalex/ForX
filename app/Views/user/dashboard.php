@@ -42,8 +42,8 @@ $mockNotifications = [
                 <div class="stat-value" id="dashboardTotalBalanceValue">$<?= number_format($totalBalance, 2) ?></div>
                 <div class="stat-label"><?= t('total_balance') ?></div>
             </div>
-            <button class="icon-btn" onclick="toggleBalanceVisibility('dashboard')" style="padding: 8px; align-self: flex-start; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="dashboardBalanceEyeIcon">
+            <button class="icon-btn" onclick="toggleBalanceVisibility('dashboard')" style="padding: 8px; align-self: flex-start; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; z-index: 10;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="dashboardBalanceEyeIcon" style="pointer-events: none;">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
                 </svg>
@@ -113,8 +113,8 @@ $mockNotifications = [
             </h3>
             <div class="card-actions">
                 <span class="balance-display"><?= t('balance') ?>: <strong id="dashboardLiveTradeBalanceValue">$<?= number_format($totalBalance, 2) ?></strong></span>
-                <button class="icon-btn" onclick="event.stopPropagation(); toggleBalanceVisibility('liveTrading')" style="padding: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-left: 8px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="liveTradeBalanceEyeIcon">
+                <button class="icon-btn" onclick="event.stopPropagation(); toggleBalanceVisibility('liveTrading')" style="padding: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-left: 8px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; z-index: 10;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="liveTradeBalanceEyeIcon" style="pointer-events: none;">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
