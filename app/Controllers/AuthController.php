@@ -64,8 +64,23 @@ class AuthController
         $result = Auth::attempt($email, $password);
         
         if ($result === 'unverified') {
-            $user = Database::fetch("SELECT name FROM users WHERE email = ?", [$email]);
+            $user = Database::fetch("SELECT id, name, email_verified FROM users WHERE email = ?", [$email]);
             if ($user) {
+                // If the user is actually verified in the database, but session/auth says unverified,
+                // we should trust the database and log them in.
+                if ($user['email_verified']) {
+                    Auth::login($user['id']);
+                    RateLimiter::clear($rateLimitKey);
+                    AuditLog::log('login', 'user', $user['id']);
+                    
+                    if (Auth::isAdmin()) {
+                        Router::redirect('/admin');
+                    } else {
+                        Router::redirect('/dashboard');
+                    }
+                    return;
+                }
+
                 $verificationCode = EmailService::generateVerificationCode();
                 $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
                 
