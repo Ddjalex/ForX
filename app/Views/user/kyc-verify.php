@@ -639,9 +639,21 @@ select.form-control {
 }
 
 select.form-control option {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    padding: 10px;
+    background: #1e3a5f;
+    color: #ffffff;
+    padding: 12px 10px;
+    line-height: 1.5;
+}
+
+select.form-control option:checked {
+    background: linear-gradient(#00d4aa, #00d4aa);
+    background-color: #00d4aa;
+    color: #000;
+}
+
+select.form-control option:hover {
+    background: #2a4a7f;
+    color: #ffffff;
 }
 
 /* Document Upload */
