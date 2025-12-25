@@ -65,7 +65,7 @@ class AuthController
         
         // If Auth service says unverified, double check the database directly for EMAIL verification
         if ($result === 'unverified' || $result === true) {
-            $user = Database::fetch("SELECT id, name, email_verified FROM users WHERE email = ?", [$email]);
+            $user = Database::fetch("SELECT id, email, name, email_verified, role FROM users WHERE email = ?", [$email]);
             if ($user && $user['email_verified']) {
                 // User is EMAIL verified in database, force login
                 Auth::login($user);
