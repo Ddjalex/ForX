@@ -1016,21 +1016,35 @@ async function submitKYC(e) {
 
         const response = await fetch('/kyc/submit', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
 
         let data;
         const text = await response.text();
+        
+        // Clean up text in case there's accidental whitespace or PHP warnings
+        const cleanText = text.trim();
+        
         try {
-            data = JSON.parse(text);
+            data = JSON.parse(cleanText);
         } catch (e) {
             console.error('Server response:', text);
-            throw new Error('Invalid server response');
+            // Even if JSON fails, if the text indicates success, treat it as such
+            if (cleanText.includes('"success":true')) {
+                data = { success: true };
+            } else {
+                throw new Error('Invalid server response');
+            }
         }
 
         if (data.success) {
             showNotification('Verification submitted successfully! Admin will review within 24 hours.', 'success');
-            setTimeout(() => window.location.reload(), 2000);
+            setTimeout(() => {
+                window.location.href = '/kyc/verify';
+            }, 2000);
         } else {
             showNotification(data.error || 'Submission failed', 'error');
             submitBtn.disabled = false;

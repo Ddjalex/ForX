@@ -1022,11 +1022,17 @@ async function approveKYC(kycId) {
 
         let data;
         const text = await response.text();
+        const cleanText = text.trim();
+
         try {
-            data = JSON.parse(text);
+            data = JSON.parse(cleanText);
         } catch (e) {
             console.error('Server response:', text);
-            throw new Error('Invalid server response');
+            if (cleanText.includes('"success":true')) {
+                data = { success: true };
+            } else {
+                throw new Error('Invalid server response');
+            }
         }
 
         if (data.success) {
@@ -1062,11 +1068,17 @@ document.getElementById('rejectForm')?.addEventListener('submit', async (e) => {
 
         let data;
         const text = await response.text();
+        const cleanText = text.trim();
+
         try {
-            data = JSON.parse(text);
+            data = JSON.parse(cleanText);
         } catch (e) {
             console.error('Server response:', text);
-            throw new Error('Invalid server response');
+            if (cleanText.includes('"success":true')) {
+                data = { success: true };
+            } else {
+                throw new Error('Invalid server response');
+            }
         }
 
         if (data.success) {
