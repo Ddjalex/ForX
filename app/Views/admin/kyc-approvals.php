@@ -163,19 +163,20 @@ ob_start();
                             <div class="doc-grid">
                                 <?php foreach ($kyc['documents'] as $doc): ?>
                                     <div class="doc-item">
-                                        <div class="doc-preview">
+                                        <div class="doc-preview" style="aspect-ratio: auto; height: auto; min-height: 400px;">
                                             <?php
                                             $imagePath = $doc['file_path'];
                                             if (strpos($imagePath, 'http') !== 0) {
-                                                // Handle standard cPanel deployment paths
-                                                // If it starts with /public, remove it as it's served from public_html
                                                 $imagePath = str_replace(['/public/', 'public/'], '/', $imagePath);
                                                 if (strpos($imagePath, '/') !== 0) {
                                                     $imagePath = '/' . $imagePath;
                                                 }
                                             }
                                             ?>
-                                            <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= $doc['document_type'] ?>" onclick="showDocumentModal('<?= htmlspecialchars($imagePath) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%22200%22 y=%22150%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EImage Not Found%3C/text%3E%3C/svg%3E'">
+                                            <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= $doc['document_type'] ?>" 
+                                                 style="object-fit: contain; width: 100%; height: auto; max-height: 600px;"
+                                                 onclick="showDocumentModal('<?= htmlspecialchars($imagePath) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')" 
+                                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%22200%22 y=%22150%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EImage Not Found%3C/text%3E%3C/svg%3E'">
                                             <div class="doc-overlay">
                                                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
