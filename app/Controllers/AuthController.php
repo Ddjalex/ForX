@@ -64,7 +64,7 @@ class AuthController
         $result = Auth::attempt($email, $password);
         
         // Log the result for debugging
-        error_log("Login attempt for $email: " . (is_bool($result) ? ($result ? 'true' : 'false') : $result));
+        error_log("DEBUG: Login result for $email: " . (is_bool($result) ? ($result ? 'true' : 'false') : $result));
 
         if ($result === true) {
             RateLimiter::clear($rateLimitKey);
