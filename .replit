@@ -40,9 +40,9 @@ waitForPort = 5000
 [userenv]
 
 [userenv.shared]
-BREVO_SENDER_EMAIL = "noreply@alphacoremarkets.com"
+BREVO_SENDER_EMAIL = "almesagadw@gmail.com"
 BREVO_SENDER_NAME = "Alpha Core Markets"
-BREVO_API_KEY = "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"
+BREVO_API_KEY = "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"
 COINGECKO_API_KEY = "CG-WSd513UKp8XTr3JTgrbRhwgs"
 
 [[ports]]
