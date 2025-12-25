@@ -1,4 +1,6 @@
 <?php
+ob_start();
+
 if (!isset($settings)) $settings = [];
 if (!isset($depositNetworks)) $depositNetworks = [];
 if (!isset($csrf_token)) $csrf_token = '';
