@@ -243,6 +243,14 @@ class AuthController
             return;
         }
 
+        // FIX: If the user is already verified, don't show the verification page, redirect to login
+        $user = Database::fetch("SELECT id, email_verified FROM users WHERE email = ?", [$email]);
+        if ($user && $user['email_verified']) {
+            Session::flash('success', 'Your email is already verified. Please login.');
+            Router::redirect('/login?email=' . urlencode($email));
+            return;
+        }
+
         echo Router::render('auth/verify-email', [
             'csrf_token' => Session::generateCsrfToken(),
             'email' => $email,
