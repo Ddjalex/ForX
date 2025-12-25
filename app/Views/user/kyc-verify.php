@@ -844,6 +844,8 @@ select.form-control option:hover {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
+    position: relative;
+    z-index: 5;
 }
 
 .btn {
@@ -857,6 +859,8 @@ select.form-control option:hover {
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    position: relative;
+    z-index: 5;
 }
 
 .btn-primary {
@@ -879,10 +883,12 @@ select.form-control option:hover {
 }
 
 .btn-submit {
+    display: flex;
     width: 100%;
     justify-content: center;
     font-size: 16px;
     padding: 16px;
+    box-sizing: border-box;
 }
 
 .form-note {
