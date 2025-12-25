@@ -63,25 +63,24 @@ class AuthController
 
         $result = Auth::attempt($email, $password);
         
-        // If Auth service says unverified, double check the database directly for EMAIL verification
-        if ($result === 'unverified' || $result === true) {
-            $user = Database::fetch("SELECT id, email, name, email_verified, role FROM users WHERE email = ?", [$email]);
-            if ($user && $user['email_verified']) {
-                // User is EMAIL verified in database, force login
-                Auth::login($user);
-                RateLimiter::clear($rateLimitKey);
-                AuditLog::log('login', 'user', $user['id']);
-                
-                if (Auth::isAdmin()) {
-                    Router::redirect('/admin');
-                } else {
-                    Router::redirect('/dashboard');
-                }
-                return;
-            }
+        // Log the result for debugging
+        error_log("Login attempt for $email: " . (is_bool($result) ? ($result ? 'true' : 'false') : $result));
+
+        if ($result === true) {
+            RateLimiter::clear($rateLimitKey);
+            AuditLog::log('login', 'user', Auth::id());
             
-            // If they really are EMAIL unverified, show the registration verification prompt
-            if ($result === 'unverified') {
+            if (Auth::isAdmin()) {
+                Router::redirect('/admin');
+            } else {
+                Router::redirect('/dashboard');
+            }
+            return;
+        }
+
+        if ($result === 'unverified') {
+            $user = Database::fetch("SELECT id, email, name, email_verified, role FROM users WHERE email = ?", [$email]);
+            if ($user) {
                 $verificationCode = EmailService::generateVerificationCode();
                 $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
                 
@@ -102,20 +101,9 @@ class AuthController
             }
         }
 
-        if ($result === true) {
-            RateLimiter::clear($rateLimitKey);
-            AuditLog::log('login', 'user', Auth::id());
-            
-            if (Auth::isAdmin()) {
-                Router::redirect('/admin');
-            } else {
-                Router::redirect('/dashboard');
-            }
-        } else {
-            RateLimiter::hit($rateLimitKey);
-            Session::flash('error', 'Invalid email or password.');
-            Router::redirect('/login');
-        }
+        RateLimiter::hit($rateLimitKey);
+        Session::flash('error', 'Invalid email or password.');
+        Router::redirect('/login');
     }
 
     public function showRegister(): void
