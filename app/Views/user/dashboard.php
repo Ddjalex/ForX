@@ -10,22 +10,6 @@ $totalTrades = $stats['total_trades'] ?? 0;
 $openTrades = $stats['open_trades'] ?? 0;
 $closedTrades = $stats['closed_trades'] ?? 0;
 $winLossRatio = $stats['win_loss_ratio'] ?? 0;
-
-// Mock notification data
-$mockNotifications = [
-    ['country' => 'Italy', 'action' => 'withdrawn', 'amount' => 40000],
-    ['country' => 'Mexico', 'action' => 'withdrawn', 'amount' => 4500],
-    ['country' => 'Turkey', 'action' => 'is trading with', 'amount' => 58623],
-    ['country' => 'USA', 'action' => 'withdrawn', 'amount' => 58623],
-    ['country' => 'Switzerland', 'action' => 'withdrawn', 'amount' => 40000],
-    ['country' => 'Spain', 'action' => 'just invested', 'amount' => 52300],
-    ['country' => 'Argentina', 'action' => 'is trading with', 'amount' => 10000],
-    ['country' => 'Panama', 'action' => 'just invested', 'amount' => 4500],
-    ['country' => 'Canada', 'action' => 'deposited', 'amount' => 15000],
-    ['country' => 'Germany', 'action' => 'withdrawn', 'amount' => 32500],
-    ['country' => 'UK', 'action' => 'just invested', 'amount' => 78900],
-    ['country' => 'Australia', 'action' => 'is trading with', 'amount' => 22300],
-];
 ?>
 
 <div id="systemNotification" class="system-notification" style="display: none;">
