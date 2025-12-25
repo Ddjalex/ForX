@@ -566,12 +566,16 @@ ob_start();
 /* Form Group */
 .form-group {
     margin-bottom: 20px;
+    position: relative;
+    z-index: auto;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+    position: relative;
+    z-index: auto;
 }
 
 .form-label {
@@ -590,6 +594,7 @@ ob_start();
     position: relative;
     display: flex;
     align-items: center;
+    z-index: 10;
 }
 
 .input-icon {
@@ -629,6 +634,14 @@ select.form-control {
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 35px;
+    position: relative;
+    z-index: 20;
+}
+
+select.form-control option {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 10px;
 }
 
 /* Document Upload */
