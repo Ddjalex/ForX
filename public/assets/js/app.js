@@ -496,7 +496,7 @@ async function updateWalletBalance() {
     }
 }
 
-function toggleBalanceVisibility(context) {
+window.toggleBalanceVisibility = function(context) {
     const totalBalanceValue = document.getElementById('dashboardTotalBalanceValue');
     const liveTradeBalanceValue = document.getElementById('dashboardLiveTradeBalanceValue');
     const balanceValueEl = document.querySelector('.balance-value');
