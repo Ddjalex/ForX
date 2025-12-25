@@ -11,7 +11,7 @@ ob_start();
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
             </div>
-            <h1>Identity Verification</h1>
+            <h1>Identity Verification (KYC)</h1>
             <p class="subtitle">Secure your account and unlock full trading potential</p>
             
             <!-- Progress Steps -->
@@ -291,9 +291,23 @@ ob_start();
     box-sizing: border-box;
 }
 
+:root {
+    --bg-primary: #0d1b2a;
+    --bg-secondary: #1e3a5f;
+    --bg-tertiary: #2a4a7f;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --accent-primary: #00d4aa;
+    --accent-light: #26f0d9;
+    --border-color: #2d5a8c;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+}
+
 .kyc-wrapper {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(0, 212, 170, 0.05) 0%, rgba(0, 150, 136, 0.02) 100%);
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a2f4a 100%);
     padding: 20px;
 }
 
@@ -324,13 +338,13 @@ ob_start();
     width: 80px;
     height: 80px;
     margin: 0 auto 20px;
-    background: linear-gradient(135deg, var(--accent-primary), #00c9b7);
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #000;
-    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.2);
+    color: var(--bg-primary);
+    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
     animation: float 3s ease-in-out infinite;
 }
 
@@ -344,6 +358,7 @@ ob_start();
     margin: 0 0 10px;
     color: var(--text-primary);
     font-weight: 700;
+    font-family: 'Georgia', serif;
 }
 
 .subtitle {
@@ -389,8 +404,8 @@ ob_start();
 }
 
 .step.active {
-    background: linear-gradient(135deg, var(--accent-primary), #00c9b7);
-    color: #000;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
+    color: var(--bg-primary);
     border-color: var(--accent-primary);
     box-shadow: 0 5px 15px rgba(0, 212, 170, 0.3);
 }
@@ -413,6 +428,7 @@ ob_start();
     margin-bottom: 30px;
     backdrop-filter: blur(10px);
     animation: slideDown 0.6s ease-out 0.1s both;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .alert-icon {
@@ -440,31 +456,31 @@ ob_start();
 }
 
 .alert-danger-enhanced {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.2);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .alert-danger-enhanced .alert-icon {
-    background: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
 }
 
 .alert-danger-enhanced .alert-content {
-    color: #dc3545;
+    color: #ef4444;
 }
 
 .alert-warning-enhanced {
-    background: rgba(255, 193, 7, 0.1);
-    border: 1px solid rgba(255, 193, 7, 0.2);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .alert-warning-enhanced .alert-icon {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
 }
 
 .alert-warning-enhanced .alert-content {
-    color: #ffc107;
+    color: #f59e0b;
 }
 
 .alert-content h3 {
@@ -489,7 +505,7 @@ ob_start();
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.6s ease-out 0.2s both;
 }
 
@@ -511,6 +527,8 @@ ob_start();
     display: flex;
     align-items: center;
     gap: 10px;
+    font-family: 'Georgia', serif;
+    font-weight: 600;
 }
 
 .title-icon {
@@ -536,6 +554,7 @@ ob_start();
     margin: 0 0 8px;
     color: var(--text-primary);
     font-weight: 600;
+    font-family: 'Georgia', serif;
 }
 
 .section-description {
@@ -564,7 +583,7 @@ ob_start();
 }
 
 .required {
-    color: #dc3545;
+    color: var(--danger);
 }
 
 .input-wrapper {
@@ -595,8 +614,8 @@ ob_start();
 .form-control:focus {
     outline: none;
     border-color: var(--accent-primary);
-    background: rgba(0, 212, 170, 0.02);
-    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.08);
+    background: rgba(0, 212, 170, 0.05);
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
 }
 
 .form-control::placeholder {
@@ -647,10 +666,6 @@ select.form-control {
     color: white;
 }
 
-.document-upload-card.uploaded .upload-status-badge svg {
-    transform: scale(1.2);
-}
-
 .doc-label {
     display: block;
     margin-bottom: 12px;
@@ -697,27 +712,10 @@ select.form-control {
     overflow: hidden;
 }
 
-.upload-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(0, 212, 170, 0.05) 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-}
-
 .upload-box:hover {
     border-color: var(--accent-primary);
     background: rgba(0, 212, 170, 0.05);
     box-shadow: 0 5px 15px rgba(0, 212, 170, 0.1);
-}
-
-.upload-box:hover::before {
-    opacity: 1;
 }
 
 .upload-box.drag-over {
@@ -755,8 +753,8 @@ select.form-control {
 
 /* Requirements Section */
 .requirements-section {
-    background: rgba(0, 212, 170, 0.05);
-    border: 1px solid rgba(0, 212, 170, 0.15);
+    background: rgba(0, 212, 170, 0.08);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 25px;
     margin: 30px 0;
@@ -769,6 +767,7 @@ select.form-control {
     align-items: center;
     gap: 10px;
     font-size: 16px;
+    font-family: 'Georgia', serif;
 }
 
 .requirements-grid {
@@ -787,7 +786,7 @@ select.form-control {
     width: 28px;
     height: 28px;
     background: var(--accent-primary);
-    color: #000;
+    color: var(--bg-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -836,8 +835,8 @@ select.form-control {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--accent-primary), #00c9b7);
-    color: #000;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
+    color: var(--bg-primary);
 }
 
 .btn-primary:hover {
@@ -900,7 +899,6 @@ select.form-control {
     }
 }
 
-/* Loading State */
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1014,7 +1012,7 @@ function showNotification(message, type = 'info') {
     notif.id = 'systemNotification';
     notif.className = `notification ${type}`;
     
-    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#dc3545' : '#3b82f6';
+    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
     
     notif.innerHTML = `
         <div class="notification-content" style="
@@ -1044,7 +1042,7 @@ function showNotification(message, type = 'info') {
         padding: 15px 20px;
         border-radius: 8px;
         z-index: 10000;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         animation: slideInRight 0.3s ease-out;
     `;
     
@@ -1055,7 +1053,6 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// Add animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideInRight {

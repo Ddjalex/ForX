@@ -277,8 +277,22 @@ ob_start();
     box-sizing: border-box;
 }
 
+:root {
+    --bg-primary: #0d1b2a;
+    --bg-secondary: #1e3a5f;
+    --bg-tertiary: #2a4a7f;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --accent-primary: #00d4aa;
+    --accent-light: #26f0d9;
+    --border-color: #2d5a8c;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+}
+
 .admin-kyc-wrapper {
-    background: linear-gradient(135deg, rgba(0, 212, 170, 0.03) 0%, rgba(0, 150, 136, 0.01) 100%);
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a2f4a 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -314,6 +328,7 @@ ob_start();
     margin: 0 0 8px;
     color: var(--text-primary);
     font-weight: 700;
+    font-family: 'Georgia', serif;
 }
 
 .header-title p {
@@ -357,8 +372,8 @@ ob_start();
 }
 
 .stat-card.pending .stat-icon {
-    background: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
 }
 
 .stat-card.approved .stat-icon {
@@ -367,8 +382,8 @@ ob_start();
 }
 
 .stat-card.rejected .stat-icon {
-    background: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
 .stat-content {
@@ -388,7 +403,7 @@ ob_start();
     margin: 5px 0 0;
     font-size: 28px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--accent-primary);
 }
 
 /* Tabs Section */
@@ -443,7 +458,7 @@ ob_start();
 
 .tab-btn.active .tab-badge {
     background: var(--accent-primary);
-    color: #000;
+    color: var(--bg-primary);
 }
 
 .tab-btn:hover {
@@ -500,8 +515,8 @@ ob_start();
     width: 56px;
     height: 56px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent-primary), #00c9b7);
-    color: #000;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
+    color: var(--bg-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -554,8 +569,8 @@ ob_start();
 }
 
 .status-badge[data-status="pending"] {
-    background: rgba(255, 193, 7, 0.15);
-    color: #ffc107;
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
 }
 
 .status-badge[data-status="approved"] {
@@ -564,8 +579,8 @@ ob_start();
 }
 
 .status-badge[data-status="rejected"] {
-    background: rgba(220, 53, 69, 0.15);
-    color: #dc3545;
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
 }
 
 .submission-date {
@@ -592,6 +607,7 @@ ob_start();
     gap: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: 'Georgia', serif;
 }
 
 .section-title svg {
@@ -692,14 +708,14 @@ ob_start();
 }
 
 .btn-reject {
-    background: linear-gradient(135deg, #dc3545, #c82333);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     flex: 1;
 }
 
 .btn-reject:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
 }
 
 .btn-cancel {
@@ -708,7 +724,7 @@ ob_start();
 }
 
 .btn-cancel:hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Rejection & Approval Info */
@@ -719,7 +735,7 @@ ob_start();
 }
 
 .rejection-reason-section {
-    background: rgba(220, 53, 69, 0.05);
+    background: rgba(239, 68, 68, 0.05);
 }
 
 .approval-info-section {
@@ -810,7 +826,8 @@ ob_start();
     max-height: 90vh;
     overflow-y: auto;
     animation: slideUp 0.4s ease-out;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
 }
 
 .modal-form {
@@ -821,6 +838,7 @@ ob_start();
     margin: 0 0 8px;
     color: var(--text-primary);
     font-size: 22px;
+    font-family: 'Georgia', serif;
 }
 
 .modal-description {
@@ -883,7 +901,7 @@ ob_start();
 }
 
 .required {
-    color: #dc3545;
+    color: var(--danger);
 }
 
 .form-control {
@@ -903,7 +921,7 @@ ob_start();
     outline: none;
     border-color: var(--accent-primary);
     background: rgba(0, 212, 170, 0.02);
-    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.08);
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
 }
 
 .modal-actions {
@@ -1047,7 +1065,7 @@ function showNotification(message, type = 'info') {
     const notif = document.createElement('div');
     notif.id = 'adminNotification';
     
-    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#dc3545' : '#3b82f6';
+    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
     
     notif.style.cssText = `
         position: fixed;
@@ -1058,7 +1076,7 @@ function showNotification(message, type = 'info') {
         padding: 15px 20px;
         border-radius: 8px;
         z-index: 10000;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         animation: slideInRight 0.3s ease-out;
         font-weight: 600;
     `;
