@@ -64,10 +64,10 @@ ob_start();
 
         <!-- Main Content -->
         <?php if ($kyc_status === 'approved'): ?>
-            <div class="verification-complete-container" style="text-align: center; padding: 60px 20px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--accent-primary); margin-top: 30px;">
-                <div class="verified-icon" style="font-size: 64px; color: var(--accent-primary); margin-bottom: 20px;">✔️</div>
-                <h2 style="color: var(--text-primary); font-size: 28px; margin-bottom: 10px;">KYC VERIFIED ✔️</h2>
-                <p style="color: var(--text-secondary); font-size: 16px;">Congratulations! Your identity has been successfully verified. You now have full access to all platform features.</p>
+            <div class="verification-complete-container" style="text-align: center; padding: 60px 20px; background: #112236; border-radius: 16px; border: 1px solid #00d4aa; margin-top: 30px;">
+                <div class="verified-icon" style="font-size: 64px; color: #00d4aa; margin-bottom: 20px;">✔️</div>
+                <h2 style="color: #ffffff; font-size: 28px; margin-bottom: 10px;">KYC VERIFIED ✔️</h2>
+                <p style="color: #a0aec0; font-size: 16px;">Congratulations! Your identity has been successfully verified. You now have full access to all platform features.</p>
             </div>
         <?php else: ?>
             <div class="kyc-content">
@@ -283,14 +283,11 @@ ob_start();
 </div>
 
 <style>
-* {
-    box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
 :root {
-    --bg-primary: #0d1b2a;
-    --bg-secondary: #1e3a5f;
-    --bg-tertiary: #2a4a7f;
+    --bg-primary: #0a1628;
+    --bg-secondary: #112236;
+    --bg-tertiary: #1a2f4a;
     --text-primary: #ffffff;
     --text-secondary: #a0aec0;
     --accent-primary: #00d4aa;
@@ -301,482 +298,49 @@ ob_start();
     --warning: #f59e0b;
 }
 
-.kyc-wrapper {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0d1b2a 0%, #1a2f4a 100%);
-    padding: 20px;
-}
-
-.kyc-container {
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-/* Enhanced Header */
-.kyc-header-enhanced {
-    text-align: center;
-    margin-bottom: 50px;
-    animation: slideDown 0.6s ease-out;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.header-badge {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--bg-primary);
-    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-.kyc-header-enhanced h1 {
-    font-size: 36px;
-    margin: 0 0 10px;
-    color: var(--text-primary);
-    font-weight: 700;
-}
-
-.subtitle {
-    font-size: 16px;
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-}
-
-/* Progress Steps */
-.progress-steps {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0;
-    margin-top: 40px;
-}
-
-.step {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    color: var(--text-secondary);
-    font-weight: 600;
-    transition: all 0.3s;
-    position: relative;
-    z-index: 2;
-}
-
-.step.active {
-    background: var(--accent-primary);
-    border-color: var(--accent-primary);
-    color: var(--bg-primary);
-    box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
-}
-
-.step span {
-    font-size: 20px;
-}
-
-.step p {
-    position: absolute;
-    top: 70px;
-    white-space: nowrap;
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-.step.active p {
-    color: var(--accent-primary);
-    font-weight: 700;
-}
-
-.step-line {
-    width: 100px;
-    height: 2px;
-    background: var(--border-color);
-    margin: 0 -5px;
-    position: relative;
-    z-index: 1;
-}
-
-/* Alert Cards */
-.alert-card {
-    display: flex;
-    align-items: center;
-    padding: 20px 25px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    animation: fadeIn 0.5s ease-out;
-}
-
-.alert-success-enhanced {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid var(--success);
-    color: var(--success);
-}
-
-.alert-danger-enhanced {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--danger);
-    color: var(--danger);
-}
-
-.alert-warning-enhanced {
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid var(--warning);
-    color: var(--warning);
-}
-
-.alert-icon {
-    margin-right: 20px;
-}
-
-.alert-content h3 {
-    margin: 0 0 5px;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.alert-content p {
-    margin: 0;
-    opacity: 0.9;
-}
-
-/* KYC Form Card */
-.kyc-form-card {
-    background: var(--bg-secondary);
-    border-radius: 20px;
-    padding: 40px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-}
-
-.section-title {
-    font-size: 24px;
-    color: var(--text-primary);
-    margin-bottom: 40px;
-    display: flex;
-    align-items: center;
-}
-
-.title-icon {
-    margin-right: 15px;
-    font-size: 28px;
-}
-
-.form-section {
-    margin-bottom: 50px;
-}
-
-.section-label {
-    margin-bottom: 25px;
-    border-left: 4px solid var(--accent-primary);
-    padding-left: 15px;
-}
-
-.section-label h3 {
-    font-size: 20px;
-    margin: 0 0 5px;
-    color: var(--text-primary);
-}
-
-.section-description {
-    color: var(--text-secondary);
-    font-size: 14px;
-    margin: 0;
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 10px;
-    color: var(--text-primary);
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.required {
-    color: var(--danger);
-}
-
-.input-wrapper {
-    position: relative;
-}
-
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--accent-primary);
-}
-
-.form-control {
-    width: 100%;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 15px 15px 15px 45px;
-    color: var(--text-primary);
-    font-size: 15px;
-    transition: all 0.3s;
-}
-
-.form-control:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 15px rgba(0, 212, 170, 0.1);
-    outline: none;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-/* Documents Grid */
-.documents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-}
-
-.document-upload-card {
-    background: var(--bg-tertiary);
-    border-radius: 15px;
-    padding: 25px;
-    position: relative;
-    border: 1px solid var(--border-color);
-    transition: all 0.3s;
-}
-
-.document-upload-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-primary);
-}
-
-.upload-status-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--bg-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-}
-
-.upload-status-badge.completed {
-    background: var(--success);
-    color: white;
-}
-
-.doc-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.doc-label svg {
-    color: var(--accent-primary);
-    margin-bottom: 10px;
-}
-
-.label-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.doc-label small {
-    color: var(--text-secondary);
-    font-size: 12px;
-}
-
-.upload-box {
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    padding: 30px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: var(--bg-primary);
-}
-
-.upload-box:hover {
-    border-color: var(--accent-primary);
-    background: rgba(0, 212, 170, 0.05);
-}
-
-.upload-box.has-file {
-    border-style: solid;
-    border-color: var(--success);
-}
-
-.upload-content svg {
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-.upload-content p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-primary);
-}
-
-.upload-content small {
-    color: var(--text-secondary);
-    font-size: 11px;
-}
-
-/* Requirements Section */
-.requirements-section {
-    background: rgba(0, 212, 170, 0.05);
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 40px;
-    border: 1px solid rgba(0, 212, 170, 0.2);
-}
-
-.requirements-section h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--accent-primary);
-    font-size: 18px;
-    margin: 0 0 25px;
-}
-
-.requirements-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.requirement-item {
-    display: flex;
-    gap: 12px;
-}
-
-.req-icon {
-    width: 22px;
-    height: 22px;
-    background: var(--success);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    flex-shrink: 0;
-}
-
-.req-text strong {
-    display: block;
-    color: var(--text-primary);
-    font-size: 14px;
-    margin-bottom: 3px;
-}
-
-.req-text p {
-    margin: 0;
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-/* Form Actions */
-.form-actions {
-    text-align: center;
-}
-
-.btn-submit {
-    min-width: 250px;
-    height: 55px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 16px;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
-    border: none;
-    border-radius: 12px;
-    color: var(--bg-primary);
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 10px 20px rgba(0, 212, 170, 0.2);
-}
-
-.btn-submit:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(0, 212, 170, 0.3);
-}
-
-.btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.form-note {
-    margin-top: 20px;
-    color: var(--text-secondary);
-    font-size: 13px;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .kyc-form-card {
-        padding: 25px;
-    }
-    
-    .progress-steps {
-        gap: 0;
-    }
-    
-    .step-line {
-        width: 60px;
-    }
-}
+.kyc-wrapper { min-height: 100vh; background: var(--bg-primary); padding: 20px; }
+.kyc-container { max-width: 1000px; margin: 0 auto; }
+.kyc-header-enhanced { text-align: center; margin-bottom: 50px; }
+.header-badge { width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-light)); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: var(--bg-primary); box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3); }
+.kyc-header-enhanced h1 { font-size: 32px; color: var(--text-primary); font-weight: 700; margin-bottom: 10px; }
+.subtitle { color: var(--text-secondary); font-size: 16px; }
+
+.progress-steps { display: flex; justify-content: center; align-items: center; margin-top: 40px; }
+.step { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 600; position: relative; }
+.step.active { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
+.step p { position: absolute; top: 60px; white-space: nowrap; font-size: 12px; color: var(--text-secondary); }
+.step.active p { color: var(--accent-primary); font-weight: 700; }
+.step-line { width: 80px; height: 2px; background: var(--border-color); margin: 0 -5px; }
+
+.alert-card { display: flex; align-items: center; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
+.alert-success-enhanced { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); }
+.alert-danger-enhanced { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+.alert-warning-enhanced { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--warning); color: var(--warning); }
+.alert-icon { margin-right: 15px; }
+.alert-content h3 { margin: 0 0 5px; font-size: 18px; }
+
+.kyc-form-card { background: var(--bg-secondary); border-radius: 20px; padding: 40px; border: 1px solid var(--border-color); }
+.section-title { font-size: 24px; color: var(--text-primary); margin-bottom: 40px; }
+.form-section { margin-bottom: 40px; }
+.section-label { border-left: 4px solid var(--accent-primary); padding-left: 15px; margin-bottom: 25px; }
+.section-label h3 { font-size: 20px; color: var(--text-primary); margin-bottom: 5px; }
+.form-control { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 15px 15px 45px; color: var(--text-primary); transition: 0.3s; }
+.input-wrapper { position: relative; }
+.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-primary); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.documents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.document-upload-card { background: var(--bg-tertiary); border-radius: 15px; padding: 20px; border: 1px solid var(--border-color); text-align: center; }
+.upload-box { border: 2px dashed var(--border-color); border-radius: 12px; padding: 30px; cursor: pointer; background: var(--bg-primary); margin-top: 15px; }
+.upload-box:hover { border-color: var(--accent-primary); }
+
+.requirements-section { background: rgba(0, 212, 170, 0.05); border-radius: 15px; padding: 25px; margin-bottom: 30px; border: 1px solid rgba(0, 212, 170, 0.2); }
+.requirements-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.requirement-item { display: flex; gap: 10px; font-size: 13px; }
+.req-icon { color: var(--success); font-weight: bold; }
+
+.btn-submit { width: 100%; max-width: 300px; height: 55px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-light)); border: none; border-radius: 12px; color: var(--bg-primary); font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-submit:hover { transform: translateY(-2px); opacity: 0.9; }
 </style>
 
 <script>
@@ -784,107 +348,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const kycForm = document.getElementById('kycForm');
     if (!kycForm) return;
 
-    // File Upload Handling
     const uploadBoxes = ['frontIdUpload', 'backIdUpload', 'facePhotoUpload'];
-    
     uploadBoxes.forEach(boxId => {
         const box = document.getElementById(boxId);
         const input = box.querySelector('input[type="file"]');
-        const statusBadge = document.getElementById(boxId.replace('Upload', 'Status'));
-
         box.addEventListener('click', () => input.click());
-
         input.addEventListener('change', function() {
             if (this.files && this.files[0]) {
-                const fileName = this.files[0].name;
-                box.classList.add('has-file');
-                box.querySelector('p').textContent = fileName;
-                statusBadge.classList.add('completed');
-                statusBadge.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                box.querySelector('p').textContent = this.files[0].name;
+                box.style.borderColor = 'var(--success)';
             }
-        });
-
-        // Drag and Drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            box.addEventListener(eventName, e => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        });
-
-        box.addEventListener('drop', e => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            input.files = files;
-            const event = new Event('change');
-            input.dispatchEvent(event);
         });
     });
 
-    // Form Submission
     kycForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         const submitBtn = this.querySelector('.btn-submit');
-        const originalText = submitBtn.innerHTML;
-        const formData = new FormData(this);
-
+        submitBtn.disabled = true;
         try {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span> Submitting...';
-
-            const response = await fetch('/kyc/submit', {
+            const res = await fetch('/kyc/submit', {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                body: new FormData(this),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-
-            const text = await response.text();
-            const cleanText = text.trim().toLowerCase();
-            
-            if (cleanText.indexOf('success') !== -1) {
-                showNotification('Verification submitted successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = '/kyc/verify';
-                }, 2000);
+            const text = await res.text();
+            if (text.toLowerCase().includes('success')) {
+                alert('Submitted successfully!');
+                location.reload();
             } else {
-                showNotification('Submission failed. Please check inputs.', 'error');
+                alert('Submission failed. Check your files.');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showNotification('An error occurred. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }
+        } catch (e) { alert('An error occurred.'); submitBtn.disabled = false; }
     });
-
-    function showNotification(message, type = 'info') {
-        const notif = document.createElement('div');
-        notif.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#10b981' : '#ef4444'};
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            z-index: 10000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: slideIn 0.3s ease-out;
-            font-weight: 600;
-        `;
-        notif.textContent = message;
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 4000);
-    }
 });
 </script>
 
 <?php
 $content = ob_get_clean();
-include __DIR__ . '/../layouts/dashboard.php';
+// Direct reliable path for cPanel
+$fileDir = __DIR__;
+$layoutFile = '/../layouts/dashboard.php';
+if (file_exists($fileDir . $layoutFile)) {
+    include $fileDir . $layoutFile;
+} else if (defined('ROOT_PATH')) {
+    include ROOT_PATH . '/app/Views/layouts/dashboard.php';
+} else {
+    include dirname(__DIR__) . '/layouts/dashboard.php';
+}
 ?>
