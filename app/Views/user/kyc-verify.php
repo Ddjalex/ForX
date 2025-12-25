@@ -967,7 +967,9 @@ function setupFileUpload(uploadBoxId, inputName, statusBadgeId) {
         e.preventDefault();
         uploadBox.classList.remove('drag-over');
         if (e.dataTransfer.files.length > 0) {
-            input.files = e.dataTransfer.files;
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(e.dataTransfer.files[0]);
+            input.files = dataTransfer.files;
             updateFileStatus(card, uploadBox, input.files[0].name, statusBadge);
         }
     });
