@@ -455,21 +455,34 @@ class AdminController
 
     public function settings(): void
     {
-        $settings = Database::fetchAll("SELECT * FROM settings");
-        $settingsArray = [];
-        foreach ($settings as $setting) {
-            $settingsArray[$setting['setting_key']] = $setting['value'];
+        try {
+            $settings = Database::fetchAll("SELECT * FROM settings");
+            $settingsArray = [];
+            foreach ($settings as $setting) {
+                if (isset($setting['setting_key'])) {
+                    $settingsArray[$setting['setting_key']] = $setting['value'];
+                }
+            }
+
+            // Check if table exists before querying
+            $tableExists = Database::fetch("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'deposit_networks')");
+            $depositNetworks = [];
+            if ($tableExists && ($tableExists['exists'] === true || $tableExists['exists'] === 't')) {
+                $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
+            }
+
+            echo Router::render('admin/settings', [
+                'settings' => $settingsArray,
+                'depositNetworks' => $depositNetworks,
+                'csrf_token' => Session::generateCsrfToken(),
+                'success' => Session::getFlash('success'),
+                'error' => Session::getFlash('error'),
+            ]);
+        } catch (\Throwable $e) {
+            error_log("Admin Settings View Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+            Session::flash('error', 'Unable to load settings at this time. ' . $e->getMessage());
+            Router::redirect('/admin');
         }
-
-        $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
-
-        echo Router::render('admin/settings', [
-            'settings' => $settingsArray,
-            'depositNetworks' => $depositNetworks,
-            'csrf_token' => Session::generateCsrfToken(),
-            'success' => Session::getFlash('success'),
-            'error' => Session::getFlash('error'),
-        ]);
     }
 
     public function manageDepositNetworks(): void

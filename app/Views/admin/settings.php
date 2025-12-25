@@ -1,3 +1,19 @@
+<?php
+if (!isset($settings)) $settings = [];
+if (!isset($depositNetworks)) $depositNetworks = [];
+if (!isset($csrf_token)) $csrf_token = '';
+if (!isset($success)) $success = '';
+if (!isset($error)) $error = '';
+?>
+
+<?php if (!empty($success)): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+<?php endif; ?>
+
+<?php if (!empty($error)): ?>
+    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+<?php endif; ?>
+
 <div class="settings-container">
     <div class="settings-sidebar">
         <div class="settings-nav">
