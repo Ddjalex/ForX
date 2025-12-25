@@ -27,17 +27,18 @@ if (!function_exists('t')) {
     <script src="/assets/js/tradingview-market-data.js" defer></script>
     <script src="/assets/js/notifications.js" defer></script>
     <style>
-        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow-y: auto; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); }
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow-y: auto; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); transform: translateX(-260px); transition: transform 0.3s ease; }
+        .sidebar.active { transform: translateX(0); }
         .sidebar-header { position: sticky; top: 0; background: #0a1628; z-index: 10; padding: 20px; border-bottom: 1px solid rgba(0, 212, 170, 0.1); }
-        .main-content { margin-left: 260px; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; }
-        .top-header { position: fixed; top: 0; left: 260px; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); }
+        .main-content { margin-left: 0; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; transition: margin-left 0.3s ease; }
+        .main-content.shifted { margin-left: 260px; }
+        .top-header { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); transition: left 0.3s ease; }
+        .top-header.shifted { left: 260px; }
         .header-controls { position: fixed; top: 0; right: 0; height: 70px; display: flex; align-items: center; padding: 0 20px; z-index: 10001; }
-        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; }
+        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 4px; padding: 5px; cursor: pointer; color: #00D4AA; }
         @media (max-width: 768px) { 
-            .main-content { margin-left: 0; }
-            .top-header { left: 0; }
-            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-            .sidebar.active { transform: translateX(0); }
+            .main-content.shifted { margin-left: 0; }
+            .top-header.shifted { left: 0; }
         }
         .notification-panel { position: fixed !important; right: 20px !important; top: 70px !important; }
         .sidebar-nav-scroll { height: calc(100vh - 120px); overflow-y: auto; }
@@ -762,6 +763,24 @@ if (!function_exists('t')) {
         if (window.innerWidth <= 1024) {
             document.body.classList.add('sidebar-collapsed');
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const close = document.getElementById('sidebarClose');
+            const mainContent = document.querySelector('.main-content');
+            const topHeader = document.querySelector('.top-header');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                mainContent.classList.toggle('shifted');
+                topHeader.classList.toggle('shifted');
+            }
+
+            toggle?.addEventListener('click', toggleSidebar);
+            close?.addEventListener('click', toggleSidebar);
+        });
     </script>
 </body>
 </html>
