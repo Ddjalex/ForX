@@ -155,13 +155,8 @@ class KYCController
 
         // Update user verification
         Database::update('users', [
-            'email_verified' => 'true',
-            'kyc_verified' => 'true',
-        ], 'id = ?', [$kyc['user_id']]);
-
-        // Also update users table status if needed
-        Database::update('users', [
-            'kyc_verified' => true
+            'kyc_verified' => true,
+            'kyc_verified_at' => date('Y-m-d H:i:s')
         ], 'id = ?', [$kyc['user_id']]);
 
         // Send notification

@@ -167,7 +167,13 @@ ob_start();
                                             <?php
                                             $imagePath = $doc['file_path'];
                                             if (strpos($imagePath, 'http') !== 0) {
-                                                $imagePath = str_replace(['/public/', 'public/'], '/', $imagePath);
+                                                // Ensure the path starts with /uploads and handle ROOT_PATH issues
+                                                if (strpos($imagePath, '/public/') === 0) {
+                                                    $imagePath = substr($imagePath, 7);
+                                                } elseif (strpos($imagePath, 'public/') === 0) {
+                                                    $imagePath = substr($imagePath, 6);
+                                                }
+                                                
                                                 if (strpos($imagePath, '/') !== 0) {
                                                     $imagePath = '/' . $imagePath;
                                                 }
