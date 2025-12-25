@@ -148,7 +148,7 @@ $mockNotifications = [
                 
                 <div class="form-group">
                     <label>Asset Type</label>
-                    <select name="asset_type" id="assetType" class="form-control" onchange="updateAssetNames()">
+                    <select name="asset_type" id="assetType" class="form-control" onchange="updateAssetNames(); updateMarketInfo();">
                         <?php foreach ($assetTypes ?? [] as $type): ?>
                             <option value="<?= htmlspecialchars($type['name']) ?>" 
                                 data-type="<?= htmlspecialchars($type['name']) ?>">
@@ -185,7 +185,7 @@ $mockNotifications = [
                         <?php endforeach; ?>
                     </div>
                     <div class="leverage-slider-container">
-                        <input type="range" id="leverageSlider" class="leverage-slider" min="0.1" max="100" step="0.1" value="5" oninput="setLeverageFromSlider(this.value)">
+                        <input type="range" id="leverageSlider" class="leverage-slider" min="0.1" max="100" step="0.1" value="5" oninput="updateLeverageFromSlider(this.value)">
                         <span class="leverage-value-display" id="leverageDisplay">5x</span>
                     </div>
                     <input type="hidden" name="leverage" id="leverageValue" value="5">

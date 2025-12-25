@@ -331,14 +331,18 @@ function showTradeNotification(message, type = 'info') {
 function setLeverage(leverage) {
     const leverageInput = document.getElementById('leverageValue') || document.getElementById('leverageInput');
     const slider = document.getElementById('leverageSlider');
+    const display = document.getElementById('leverageDisplay');
     
     if (leverageInput) leverageInput.value = leverage;
     if (slider) slider.value = leverage;
+    if (display) display.textContent = leverage + 'x';
     
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         btn.classList.remove('active');
+        if (btn.getAttribute('data-leverage') == leverage) {
+            btn.classList.add('active');
+        }
     });
-    if (event && event.target) event.target.classList.add('active');
     
     // Re-validate trade amount with new leverage
     if (typeof validateTradeAmount === 'function') {
@@ -348,17 +352,49 @@ function setLeverage(leverage) {
 
 function updateLeverageFromSlider(value) {
     const leverageInput = document.getElementById('leverageValue') || document.getElementById('leverageInput');
-    if (leverageInput) leverageInput.value = value;
+    if (leverageInput) {
+        leverageInput.value = value;
+        // Trigger input event for any listeners
+        leverageInput.dispatchEvent(new Event('input'));
+    }
     
+    const sliderValueDisplay = document.querySelector('.leverage-slider-container .slider-value') || document.querySelector('.leverage-amount');
+    if (sliderValueDisplay) sliderValueDisplay.textContent = value + 'x';
+
     document.querySelectorAll('.leverage-btn').forEach(btn => {
         btn.classList.remove('active');
+        if (btn.getAttribute('data-leverage') == value) {
+            btn.classList.add('active');
+        }
     });
-    const targetBtn = document.querySelector(`[data-leverage="${value}"]`);
-    if (targetBtn) targetBtn.classList.add('active');
     
     // Re-validate trade amount with new leverage
     if (typeof validateTradeAmount === 'function') {
         validateTradeAmount();
+    }
+}
+
+function updateMarketInfo() {
+    const assetTypeSelect = document.getElementById('assetType');
+    const assetNameSelect = document.getElementById('assetName');
+    
+    const displayAssetType = document.getElementById('dashboardCurrentAssetType');
+    const displayAssetName = document.getElementById('dashboardCurrentAssetName');
+    const displayPrice = document.getElementById('dashboardCurrentPrice');
+    
+    if (assetTypeSelect && displayAssetType) {
+        displayAssetType.textContent = assetTypeSelect.value;
+    }
+    
+    if (assetNameSelect && displayAssetName) {
+        const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+        if (selectedOption) {
+            displayAssetName.textContent = selectedOption.getAttribute('data-display') || selectedOption.text;
+            if (displayPrice) {
+                const price = parseFloat(selectedOption.getAttribute('data-price') || 0);
+                displayPrice.textContent = '$' + price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+        }
     }
 }
 
