@@ -75,6 +75,7 @@ ob_start();
         <?php endif; ?>
 
         <!-- Main Content -->
+        <?php if ($kyc_status !== 'approved'): ?>
         <div class="kyc-content">
             <div class="kyc-form-card">
                 <h2 class="section-title">
@@ -88,6 +89,208 @@ ob_start();
                     <!-- Personal Information Section -->
                     <div class="form-section">
                         <div class="section-label">
+                            <h3>Step 1: Personal Details</h3>
+                            <p class="section-description">Enter your information as it appears on your identification document</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <input type="text" name="full_name" class="form-control" required placeholder="Enter your full name as on ID">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">ID Type <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                        <path d="M16 5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2"></path>
+                                    </svg>
+                                    <select name="id_type" class="form-control" required>
+                                        <option value="">Select your ID type</option>
+                                        <option value="national_id">National ID Card</option>
+                                        <option value="passport">Passport</option>
+                                        <option value="drivers_license">Driver's License</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">ID Number <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    <input type="text" name="id_number" class="form-control" required placeholder="Enter your ID number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Upload Section -->
+                    <div class="form-section">
+                        <div class="section-label">
+                            <h3>Step 2: Upload Documents</h3>
+                            <p class="section-description">Upload clear images of your identification and a recent selfie</p>
+                        </div>
+
+                        <div class="documents-grid">
+                            <!-- Front ID Upload -->
+                            <div class="document-upload-card">
+                                <div class="upload-status-badge" id="frontIdStatus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                    </svg>
+                                </div>
+                                <label class="doc-label">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                        <polyline points="13 2 13 9 20 9"></polyline>
+                                    </svg>
+                                    <span class="label-text">ID Front</span>
+                                    <small>Clear photo of front side</small>
+                                </label>
+                                <div class="upload-box" id="frontIdUpload">
+                                    <div class="upload-content">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                        <p>Click to upload or drag</p>
+                                        <small>PNG, JPG (Max 5MB)</small>
+                                    </div>
+                                    <input type="file" name="front_id" accept="image/*" required style="display: none;">
+                                </div>
+                            </div>
+
+                            <!-- Back ID Upload -->
+                            <div class="document-upload-card">
+                                <div class="upload-status-badge" id="backIdStatus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                    </svg>
+                                </div>
+                                <label class="doc-label">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                        <polyline points="13 2 13 9 20 9"></polyline>
+                                    </svg>
+                                    <span class="label-text">ID Back</span>
+                                    <small>Clear photo of back side</small>
+                                </label>
+                                <div class="upload-box" id="backIdUpload">
+                                    <div class="upload-content">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                        <p>Click to upload or drag</p>
+                                        <small>PNG, JPG (Max 5MB)</small>
+                                    </div>
+                                    <input type="file" name="back_id" accept="image/*" required style="display: none;">
+                                </div>
+                            </div>
+
+                            <!-- Face Photo Upload -->
+                            <div class="document-upload-card">
+                                <div class="upload-status-badge" id="facePhotoStatus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                    </svg>
+                                </div>
+                                <label class="doc-label">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    <span class="label-text">Selfie</span>
+                                    <small>Your face in current photo</small>
+                                </label>
+                                <div class="upload-box" id="facePhotoUpload">
+                                    <div class="upload-content">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                        <p>Click to upload or drag</p>
+                                        <small>PNG, JPG (Max 5MB)</small>
+                                    </div>
+                                    <input type="file" name="face_photo" accept="image/*" required style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requirements Section -->
+                    <div class="requirements-section">
+                        <h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            Document Requirements
+                        </h3>
+                        <div class="requirements-grid">
+                            <div class="requirement-item">
+                                <div class="req-icon">✓</div>
+                                <div class="req-text">
+                                    <strong>Clear Quality</strong>
+                                    <p>Documents must be clear, readable, and in full view</p>
+                                </div>
+                            </div>
+                            <div class="requirement-item">
+                                <div class="req-icon">✓</div>
+                                <div class="req-text">
+                                    <strong>Proper Lighting</strong>
+                                    <p>Ensure good lighting with no glare or shadows</p>
+                                </div>
+                            </div>
+                            <div class="requirement-item">
+                                <div class="req-icon">✓</div>
+                                <div class="req-text">
+                                    <strong>Face Visibility</strong>
+                                    <p>Selfie must show your entire face clearly</p>
+                                </div>
+                            </div>
+                            <div class="requirement-item">
+                                <div class="req-icon">✓</div>
+                                <div class="req-text">
+                                    <strong>Name Match</strong>
+                                    <p>Information must match your registered name</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg btn-submit">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
+                            </svg>
+                            Submit Verification
+                        </button>
+                        <p class="form-note">Once submitted, our team will review your documents within 24 hours.</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="verification-complete-container" style="text-align: center; padding: 60px 20px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--accent-primary); margin-top: 30px;">
+            <div class="verified-icon" style="font-size: 64px; color: var(--accent-primary); margin-bottom: 20px;">✔️</div>
+            <h2 style="color: var(--text-primary); font-size: 28px; margin-bottom: 10px;">KYC VERIFIED ✔️</h2>
+            <p style="color: var(--text-secondary); font-size: 16px;">Congratulations! Your identity has been successfully verified. You now have full access to all platform features.</p>
+        </div>
+        <?php endif; ?>
                             <h3>Step 1: Personal Details</h3>
                             <p class="section-description">Enter your information as it appears on your identification document</p>
                         </div>

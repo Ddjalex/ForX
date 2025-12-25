@@ -1024,26 +1024,14 @@ async function approveKYC(kycId) {
             }
         });
 
-        let data;
         const text = await response.text();
-        const cleanText = text.trim();
+        const cleanText = text.trim().toLowerCase();
 
-        try {
-            data = JSON.parse(cleanText);
-        } catch (e) {
-            console.error('Server response:', text);
-            if (cleanText.indexOf('"success":true') !== -1) {
-                data = { success: true };
-            } else {
-                throw new Error('Invalid server response');
-            }
-        }
-
-        if (data.success) {
+        if (cleanText.indexOf('success') !== -1) {
             showNotification('KYC approved successfully', 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
-            showNotification(data.error || 'Failed to approve KYC', 'error');
+            showNotification('Failed to approve KYC', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
