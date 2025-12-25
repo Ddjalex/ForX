@@ -58,12 +58,6 @@ $mockNotifications = [
         <div class="stat-value">$<?= number_format($bonus, 2) ?></div>
         <div class="stat-label"><?= t('total_bonus') ?></div>
     </div>
-    <div class="stat-card <?= !$isVerified ? 'danger' : '' ?>">
-        <div class="stat-value" style="font-size: 16px; <?= $isVerified ? 'color: var(--success)' : 'color: var(--danger)' ?>">
-            <?= $isVerified ? t('verified') : t('not_verified') ?>
-        </div>
-        <div class="stat-label"><?= t('account_status') ?></div>
-    </div>
 </div>
 
 <div class="stats-grid">
