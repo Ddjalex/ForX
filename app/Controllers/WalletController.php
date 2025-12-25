@@ -38,34 +38,23 @@ class WalletController
 
     public function showDeposit(): void
     {
-        try {
-            $allSettings = Database::fetchAll("SELECT * FROM settings");
-            $settings = [];
-            foreach ($allSettings as $setting) {
-                if (isset($setting['setting_key']) && isset($setting['value'])) {
-                    $settings[$setting['setting_key']] = $setting['value'];
-                }
+        $allSettings = Database::fetchAll("SELECT * FROM settings");
+        $settings = [];
+        foreach ($allSettings as $setting) {
+            if (isset($setting['setting_key']) && isset($setting['value'])) {
+                $settings[$setting['setting_key']] = $setting['value'];
             }
-            
-            // Check if table exists before querying
-            $tableExists = Database::fetch("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'deposit_networks')");
-            $networks = [];
-            if ($tableExists && $tableExists['exists']) {
-                $networks = Database::fetchAll("SELECT * FROM deposit_networks WHERE status = 'active' ORDER BY name ASC");
-            }
-            
-            echo Router::render('user/deposit', [
-                'settings' => $settings,
-                'networks' => $networks,
-                'csrf_token' => Session::generateCsrfToken(),
-                'error' => Session::getFlash('error'),
-                'success' => Session::getFlash('success'),
-            ]);
-        } catch (\Throwable $e) {
-            error_log("Deposit View Error: " . $e->getMessage());
-            Session::flash('error', 'Unable to load deposit options at this time.');
-            Router::redirect('/wallet');
         }
+        
+        $networks = Database::fetchAll("SELECT * FROM deposit_networks WHERE status = 'active' ORDER BY name ASC");
+        
+        echo Router::render('user/deposit', [
+            'settings' => $settings,
+            'networks' => $networks,
+            'csrf_token' => Session::generateCsrfToken(),
+            'error' => Session::getFlash('error'),
+            'success' => Session::getFlash('success'),
+        ]);
     }
 
     public function deposit(): void

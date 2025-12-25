@@ -107,8 +107,14 @@ class Router
         $viewPath = __DIR__ . '/../Views/' . $view . '.php';
         
         if (file_exists($viewPath)) {
-            include $viewPath;
+            try {
+                include $viewPath;
+            } catch (\Throwable $e) {
+                error_log("View rendering error in {$view}: " . $e->getMessage());
+                echo "<!-- View Error: " . htmlspecialchars($e->getMessage()) . " -->";
+            }
         } else {
+            error_log("View not found: {$viewPath}");
             echo "<!-- View not found: {$view} -->";
         }
         
