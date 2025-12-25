@@ -353,10 +353,23 @@ class AuthController
 
     public function logout(): void
     {
-        if (Auth::check()) {
-            AuditLog::log('logout', 'user', Auth::id());
+        try {
+            if (Auth::check()) {
+                $userId = Auth::id();
+                if ($userId) {
+                    AuditLog::log('logout', 'user', $userId);
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log("Logout audit log error: " . $e->getMessage());
         }
-        Auth::logout();
+        
+        try {
+            Auth::logout();
+        } catch (\Throwable $e) {
+            error_log("Logout auth error: " . $e->getMessage());
+        }
+        
         Router::redirect('/login');
     }
 
