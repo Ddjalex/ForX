@@ -366,10 +366,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
 #systemNotification {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
-    z-index: 10000;
-    animation: slideIn 0.3s ease-out;
+    z-index: 100000;
+    animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #systemNotification.show {
@@ -377,69 +377,64 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 #systemNotification.hide {
-    animation: slideOut 0.3s ease-out forwards;
+    animation: slideOut 0.3s ease-in forwards;
 }
 
 @keyframes slideIn {
-    from {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(120%) scale(0.8); opacity: 0; }
+    to { transform: translateX(0) scale(1); opacity: 1; }
 }
 
 @keyframes slideOut {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(400px);
-        opacity: 0;
-    }
+    from { transform: translateX(0) scale(1); opacity: 1; }
+    to { transform: translateX(120%) scale(0.8); opacity: 0; }
 }
 
 .notification-content {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    border: 1px solid rgba(0, 212, 170, 0.3);
-    border-radius: 8px;
-    padding: 16px 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 25px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 15px;
-    min-width: 300px;
-    max-width: 400px;
+    gap: 20px;
+    min-width: 350px;
+    max-width: 450px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .notification-text {
     color: #1a1a1a;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    line-height: 1.4;
+    line-height: 1.5;
+}
+
+.notification-text strong {
+    color: #000;
+    font-weight: 700;
 }
 
 .notification-close-btn {
-    background: none;
+    background: #f0f2f5;
     border: none;
-    color: #999;
-    font-size: 24px;
+    color: #65676b;
+    font-size: 20px;
     cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s;
+    transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .notification-close-btn:hover {
-    color: #333;
+    background: #e4e6eb;
+    color: #050505;
 }
 
 .trade-confirm-modal {

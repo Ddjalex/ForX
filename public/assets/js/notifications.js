@@ -13,7 +13,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e) e.stopPropagation();
         const isVisible = notificationPanel.style.display === 'block';
         notificationPanel.style.display = isVisible ? 'none' : 'block';
+        
         if (!isVisible) {
+            // Position panel under the button
+            const rect = notificationBtn.getBoundingClientRect();
+            notificationPanel.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+            notificationPanel.style.right = (window.innerWidth - rect.right) + 'px';
+            notificationPanel.style.left = 'auto';
+            notificationPanel.style.position = 'fixed';
             fetchNotifications();
         }
     }

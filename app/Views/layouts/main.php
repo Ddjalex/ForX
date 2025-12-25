@@ -27,21 +27,84 @@ if (!function_exists('t')) {
     <script src="/assets/js/tradingview-market-data.js" defer></script>
     <script src="/assets/js/notifications.js" defer></script>
     <style>
-        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow-y: auto; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); transform: translateX(-260px); transition: transform 0.3s ease; }
+        :root {
+            --primary: #00D4AA;
+            --bg-dark: #0a1628;
+            --bg-secondary: #0f1822;
+            --text-color: #ffffff;
+        }
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; height: 100vh; overflow: hidden; z-index: 10002; background: #0a1628; border-right: 1px solid rgba(0, 212, 170, 0.1); transform: translateX(-260px); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
         .sidebar.active { transform: translateX(0); }
-        .sidebar-header { position: sticky; top: 0; background: #0a1628; z-index: 10; padding: 20px; border-bottom: 1px solid rgba(0, 212, 170, 0.1); }
-        .main-content { margin-left: 0; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; transition: margin-left 0.3s ease; }
+        .sidebar-header { flex-shrink: 0; background: #0a1628; padding: 20px; border-bottom: 1px solid rgba(0, 212, 170, 0.1); display: flex; align-items: center; justify-content: space-between; }
+        .sidebar-user { display: flex; align-items: center; gap: 12px; }
+        .sidebar-user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); overflow: hidden; }
+        .sidebar-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar-user-info { display: flex; flex-direction: column; }
+        .sidebar-user-name { font-size: 14px; font-weight: 600; color: #fff; }
+        .sidebar-user-status { font-size: 11px; color: var(--primary); }
+        .sidebar-close { background: none; border: none; color: #8899a6; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-close:hover { color: #fff; }
+        
+        .sidebar-nav-scroll { flex-grow: 1; overflow-y: auto; padding: 10px 0; scrollbar-width: thin; scrollbar-color: rgba(0, 212, 170, 0.2) transparent; }
+        .sidebar-nav-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav-scroll::-webkit-scrollbar-thumb { background: rgba(0, 212, 170, 0.2); border-radius: 2px; }
+        
+        .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+        .sidebar-nav li { margin: 4px 12px; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #8899a6; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
+        .sidebar-nav a:hover { background: rgba(0, 212, 170, 0.05); color: #fff; }
+        .sidebar-nav a.active { background: rgba(0, 212, 170, 0.1); color: var(--primary); }
+        .sidebar-nav svg { color: inherit; flex-shrink: 0; }
+        
+        .sidebar-dropdown { margin: 4px 12px; }
+        .sidebar-dropdown-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; color: #8899a6; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
+        .sidebar-dropdown-header:hover { background: rgba(0, 212, 170, 0.05); color: #fff; }
+        .sidebar-dropdown-content { display: none; padding-left: 28px; margin-top: 4px; }
+        .sidebar-dropdown-content.show { display: block; }
+        .sidebar-dropdown-content a { padding: 10px 16px; font-size: 13px; }
+
+        .main-content { margin-left: 0; padding-top: 70px; min-height: 100vh; background: #0a1628; position: relative; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .main-content.shifted { margin-left: 260px; }
-        .top-header { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); transition: left 0.3s ease; }
+        
+        .top-header { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #0a1628; display: flex; align-items: center; padding: 0 20px; z-index: 10000; border-bottom: 1px solid rgba(0, 212, 170, 0.1); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .top-header.shifted { left: 260px; }
+        .top-header-link { text-decoration: none; color: inherit; }
+        .top-header-content { display: flex; align-items: center; gap: 15px; margin-left: 50px; }
+        .top-header-logo { display: flex; align-items: center; gap: 12px; }
+        .header-logo-img { height: 35px; width: auto; }
+        .header-text { display: flex; flex-direction: column; }
+        .header-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; letter-spacing: 0.5px; }
+        .header-subtitle { font-size: 10px; color: var(--primary); margin: 0; text-transform: uppercase; font-weight: 600; }
+        
         .header-controls { position: fixed; top: 0; right: 0; height: 70px; display: flex; align-items: center; padding: 0 20px; z-index: 10001; }
-        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 4px; padding: 5px; cursor: pointer; color: #00D4AA; }
+        .sidebar-toggle { position: fixed; top: 15px; left: 15px; z-index: 10003; background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 4px; padding: 8px; cursor: pointer; color: #00D4AA; display: flex; align-items: center; justify-content: center; }
+        .sidebar-toggle:hover { background: rgba(0, 212, 170, 0.2); }
+        
+        .notification-btn { background: none; border: none; color: #8899a6; cursor: pointer; padding: 8px; border-radius: 4px; position: relative; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .notification-btn:hover { color: var(--primary); background: rgba(0, 212, 170, 0.05); }
+        .notification-badge { position: absolute; top: 2px; right: 2px; background: #ff4757; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 10px; border: 2px solid #0a1628; }
+        
+        .notification-panel { display: none; position: fixed; right: 20px; top: 75px; z-index: 100000; width: 350px; background: #0f1822; border: 1px solid rgba(0, 212, 170, 0.2); border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); overflow: hidden; }
+        .notification-modal-header { padding: 15px 20px; background: rgba(0, 212, 170, 0.05); border-bottom: 1px solid rgba(0, 212, 170, 0.1); display: flex; align-items: center; justify-content: space-between; }
+        .notification-modal-header h2 { font-size: 15px; font-weight: 600; color: #fff; margin: 0; }
+        .notification-list { max-height: 400px; overflow-y: auto; }
+        .notification-item { padding: 15px 20px; display: flex; gap: 15px; border-bottom: 1px solid rgba(0, 212, 170, 0.05); cursor: pointer; transition: background 0.2s; }
+        .notification-item:hover { background: rgba(0, 212, 170, 0.02); }
+        .notification-item.unread { background: rgba(0, 212, 170, 0.05); border-left: 3px solid var(--primary); }
+        .notification-item-icon { width: 35px; height: 35px; border-radius: 50%; background: rgba(0, 212, 170, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notification-item-content { flex-grow: 1; }
+        .notification-item-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .notification-item-message { font-size: 12px; color: #8899a6; line-height: 1.4; }
+        .notification-item-time { font-size: 11px; color: #556677; margin-top: 6px; }
+
         @media (max-width: 768px) { 
             .main-content.shifted { margin-left: 0; }
             .top-header.shifted { left: 0; }
+            .notification-panel { width: calc(100% - 40px); right: 20px; left: 20px; }
+            .top-header-content { margin-left: 45px; }
+            .header-title { font-size: 14px; }
+            .header-subtitle { font-size: 8px; }
         }
-        .notification-panel { position: fixed !important; right: 20px !important; top: 70px !important; }
-        .sidebar-nav-scroll { height: calc(100vh - 120px); overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -191,22 +254,23 @@ if (!function_exists('t')) {
             </button>
         </div>
 
-        <div class="notification-panel" id="notificationPanel" style="display: none; position: absolute; right: 20px; top: 70px; z-index: 10001; width: 350px;">
-            <div class="notification-modal" style="position: relative; right: auto; top: auto; width: 100%; height: auto; max-height: 500px; border: 1px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                <div class="notification-modal-header">
-                    <h2>Notifications</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <button id="markAllReadBtn" style="background: none; border: 1px solid var(--primary); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Mark all read</button>
-                        <button class="notification-close" id="notificationClose" style="background: none; border: none; cursor: pointer; color: var(--text-color);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
+        <div class="notification-panel" id="notificationPanel">
+            <div class="notification-modal-header">
+                <h2>Notifications</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="markAllReadBtn" style="background: none; border: 1px solid var(--primary); color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;">Mark all read</button>
+                    <button class="notification-close" id="notificationClose" style="background: none; border: none; cursor: pointer; color: #8899a6; display: flex; align-items: center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                <div class="notification-list" id="notificationList" style="max-height: 400px; overflow-y: auto;">
-                    <div style="padding: 20px; text-align: center; color: #888;">Loading notifications...</div>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div style="padding: 40px 20px; text-align: center; color: #556677; font-size: 13px;">
+                    <div style="margin-bottom: 10px; opacity: 0.5;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+                    Loading notifications...
                 </div>
             </div>
         </div>
