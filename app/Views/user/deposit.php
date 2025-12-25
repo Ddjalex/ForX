@@ -28,9 +28,17 @@ $minDeposit = $settings['min_deposit'] ?? '10';
             <div class="deposit-method">
                 <h4><?= htmlspecialchars($network['name'] ?? 'Crypto') ?> (<?= htmlspecialchars($network['symbol'] ?? '') ?>) Deposit</h4>
                 <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-                <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                    <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($network['network_type'] ?? '') ?></strong></p>
-                    <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($network['wallet_address'] ?? '') ?></p>
+                <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
+                    <p style="margin: 0 0 8px 0; color: var(--text-secondary); text-align: left;">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($network['network_type'] ?? '') ?></strong></p>
+                    
+                    <?php if (!empty($network['qr_code'])): ?>
+                    <div style="margin-bottom: 15px;">
+                        <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR Code" style="max-width: 150px; border-radius: 8px; background: #fff; padding: 5px;">
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">Scan QR code to pay</p>
+                    </div>
+                    <?php endif; ?>
+
+                    <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary); text-align: left;"><?= htmlspecialchars($network['wallet_address'] ?? '') ?></p>
                     <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($network['wallet_address'] ?? '') ?>'); this.textContent='Copied!';">Copy Address</button>
                 </div>
                 <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">

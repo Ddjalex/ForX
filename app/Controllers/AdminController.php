@@ -532,23 +532,42 @@ class AdminController
         $wallet_address = filter_input(INPUT_POST, 'wallet_address', FILTER_SANITIZE_SPECIAL_CHARS);
         $network_type = filter_input(INPUT_POST, 'network_type', FILTER_SANITIZE_SPECIAL_CHARS);
 
+        $qrCodePath = null;
+        if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'public/uploads/qr_codes/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $extension = pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION);
+            $fileName = uniqid('qr_') . '.' . $extension;
+            $targetPath = $uploadDir . $fileName;
+            if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
+                $qrCodePath = '/uploads/qr_codes/' . $fileName;
+            }
+        }
+
         switch ($action) {
             case 'add':
                 Database::insert('deposit_networks', [
                     'name' => $name,
                     'symbol' => $symbol,
                     'wallet_address' => $wallet_address,
-                    'network_type' => $network_type
+                    'network_type' => $network_type,
+                    'qr_code' => $qrCodePath
                 ]);
                 Session::flash('success', 'Deposit network added.');
                 break;
             case 'update':
-                Database::update('deposit_networks', [
+                $data = [
                     'name' => $name,
                     'symbol' => $symbol,
                     'wallet_address' => $wallet_address,
                     'network_type' => $network_type
-                ], 'id = ?', [$id]);
+                ];
+                if ($qrCodePath) {
+                    $data['qr_code'] = $qrCodePath;
+                }
+                Database::update('deposit_networks', $data, 'id = ?', [$id]);
                 Session::flash('success', 'Deposit network updated.');
                 break;
             case 'delete':

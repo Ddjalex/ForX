@@ -80,6 +80,11 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
                             <label class="form-label">Wallet Address</label>
                             <input type="text" class="form-control" value="<?= htmlspecialchars($network['wallet_address']) ?>" readonly>
                         </div>
+                        <?php if (!empty($network['qr_code'])): ?>
+                        <div style="text-align: center; margin: 10px 0;">
+                            <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR" style="max-width: 100px; border-radius: 4px;">
+                        </div>
+                        <?php endif; ?>
                         <div class="form-group">
                             <label class="form-label">Network Type</label>
                             <input type="text" class="form-control" value="<?= htmlspecialchars($network['network_type']) ?>" readonly>
@@ -96,7 +101,7 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
             <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
             <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
         </div>
-        <form method="POST" action="/admin/settings/networks">
+        <form method="POST" action="/admin/settings/networks" enctype="multipart/form-data">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" name="action" id="networkAction" value="add">
             <input type="hidden" name="id" id="networkId">
@@ -116,6 +121,10 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
             <div class="form-group">
                 <label class="form-label">Network Type</label>
                 <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">QR Code (Optional)</label>
+                <input type="file" name="qr_code" class="form-control" accept="image/*">
             </div>
             
             <button type="submit" class="btn btn-primary btn-block">Save Network</button>
