@@ -132,7 +132,9 @@ class Router
     private static function logDispatch(string $method, string $rawUri, string $cleanUri): void
     {
         $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
-        @mkdir($logDir, 0755, true);
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
         
         $message = date('[Y-m-d H:i:s] ') . "Dispatch: $method $rawUri (cleaned: $cleanUri)\n";
         error_log($message, 3, $logDir . '/routing.log');
@@ -141,7 +143,9 @@ class Router
     private static function logNotFound(string $method, string $uri): void
     {
         $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
-        @mkdir($logDir, 0755, true);
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
         
         $message = date('[Y-m-d H:i:s] ') . "404 Not Found: $method $uri\n";
         error_log($message, 3, $logDir . '/routing.log');
@@ -150,7 +154,9 @@ class Router
     private static function logError(string $message): void
     {
         $logDir = dirname(dirname(__DIR__)) . '/storage/logs';
-        @mkdir($logDir, 0755, true);
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
         
         error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, $logDir . '/routing.log');
     }
