@@ -4,11 +4,11 @@ $minDeposit = $settings['min_deposit'] ?? '10';
 ?>
 
 <?php if (!empty($success)): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+    <div class="alert alert-success"><?= htmlspecialchars($success ?? '') ?></div>
 <?php endif; ?>
 
 <?php if (!empty($error)): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <div class="alert alert-danger"><?= htmlspecialchars($error ?? '') ?></div>
 <?php endif; ?>
 
 <div class="deposit-grid">
@@ -20,16 +20,16 @@ $minDeposit = $settings['min_deposit'] ?? '10';
         <?php if (!empty($networks)): ?>
             <?php foreach ($networks as $network): ?>
             <div class="deposit-method">
-                <h4><?= htmlspecialchars($network['name']) ?> (<?= htmlspecialchars($network['symbol']) ?>) Deposit</h4>
+                <h4><?= htmlspecialchars($network['name'] ?? '') ?> (<?= htmlspecialchars($network['symbol'] ?? '') ?>) Deposit</h4>
                 <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
                 <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                    <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($network['network_type']) ?></strong></p>
-                    <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($network['wallet_address']) ?></p>
-                    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($network['wallet_address']) ?>'); this.textContent='Copied!';">Copy Address</button>
+                    <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($network['network_type'] ?? '') ?></strong></p>
+                    <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($network['wallet_address'] ?? '') ?></p>
+                    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($network['wallet_address'] ?? '') ?>'); this.textContent='Copied!';">Copy Address</button>
                 </div>
                 <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                    <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                    <input type="hidden" name="method" value="<?= htmlspecialchars(strtolower($network['symbol'])) ?>">
+                    <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
+                    <input type="hidden" name="method" value="<?= htmlspecialchars(strtolower($network['symbol'] ?? '')) ?>">
                     <div class="form-group">
                         <label>Amount (USD)</label>
                         <input type="number" name="amount" class="form-control" placeholder="Min: <?= htmlspecialchars($minDeposit) ?>" step="0.01" min="<?= htmlspecialchars($minDeposit) ?>" required>
@@ -63,7 +63,7 @@ $minDeposit = $settings['min_deposit'] ?? '10';
             <p>Once payment is made using this method you are to send your payment proof to our support mail <a href="mailto:<?= htmlspecialchars($settings['support_email'] ?? 'support@tradeflowglobalex.com') ?>"><?= htmlspecialchars($settings['support_email'] ?? 'support@tradeflowglobalex.com') ?></a></p>
             <p>Once requested, you will receive the payment details via our support mail.</p>
             <form method="POST" action="/wallet/deposit">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?? '' ?>">
                 <input type="hidden" name="method" value="other">
                 <button type="submit" class="btn btn-secondary">Request Details</button>
             </form>
