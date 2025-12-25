@@ -399,24 +399,30 @@ async function approveKYC(kycId) {
             body: formData,
             headers: { 'X-Requested-With': 'XMLHttpRequest' } 
         });
-        const text = await res.text();
-        if (text.toLowerCase().includes('success')) {
+        const data = await res.json();
+        if (data.success) {
             showNotification('Approved!', 'success');
             setTimeout(() => location.reload(), 1000);
-        } else { showNotification('Failed to approve', 'error'); }
+        } else { showNotification(data.error || 'Failed to approve', 'error'); }
     } catch (e) { showNotification('Error occurred', 'error'); }
 }
 
 document.getElementById('rejectForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
+    const formData = new FormData(this);
     const kycId = document.getElementById('rejectKycId').value;
+    
     try {
-        const res = await fetch(`/admin/kyc/reject/${kycId}`, { method: 'POST', body: new FormData(this), headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const text = await res.text();
-        if (text.toLowerCase().includes('success')) {
-            showNotification('Rejected!', 'success');
+        const res = await fetch(`/admin/kyc/reject/${kycId}`, { 
+            method: 'POST', 
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+        });
+        const data = await res.json();
+        if (data.success) {
+            showNotification('Rejected', 'success');
             setTimeout(() => location.reload(), 1000);
-        } else { showNotification('Failed to reject', 'error'); }
+        } else { showNotification(data.error || 'Failed to reject', 'error'); }
     } catch (e) { showNotification('Error occurred', 'error'); }
 });
 
