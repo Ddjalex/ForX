@@ -471,13 +471,16 @@ class AdminController
                 $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
             }
 
-            echo Router::render('admin/settings', [
-                'settings' => $settingsArray,
-                'depositNetworks' => $depositNetworks,
-                'csrf_token' => Session::generateCsrfToken(),
-                'success' => Session::getFlash('success'),
-                'error' => Session::getFlash('error'),
-            ]);
+            // Pass data to view
+            $title = 'Settings';
+            $pageTitle = 'Platform Settings';
+            $csrf_token = Session::generateCsrfToken();
+            $success = Session::getFlash('success');
+            $error = Session::getFlash('error');
+            $content = '';
+            
+            // Render the settings view
+            include ROOT_PATH . '/app/Views/admin/settings.php';
         } catch (\Throwable $e) {
             error_log("Admin Settings View Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             Session::flash('error', 'Unable to load settings at this time. ' . $e->getMessage());
