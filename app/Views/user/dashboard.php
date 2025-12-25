@@ -722,8 +722,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .kyc-verification-info {
-    background: rgba(0, 212, 170, 0.08);
-    border: 1px solid rgba(0, 212, 170, 0.2);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 30px;
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .kyc-verification-info li:before {
     content: '✓ ';
-    color: var(--accent-primary);
+    color: #10b981;
     font-weight: bold;
     margin-right: 8px;
 }

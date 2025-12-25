@@ -16,17 +16,50 @@ class AuthMiddleware
         }
 
         $user = Auth::user();
-        $isKycRequired = !in_array($_SERVER['REQUEST_URI'], ['/kyc/verify', '/logout', '/api/notifications/unread', '/api/notifications', '/accounts']);
         
-        // Check if KYC verification is required and user is not verified
-        if ($isKycRequired && !$user['email_verified']) {
-            // Allow only to specific pages
-            $allowedPaths = ['/dashboard', '/kyc/verify', '/logout', '/accounts'];
-            $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            $currentPath = rtrim($currentPath, '/') ?: '/';
+        // Check if user has approved KYC verification
+        $kycApproved = Database::fetch(
+            "SELECT * FROM kyc_verifications WHERE user_id = ? AND status = 'approved'",
+            [$user['id']]
+        );
+        
+        // Allowed paths for unverified users
+        $allowedForUnverified = ['/dashboard', '/kyc/verify', '/logout', '/accounts', '/api/notifications/unread', '/api/notifications'];
+        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $currentPath = rtrim($currentPath, '/') ?: '/';
+        
+        // If user doesn't have approved KYC, restrict access to trading and advanced features
+        if (!$kycApproved) {
+            // These are trading/restricted routes that require KYC approval
+            $restrictedPaths = [
+                '/wallet',
+                '/wallet/deposit',
+                '/wallet/withdraw',
+                '/markets',
+                '/dashboard/trade',
+                '/positions',
+                '/orders',
+                '/dashboard/trades/history',
+                '/copy-experts',
+                '/news',
+                '/nfts',
+                '/signals',
+                '/loans',
+                '/referrals',
+                '/live-analysis'
+            ];
             
-            if (!in_array($currentPath, $allowedPaths)) {
-                Router::redirect('/kyc/verify');
+            // Check if current path is restricted
+            foreach ($restrictedPaths as $path) {
+                if (strpos($currentPath, $path) === 0) {
+                    Router::redirect('/kyc/verify');
+                    return false;
+                }
+            }
+            
+            // Also check API routes that require KYC
+            if (strpos($currentPath, '/api/') === 0 && !in_array($currentPath, $allowedForUnverified)) {
+                Router::json(['error' => 'KYC verification required'], 403);
                 return false;
             }
         }
