@@ -1067,6 +1067,13 @@ function updateAssetNames() {
     const assetNameSelect = document.getElementById('assetName');
     const options = assetNameSelect.querySelectorAll('option');
     
+    // Update Asset Type in Market Info
+    const assetTypeSelect = document.getElementById('assetType');
+    const currentAssetTypeEl = document.getElementById('dashboardCurrentAssetType');
+    if (currentAssetTypeEl && assetTypeSelect) {
+        currentAssetTypeEl.textContent = assetTypeSelect.options[assetTypeSelect.selectedIndex].text;
+    }
+    
     let firstVisible = null;
     options.forEach(option => {
         const optionType = option.getAttribute('data-type');
@@ -1142,7 +1149,8 @@ function updateMarketInfo() {
     if (!selectedOption) return;
     
     const assetTypeRaw = selectedOption.getAttribute('data-type') || 'crypto';
-    const assetType = capitalizeAssetType(assetTypeRaw);
+    const assetTypeSelect = document.getElementById('assetType');
+    const assetType = assetTypeSelect ? assetTypeSelect.options[assetTypeSelect.selectedIndex].text : capitalizeAssetType(assetTypeRaw);
     const assetName = selectedOption.textContent.split('(')[0].trim() || 'BTC/USD';
     const assetPriceRaw = selectedOption.getAttribute('data-price') || '0';
     const assetPrice = parseFloat(assetPriceRaw);
@@ -1155,7 +1163,7 @@ function updateMarketInfo() {
     if (currentAssetNameEl) currentAssetNameEl.textContent = assetName;
     if (currentPriceEl) {
         if (assetPrice > 0 && isFinite(assetPrice)) {
-            currentPriceEl.textContent = '$' + assetPrice.toFixed(2);
+            currentPriceEl.textContent = '$' + assetPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         } else {
             currentPriceEl.textContent = '$0.00';
         }
