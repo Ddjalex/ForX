@@ -510,7 +510,12 @@ class AdminController
     public function manageDepositNetworks(): void
     {
         try {
+            error_log("=== DEPOSIT NETWORKS REQUEST ===");
+            error_log("POST data: " . json_encode($_POST));
+            error_log("FILES data: " . json_encode($_FILES));
+            
             if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+                error_log("CSRF Token validation failed");
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
                     Router::json(['success' => false, 'error' => 'Invalid request.'], 403);
                     return;
@@ -522,6 +527,7 @@ class AdminController
 
             // Determine if this is a general settings update or a network update
             if (isset($_POST['update_general_settings'])) {
+                error_log("Routing to general settings update");
                 $this->updateSettings();
                 return;
             }
@@ -533,13 +539,17 @@ class AdminController
             $wallet_address = filter_input(INPUT_POST, 'wallet_address', FILTER_SANITIZE_SPECIAL_CHARS);
             $network_type = filter_input(INPUT_POST, 'network_type', FILTER_SANITIZE_SPECIAL_CHARS);
 
+            error_log("Action: $action | Name: $name | Symbol: $symbol | Wallet: $wallet_address | Type: $network_type");
+
             $qrCodePath = null;
             if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
+                error_log("QR Code file detected, uploading...");
                 $uploadDir = 'uploads/qr_codes/';
                 $fullUploadDir = \PUBLIC_PATH . '/' . $uploadDir;
                 
                 if (!is_dir($fullUploadDir)) {
                     @mkdir($fullUploadDir, 0755, true);
+                    error_log("Created upload directory: $fullUploadDir");
                 }
                 
                 $extension = strtolower(pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION));
@@ -548,11 +558,15 @@ class AdminController
                 
                 if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
                     $qrCodePath = '/uploads/qr_codes/' . $fileName;
+                    error_log("QR Code uploaded: $qrCodePath");
+                } else {
+                    error_log("Failed to move uploaded QR code file");
                 }
             }
 
             switch ($action) {
                 case 'add':
+                    error_log("Adding new network: $name");
                     Database::insert('deposit_networks', [
                         'name' => $name,
                         'symbol' => $symbol,
@@ -561,8 +575,10 @@ class AdminController
                         'qr_code' => $qrCodePath,
                         'status' => 'active'
                     ]);
+                    error_log("Network added successfully");
                     break;
                 case 'update':
+                    error_log("Updating network ID: $id");
                     $data = [
                         'name' => $name,
                         'symbol' => $symbol,
@@ -573,16 +589,24 @@ class AdminController
                         $data['qr_code'] = $qrCodePath;
                     }
                     Database::update('deposit_networks', $data, 'id = ?', [$id]);
+                    error_log("Network updated successfully");
                     break;
                 case 'delete':
+                    error_log("Deleting network ID: $id");
                     Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
+                    error_log("Network deleted successfully");
                     break;
+                default:
+                    error_log("No valid action specified. Action was: '$action'");
             }
 
             Session::flash('success', 'Operation successful.');
             Router::redirect('/admin/settings');
         } catch (\Throwable $e) {
-            error_log("Manage Networks Critical Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            error_log("=== MANAGE NETWORKS CRITICAL ERROR ===");
+            error_log("Error Message: " . $e->getMessage());
+            error_log("Error Code: " . $e->getCode());
+            error_log("Stack Trace: " . $e->getTraceAsString());
             
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
                 Router::json(['success' => false, 'error' => $e->getMessage()], 500);

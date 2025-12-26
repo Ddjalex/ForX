@@ -55,6 +55,10 @@ $pageTitle = $pageTitle ?? 'Settings';
                 </div>
             </div>
 
+            <div id="networkDebugInfo" style="background: #2d3748; border: 1px solid #4a5568; border-radius: 8px; padding: 12px; margin-bottom: 16px; color: #cbd5e0; font-size: 12px; display: none;">
+                <strong>Debug Info:</strong> <span id="debugText"></span>
+            </div>
+
             <div class="settings-grid">
                 <?php foreach ($depositNetworks as $network): ?>
                 <div class="settings-card">
@@ -484,6 +488,7 @@ function showAddNetworkModal() {
     document.getElementById('networkSymbol').value = '';
     document.getElementById('networkWallet').value = '';
     document.getElementById('networkType').value = '';
+    document.getElementById('networkQRCode').value = '';
     document.getElementById('networkModal').classList.add('active');
 }
 
