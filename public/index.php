@@ -97,9 +97,9 @@ try {
         }
     }
 
-    // Load routes and dispatch
-    require ROOT_PATH . '/routes/web.php';
-    Router::dispatch();
+// Load routes and dispatch
+require_once ROOT_PATH . '/routes/web.php';
+\App\Services\Router::dispatch();
     
 } catch (Throwable $e) {
     $errorMsg = "EXCEPTION: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine() . "\nTrace: " . $e->getTraceAsString() . "\n";

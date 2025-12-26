@@ -33,8 +33,9 @@ class Router
         $method = $_SERVER['REQUEST_METHOD'];
         $rawUri = $_SERVER['REQUEST_URI'];
         
-        // Clean up URI - remove query string
+        // Clean up URI - remove query string and trailing slash
         $uri = parse_url($rawUri, PHP_URL_PATH);
+        $uri = rtrim($uri, '/') ?: '/';
         
         // Remove known deployment prefixes
         $prefixes = ['/public_html', '/public'];
@@ -42,18 +43,9 @@ class Router
             $prefix = rtrim($prefix, '/');
             if (!empty($prefix) && strpos($uri, $prefix) === 0) {
                 $uri = substr($uri, strlen($prefix));
+                $uri = '/' . ltrim($uri, '/');
+                $uri = rtrim($uri, '/') ?: '/';
             }
-        }
-        
-        // Normalize URI: ensure starts with / and remove trailing slash
-        $uri = '/' . ltrim($uri, '/');
-        if ($uri !== '/') {
-            $uri = rtrim($uri, '/');
-        }
-        
-        // Final fallback: if URI is empty, set to root
-        if (empty($uri)) {
-            $uri = '/';
         }
         
         // Log dispatch attempt
