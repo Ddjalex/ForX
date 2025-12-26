@@ -38,7 +38,7 @@ class Router
         $uri = rtrim($uri, '/') ?: '/';
         
         // Remove known deployment prefixes
-        $prefixes = ['/public_html', '/public'];
+        $prefixes = ['/public_html'];
         foreach ($prefixes as $prefix) {
             if (strpos($uri, $prefix) === 0) {
                 $uri = substr($uri, strlen($prefix));
