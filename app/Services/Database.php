@@ -62,7 +62,7 @@ class Database
     public static function tableExists(string $tableName): bool
     {
         try {
-            // Fix: Check MariaDB/MySQL information_schema using current database name
+            // Fix: MySQL information_schema check using DATABASE() function
             $result = self::fetch(
                 "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?",
                 [$tableName]
@@ -76,10 +76,10 @@ class Database
     public static function insert(string $table, array $data): int
     {
         $data = self::convertBooleans($data);
-        $columns = implode(', ', array_keys($data));
+        $columns = implode('`, `', array_keys($data));
         $placeholders = implode(', ', array_fill(0, count($data), '?'));
         
-        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+        $sql = "INSERT INTO `{$table}` (`{$columns}`) VALUES ({$placeholders})";
         self::query($sql, array_values($data));
         
         return (int) self::getInstance()->lastInsertId();
@@ -89,7 +89,7 @@ class Database
     {
         foreach ($data as $key => $value) {
             if (is_bool($value)) {
-                // MySQL/MariaDB use 1/0 for booleans (TINYINT(1))
+                // MySQL uses 1/0 for TINYINT(1) booleans
                 $data[$key] = $value ? 1 : 0;
             }
         }
