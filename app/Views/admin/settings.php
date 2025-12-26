@@ -68,14 +68,9 @@ $pageTitle = $pageTitle ?? 'Settings';
                             <button type="button" class="action-btn-icon" onclick="showEditNetworkModal(<?= htmlspecialchars(json_encode($network)) ?>)">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                             </button>
-                            <form method="POST" action="/admin/settings" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
-                                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="id" value="<?= $network['id'] ?>">
-                                <button type="submit" class="action-btn-icon delete">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                </button>
-                            </form>
+                            <button type="button" class="action-btn-icon delete" onclick="deleteNetwork(<?= $network['id'] ?>, '<?= htmlspecialchars($network['name']) ?>')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -250,26 +245,26 @@ $pageTitle = $pageTitle ?? 'Settings';
             <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
             <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
         </div>
-        <form method="POST" action="/admin/settings" enctype="multipart/form-data">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" id="networkForm" onsubmit="submitNetworkForm(event)">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" name="action" id="networkAction" value="add">
-            <input type="hidden" name="id" id="networkId">
+            <input type="hidden" name="id" id="networkId" value="">
             
             <div class="form-group">
                 <label class="form-label">Network Name</label>
-                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
+                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin">
             </div>
             <div class="form-group">
                 <label class="form-label">Symbol</label>
-                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
+                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC">
             </div>
             <div class="form-group">
                 <label class="form-label">Wallet Address</label>
-                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
+                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address">
             </div>
             <div class="form-group">
                 <label class="form-label">Network Type</label>
-                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
+                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)">
             </div>
             <div class="form-group">
                 <label class="form-label">QR Code (Optional)</label>
@@ -507,6 +502,55 @@ function showEditNetworkModal(network) {
 
 function hideNetworkModal() {
     document.getElementById('networkModal').classList.remove('active');
+}
+
+function submitNetworkForm(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('networkName').value.trim();
+    const symbol = document.getElementById('networkSymbol').value.trim();
+    const wallet = document.getElementById('networkWallet').value.trim();
+    const type = document.getElementById('networkType').value.trim();
+    
+    if (!name || !symbol || !wallet || !type) {
+        alert('Please fill in all required fields');
+        return false;
+    }
+    
+    document.getElementById('networkForm').submit();
+    return false;
+}
+
+function deleteNetwork(id, name) {
+    if (!confirm('Are you sure you want to delete "' + name + '"?')) {
+        return false;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/settings';
+    
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = '_csrf_token';
+    csrf.value = '<?= $csrf_token ?>';
+    form.appendChild(csrf);
+    
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'delete';
+    form.appendChild(actionInput);
+    
+    const idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.name = 'id';
+    idInput.value = id;
+    form.appendChild(idInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    return false;
 }
 
 function switchSection(sectionId) {
