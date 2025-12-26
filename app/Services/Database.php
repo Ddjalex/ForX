@@ -81,25 +81,15 @@ class Database
         $data = self::convertBooleans($data);
         $columnsEscaped = [];
         foreach (array_keys($data) as $key) {
-            $columnsEscaped[] = "`$key`";
+            $columnsEscaped[] = $key; // Removed backticks for PostgreSQL compatibility
         }
         $columns = implode(', ', $columnsEscaped);
         $placeholders = implode(', ', array_fill(0, count($data), '?'));
         
-        $sql = "INSERT INTO `{$table}` ({$columns}) VALUES ({$placeholders})";
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
         self::query($sql, array_values($data));
         
         return (int) self::getInstance()->lastInsertId();
-    }
-
-    private static function convertBooleans(array $data): array
-    {
-        foreach ($data as $key => $value) {
-            if (is_bool($value)) {
-                $data[$key] = $value ? 1 : 0;
-            }
-        }
-        return $data;
     }
 
     public static function update(string $table, array $data, string $where, array $whereParams = []): int
@@ -107,17 +97,17 @@ class Database
         $data = self::convertBooleans($data);
         $setParts = [];
         foreach (array_keys($data) as $key) {
-            $setParts[] = "`$key` = ?";
+            $setParts[] = "$key = ?"; // Removed backticks for PostgreSQL compatibility
         }
         $set = implode(', ', $setParts);
-        $sql = "UPDATE `{$table}` SET {$set} WHERE {$where}";
+        $sql = "UPDATE {$table} SET {$set} WHERE {$where}";
         
         return self::query($sql, array_merge(array_values($data), $whereParams))->rowCount();
     }
 
     public static function delete(string $table, string $where, array $params = []): int
     {
-        $sql = "DELETE FROM `{$table}` WHERE {$where}";
+        $sql = "DELETE FROM {$table} WHERE {$where}"; // Removed backticks for PostgreSQL compatibility
         return self::query($sql, $params)->rowCount();
     }
 }
