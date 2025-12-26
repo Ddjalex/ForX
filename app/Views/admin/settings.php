@@ -63,7 +63,7 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
                             <button type="button" class="action-btn-icon" onclick="showEditNetworkModal(<?= htmlspecialchars(json_encode($network)) ?>)">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                             </button>
-                            <form method="POST" action="/admin/settings/networks" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
+                            <form method="POST" action="/admin/settings" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
                                 <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="<?= $network['id'] ?>">
@@ -245,7 +245,7 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
             <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
             <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
         </div>
-        <form method="POST" action="/admin/settings/networks" enctype="multipart/form-data">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" name="action" id="networkAction" value="add">
             <input type="hidden" name="id" id="networkId">
