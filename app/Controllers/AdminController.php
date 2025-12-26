@@ -509,48 +509,48 @@ class AdminController
 
     public function manageDepositNetworks(): void
     {
-        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
-                Router::json(['success' => false, 'error' => 'Invalid request.'], 403);
+        try {
+            if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+                    Router::json(['success' => false, 'error' => 'Invalid request.'], 403);
+                    return;
+                }
+                Session::flash('error', 'Invalid request.');
+                Router::redirect('/admin/settings');
                 return;
             }
-            Session::flash('error', 'Invalid request.');
-            Router::redirect('/admin/settings');
-            return;
-        }
 
-        // Determine if this is a general settings update or a network update
-        if (isset($_POST['update_general_settings'])) {
-            $this->updateSettings();
-            return;
-        }
-
-        $action = $_POST['action'] ?? '';
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
-        $symbol = filter_input(INPUT_POST, 'symbol', FILTER_SANITIZE_SPECIAL_CHARS);
-        $wallet_address = filter_input(INPUT_POST, 'wallet_address', FILTER_SANITIZE_SPECIAL_CHARS);
-        $network_type = filter_input(INPUT_POST, 'network_type', FILTER_SANITIZE_SPECIAL_CHARS);
-
-        $qrCodePath = null;
-        if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = 'uploads/qr_codes/';
-            $fullUploadDir = PUBLIC_PATH . '/' . $uploadDir;
-            
-            if (!is_dir($fullUploadDir)) {
-                mkdir($fullUploadDir, 0755, true);
+            // Determine if this is a general settings update or a network update
+            if (isset($_POST['update_general_settings'])) {
+                $this->updateSettings();
+                return;
             }
-            
-            $extension = strtolower(pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION));
-            $fileName = uniqid('qr_') . '.' . $extension;
-            $targetPath = $fullUploadDir . $fileName;
-            
-            if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
-                $qrCodePath = '/uploads/qr_codes/' . $fileName;
-            }
-        }
 
-        try {
+            $action = $_POST['action'] ?? '';
+            $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+            $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+            $symbol = filter_input(INPUT_POST, 'symbol', FILTER_SANITIZE_SPECIAL_CHARS);
+            $wallet_address = filter_input(INPUT_POST, 'wallet_address', FILTER_SANITIZE_SPECIAL_CHARS);
+            $network_type = filter_input(INPUT_POST, 'network_type', FILTER_SANITIZE_SPECIAL_CHARS);
+
+            $qrCodePath = null;
+            if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = 'uploads/qr_codes/';
+                $fullUploadDir = PUBLIC_PATH . '/' . $uploadDir;
+                
+                if (!is_dir($fullUploadDir)) {
+                    mkdir($fullUploadDir, 0755, true);
+                }
+                
+                $extension = strtolower(pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION));
+                $fileName = uniqid('qr_') . '.' . $extension;
+                $targetPath = $fullUploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
+                    $qrCodePath = '/uploads/qr_codes/' . $fileName;
+                }
+            }
+
             switch ($action) {
                 case 'add':
                     Database::insert('deposit_networks', [
@@ -581,9 +581,15 @@ class AdminController
 
             Session::flash('success', 'Operation successful.');
             Router::redirect('/admin/settings');
-        } catch (\Exception $e) {
-            error_log("Manage Networks Error: " . $e->getMessage());
-            Session::flash('error', 'Error: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log("Manage Networks Critical Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+                Router::json(['success' => false, 'error' => $e->getMessage()], 500);
+                return;
+            }
+            
+            Session::flash('error', 'Critical Error: ' . $e->getMessage());
             Router::redirect('/admin/settings');
         }
     }

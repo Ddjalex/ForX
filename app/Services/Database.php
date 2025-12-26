@@ -110,4 +110,14 @@ class Database
         $sql = "DELETE FROM {$table} WHERE {$where}"; // Removed backticks for PostgreSQL compatibility
         return self::query($sql, $params)->rowCount();
     }
+
+    private static function convertBooleans(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_bool($value)) {
+                $data[$key] = $value ? 1 : 0;
+            }
+        }
+        return $data;
+    }
 }
