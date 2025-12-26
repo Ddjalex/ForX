@@ -531,33 +531,32 @@ function deleteNetwork(id, name) {
     const settingsForm = document.getElementById('settingsForm');
     const csrfToken = settingsForm ? settingsForm.querySelector('input[name="_csrf_token"]').value : '<?= $csrf_token ?>';
     
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/admin/settings';
-    form.style.display = 'none';
-    
-    const csrf = document.createElement('input');
-    csrf.type = 'hidden';
-    csrf.name = '_csrf_token';
-    csrf.value = csrfToken;
-    form.appendChild(csrf);
-    
-    const actionInput = document.createElement('input');
-    actionInput.type = 'hidden';
-    actionInput.name = 'action';
-    actionInput.value = 'delete';
-    form.appendChild(actionInput);
-    
-    const idInput = document.createElement('input');
-    idInput.type = 'hidden';
-    idInput.name = 'id';
-    idInput.value = id;
-    form.appendChild(idInput);
-    
-    document.body.appendChild(form);
     console.log('Deleting network ID:', id);
     console.log('CSRF Token:', csrfToken);
-    form.submit();
+    
+    // Use fetch API for more reliable form submission
+    const formData = new FormData();
+    formData.append('_csrf_token', csrfToken);
+    formData.append('action', 'delete');
+    formData.append('id', id);
+    
+    fetch('/admin/settings', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error deleting network');
+        }
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        alert('Error deleting network: ' + error.message);
+    });
+    
     return false;
 }
 
