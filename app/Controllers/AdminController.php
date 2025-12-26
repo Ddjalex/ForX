@@ -506,6 +506,10 @@ class AdminController
     public function manageDepositNetworks(): void
     {
         if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+                Router::json(['success' => false, 'error' => 'Invalid request.'], 403);
+                return;
+            }
             Session::flash('error', 'Invalid request.');
             Router::redirect('/admin/settings');
             return;
@@ -522,7 +526,6 @@ class AdminController
         if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = 'uploads/qr_codes/';
             $fullUploadDir = PUBLIC_PATH . '/' . $uploadDir;
-            $qrCodePath = '/' . $uploadDir; // Base path for DB
             
             if (!is_dir($fullUploadDir)) {
                 mkdir($fullUploadDir, 0755, true);
@@ -533,41 +536,55 @@ class AdminController
             $targetPath = $fullUploadDir . $fileName;
             
             if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
-                $qrCodePath = $qrCodePath . $fileName;
+                $qrCodePath = '/' . $uploadDir . $fileName;
             }
         }
 
-        switch ($action) {
-            case 'add':
-                Database::insert('deposit_networks', [
-                    'name' => $name,
-                    'symbol' => $symbol,
-                    'wallet_address' => $wallet_address,
-                    'network_type' => $network_type,
-                    'qr_code' => $qrCodePath
-                ]);
-                Session::flash('success', 'Deposit network added.');
-                break;
-            case 'update':
-                $data = [
-                    'name' => $name,
-                    'symbol' => $symbol,
-                    'wallet_address' => $wallet_address,
-                    'network_type' => $network_type
-                ];
-                if ($qrCodePath) {
-                    $data['qr_code'] = $qrCodePath;
-                }
-                Database::update('deposit_networks', $data, 'id = ?', [$id]);
-                Session::flash('success', 'Deposit network updated.');
-                break;
-            case 'delete':
-                Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
-                Session::flash('success', 'Deposit network deleted.');
-                break;
-        }
+        try {
+            switch ($action) {
+                case 'add':
+                    Database::insert('deposit_networks', [
+                        'name' => $name,
+                        'symbol' => $symbol,
+                        'wallet_address' => $wallet_address,
+                        'network_type' => $network_type,
+                        'qr_code' => $qrCodePath,
+                        'status' => 'active'
+                    ]);
+                    break;
+                case 'update':
+                    $data = [
+                        'name' => $name,
+                        'symbol' => $symbol,
+                        'wallet_address' => $wallet_address,
+                        'network_type' => $network_type
+                    ];
+                    if ($qrCodePath) {
+                        $data['qr_code'] = $qrCodePath;
+                    }
+                    Database::update('deposit_networks', $data, 'id = ?', [$id]);
+                    break;
+                case 'delete':
+                    Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
+                    break;
+            }
 
-        Router::redirect('/admin/settings');
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+                Router::json(['success' => true, 'message' => 'Operation successful']);
+                return;
+            }
+
+            Session::flash('success', 'Operation successful.');
+            Router::redirect('/admin/settings');
+        } catch (\Exception $e) {
+            error_log("Manage Networks Error: " . $e->getMessage());
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+                Router::json(['success' => false, 'error' => $e->getMessage()], 500);
+                return;
+            }
+            Session::flash('error', $e->getMessage());
+            Router::redirect('/admin/settings');
+        }
     }
 
     public function updateSettings(): void
