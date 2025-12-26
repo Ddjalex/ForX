@@ -449,6 +449,8 @@ function showEditNetworkModal(network) {
     document.getElementById('networkSymbol').value = network.symbol;
     document.getElementById('networkWallet').value = network.wallet_address;
     document.getElementById('networkType').value = network.network_type;
+    const qrCodeInput = document.getElementById('networkQRCode');
+    if (qrCodeInput) qrCodeInput.value = '';
     document.getElementById('networkModal').classList.add('active');
 }
 
