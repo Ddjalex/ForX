@@ -8,14 +8,8 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# ----------------------------------------------------
-# Route EVERYTHING (including /api/...) through index.php
-# ----------------------------------------------------
+# Route EVERYTHING through index.php
 RewriteRule ^ index.php [L,QSA]
-
-# Assets fix (only if assets are inside /public/assets/)
-RewriteRule ^assets/(.*)$ public/assets/$1 [L,NC]
-RewriteRule ^assets$ public/assets [L,NC]
 
 # Cache Control Headers
 <IfModule mod_headers.c>
