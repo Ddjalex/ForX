@@ -59,6 +59,20 @@ class Database
         return self::query($sql, $params)->fetchAll();
     }
 
+    public static function tableExists(string $tableName): bool
+    {
+        try {
+            // Fix: Check MariaDB/MySQL information_schema using current database name
+            $result = self::fetch(
+                "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?",
+                [$tableName]
+            );
+            return ($result['count'] ?? 0) > 0;
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
+
     public static function insert(string $table, array $data): int
     {
         $data = self::convertBooleans($data);
@@ -75,7 +89,8 @@ class Database
     {
         foreach ($data as $key => $value) {
             if (is_bool($value)) {
-                $data[$key] = $value ? 'true' : 'false';
+                // MySQL/MariaDB use 1/0 for booleans (TINYINT(1))
+                $data[$key] = $value ? 1 : 0;
             }
         }
         return $data;
