@@ -41,7 +41,6 @@ class Database
                 );
             } catch (PDOException $e) {
                 error_log("Database connection failed: " . $e->getMessage());
-                // In cPanel, we must not die() if we want the error_log to be visible or handled
                 throw new \Exception("Database connection failed. Please check your configuration.");
             }
         }
@@ -70,12 +69,10 @@ class Database
     public static function tableExists(string $tableName): bool
     {
         try {
-            // Simplified check for MySQL/MariaDB
             $result = self::fetchAll("SHOW TABLES LIKE ?", [$tableName]);
             return !empty($result);
         } catch (\Exception $e) {
-            error_log("Table check error: " . $e->getMessage());
-            return true;
+            return true; 
         }
     }
 
@@ -99,7 +96,6 @@ class Database
     {
         foreach ($data as $key => $value) {
             if (is_bool($value)) {
-                // MySQL uses 1/0 for TINYINT(1) booleans
                 $data[$key] = $value ? 1 : 0;
             }
         }

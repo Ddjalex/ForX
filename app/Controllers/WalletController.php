@@ -42,7 +42,6 @@ class WalletController
         $networks = [];
         
         try {
-            // Fetch settings
             $allSettings = Database::fetchAll("SELECT * FROM settings");
             foreach ($allSettings as $setting) {
                 if (isset($setting['setting_key']) && isset($setting['value'])) {
@@ -50,9 +49,7 @@ class WalletController
                 }
             }
 
-            // Fetch networks
             $networks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY name ASC");
-
         } catch (\Exception $e) {
             error_log("Deposit Page Error: " . $e->getMessage());
         }

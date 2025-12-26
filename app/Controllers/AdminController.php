@@ -476,25 +476,11 @@ class AdminController
                 }
             }
 
-            // Check if table exists before querying
-            $tableExists = false;
-            try {
-                // MySQL/MariaDB compatible check
-                $check = Database::fetch("SHOW TABLES LIKE 'deposit_networks'");
-                $tableExists = !empty($check);
-            } catch (\Throwable $e) {
-                // Fallback for PostgreSQL (Replit environment)
-                try {
-                    $check = Database::fetch("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'deposit_networks')");
-                    $tableExists = $check && ($check['exists'] === true || $check['exists'] === 't');
-                } catch (\Throwable $e2) {
-                    $tableExists = false;
-                }
-            }
-
             $depositNetworks = [];
-            if ($tableExists) {
+            try {
                 $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
+            } catch (\Throwable $e) {
+                error_log("Admin Networks View Error: " . $e->getMessage());
             }
 
             $pageTitle = 'Platform Settings';
