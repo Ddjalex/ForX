@@ -468,7 +468,10 @@ class AdminController
     public function settings(): void
     {
         try {
-            $settings = Database::fetchAll("SELECT * FROM settings");
+            // Re-generate CSRF token
+            $csrf_token = Session::generateCsrfToken();
+            
+            $settings = Database::fetchAll("SELECT * FROM settings") ?: [];
             $settingsArray = [];
             foreach ($settings as $setting) {
                 if (isset($setting['setting_key'])) {
@@ -478,28 +481,29 @@ class AdminController
 
             $depositNetworks = [];
             try {
-                $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC");
+                $depositNetworks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY id ASC") ?: [];
             } catch (\Throwable $e) {
-                error_log("Admin Networks View Error: " . $e->getMessage());
+                error_log("Deposit Networks Fetch Error: " . $e->getMessage());
             }
 
-            $pageTitle = 'Platform Settings';
-            $csrf_token = Session::generateCsrfToken();
             $success = Session::getFlash('success');
             $error = Session::getFlash('error');
             
-            echo Router::render('admin/settings', [
+            $viewData = [
                 'settings' => $settingsArray,
                 'depositNetworks' => $depositNetworks,
                 'csrf_token' => $csrf_token,
                 'success' => $success,
                 'error' => $error,
-                'pageTitle' => $pageTitle,
-            ]);
+                'pageTitle' => 'Platform Settings',
+            ];
+
+            // Re-render
+            echo Router::render('admin/settings', $viewData);
         } catch (\Throwable $e) {
-            error_log("Admin Settings View Error: " . $e->getMessage());
-            Session::flash('error', 'Unable to load settings.');
-            Router::redirect('/admin');
+            error_log("Admin Settings Global Error: " . $e->getMessage());
+            http_response_code(500);
+            echo "<h2>System Error</h2><p>" . htmlspecialchars($e->getMessage()) . "</p>";
         }
     }
 

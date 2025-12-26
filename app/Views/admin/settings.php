@@ -1,10 +1,11 @@
 <?php
-if (!isset($settings)) $settings = [];
-if (!isset($depositNetworks)) $depositNetworks = [];
-if (!isset($csrf_token)) $csrf_token = '';
-if (!isset($success)) $success = '';
-if (!isset($error)) $error = '';
-if (!isset($pageTitle)) $pageTitle = 'Settings';
+// Safety check for variables
+$settings = $settings ?? [];
+$depositNetworks = $depositNetworks ?? [];
+$csrf_token = $csrf_token ?? '';
+$success = $success ?? '';
+$error = $error ?? '';
+$pageTitle = $pageTitle ?? 'Settings';
 ?>
 
 <?php if (!empty($success)): ?>
