@@ -537,12 +537,12 @@ class AdminController
                 mkdir($fullUploadDir, 0755, true);
             }
             
-            $extension = pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION);
+            $extension = strtolower(pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION));
             $fileName = uniqid('qr_') . '.' . $extension;
             $targetPath = $fullUploadDir . $fileName;
             
             if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
-                $qrCodePath = '/' . $uploadDir . $fileName;
+                $qrCodePath = '/uploads/qr_codes/' . $fileName;
             }
         }
 
@@ -575,20 +575,11 @@ class AdminController
                     break;
             }
 
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
-                Router::json(['success' => true, 'message' => 'Operation successful']);
-                return;
-            }
-
             Session::flash('success', 'Operation successful.');
             Router::redirect('/admin/settings');
         } catch (\Exception $e) {
             error_log("Manage Networks Error: " . $e->getMessage());
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
-                Router::json(['success' => false, 'error' => $e->getMessage()], 500);
-                return;
-            }
-            Session::flash('error', $e->getMessage());
+            Session::flash('error', 'Error: ' . $e->getMessage());
             Router::redirect('/admin/settings');
         }
     }
@@ -602,10 +593,13 @@ class AdminController
         }
 
         unset($_POST['_csrf_token']);
-        unset($_POST['update_general_settings']); // Remove this as well
+        unset($_POST['update_general_settings']); 
 
         try {
             foreach ($_POST as $key => $value) {
+                // Skip if key is numeric (might happen with malformed inputs)
+                if (is_numeric($key)) continue;
+                
                 $existing = Database::fetch("SELECT id FROM settings WHERE setting_key = ?", [$key]);
                 if ($existing) {
                     Database::update('settings', ['value' => $value], "setting_key = ?", [$key]);

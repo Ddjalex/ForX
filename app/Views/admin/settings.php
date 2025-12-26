@@ -507,21 +507,19 @@ function switchSection(sectionId) {
     // Update nav buttons
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.textContent.trim().toLowerCase().includes(sectionId.replace('-', ' '))) {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + sectionId + "'")) {
             btn.classList.add('active');
         }
     });
-
-    // Handle manual active mapping
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => item.classList.remove('active'));
-    event.currentTarget.classList.add('active');
 
     // Update sections
     document.querySelectorAll('.settings-section').forEach(sec => {
         sec.classList.remove('active');
     });
-    document.getElementById('section-' + sectionId).classList.add('active');
+    const targetSection = document.getElementById('section-' + sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
 }
 
 function updateProfitCalculations() {
