@@ -539,7 +539,7 @@ class AdminController
                 $fullUploadDir = \PUBLIC_PATH . '/' . $uploadDir;
                 
                 if (!is_dir($fullUploadDir)) {
-                    mkdir($fullUploadDir, 0755, true);
+                    @mkdir($fullUploadDir, 0755, true);
                 }
                 
                 $extension = strtolower(pathinfo($_FILES['qr_code']['name'], PATHINFO_EXTENSION));
@@ -602,142 +602,100 @@ class AdminController
             return;
         }
 
-        unset($_POST['_csrf_token']);
-        unset($_POST['update_general_settings']); 
-
+        $settings = $_POST['settings'] ?? [];
+        
         try {
-            foreach ($_POST as $key => $value) {
-                // Skip if key is numeric (might happen with malformed inputs)
-                if (is_numeric($key)) continue;
-                
+            foreach ($settings as $key => $value) {
+                // Check if setting exists
                 $existing = Database::fetch("SELECT id FROM settings WHERE setting_key = ?", [$key]);
+                
                 if ($existing) {
-                    Database::update('settings', ['value' => $value], "setting_key = ?", [$key]);
+                    Database::update('settings', ['value' => $value], 'setting_key = ?', [$key]);
                 } else {
-                    Database::insert('settings', ['setting_key' => $key, 'value' => $value, 'created_at' => date('Y-m-d H:i:s')]);
+                    Database::insert('settings', [
+                        'setting_key' => $key,
+                        'value' => $value
+                    ]);
                 }
             }
 
-            AuditLog::log('update_settings', 'settings', null, $_POST);
+            AuditLog::log('update_settings', 'settings', 0);
             Session::flash('success', 'Settings updated successfully.');
         } catch (\Exception $e) {
             error_log("Update Settings Error: " . $e->getMessage());
-            Session::flash('error', 'Failed to update settings: ' . $e->getMessage());
+            Session::flash('error', 'Error updating settings.');
         }
 
-        Router::redirect('/admin/settings');
-    }
-
-    public function auditLogs(): void
-    {
-        $logs = Database::fetchAll(
-            "SELECT a.*, u.name, u.email FROM audit_logs a 
-             LEFT JOIN users u ON a.user_id = u.id 
-             ORDER BY a.created_at DESC LIMIT 500"
-        );
-
-        echo Router::render('admin/audit-logs', [
-            'logs' => $logs,
-        ]);
-    }
-
-    public function positions(): void
-    {
-        $positions = Database::fetchAll(
-            "SELECT p.*, u.name, u.email, m.symbol 
-             FROM positions p 
-             JOIN users u ON p.user_id = u.id 
-             JOIN markets m ON p.market_id = m.id 
-             ORDER BY p.created_at DESC"
-        );
-
-        echo Router::render('admin/positions', [
-            'positions' => $positions,
-            'csrf_token' => Session::generateCsrfToken(),
-        ]);
-    }
-
-    public function changeAdminPassword(): void
-    {
-        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
-            Session::flash('error', 'Invalid request.');
-            Router::redirect('/admin/settings');
-            return;
-        }
-
-        $admin = Auth::user();
-        $oldPassword = $_POST['old_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
-
-        if (!password_verify($oldPassword, $admin['password'])) {
-            Session::flash('error', 'Current password is incorrect.');
-            Router::redirect('/admin/settings');
-            return;
-        }
-
-        if ($newPassword !== $confirmPassword) {
-            Session::flash('error', 'New passwords do not match.');
-            Router::redirect('/admin/settings');
-            return;
-        }
-
-        if (strlen($newPassword) < 8) {
-            Session::flash('error', 'Password must be at least 8 characters.');
-            Router::redirect('/admin/settings');
-            return;
-        }
-
-        Database::update('users', [
-            'password' => password_hash($newPassword, PASSWORD_DEFAULT),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ], 'id = ?', [$admin['id']]);
-
-        AuditLog::log('admin_password_changed', 'user', $admin['id']);
-
-        Session::flash('success', 'Password changed successfully.');
         Router::redirect('/admin/settings');
     }
 
     public function kyc(): void
     {
-        $kycVerifications = Database::fetchAll(
-            "SELECT kv.*, u.name as user_name, u.email as user_email,
-                    (SELECT GROUP_CONCAT(CONCAT(document_type, ':', file_path) SEPARATOR '|') 
-                     FROM kyc_documents WHERE kyc_id = kv.id) as docs
-             FROM kyc_verifications kv
-             JOIN users u ON kv.user_id = u.id
-             ORDER BY kv.created_at DESC"
+        $kycList = Database::fetchAll(
+            "SELECT k.*, u.name as user_name, u.email as user_email 
+             FROM kyc_verifications k 
+             JOIN users u ON k.user_id = u.id 
+             ORDER BY k.created_at DESC"
         );
 
-        // Parse documents
-        foreach ($kycVerifications as &$kyc) {
-            $kyc['documents'] = [];
-            if ($kyc['docs']) {
-                $docPairs = explode('|', $kyc['docs']);
-                foreach ($docPairs as $pair) {
-                    [$type, $path] = explode(':', $pair);
-                    $kyc['documents'][] = [
-                        'document_type' => $type,
-                        'file_path' => $path
-                    ];
-                }
-            }
-            unset($kyc['docs']);
+        // For each KYC, get documents
+        foreach ($kycList as &$kyc) {
+            $kyc['documents'] = Database::fetchAll(
+                "SELECT * FROM kyc_documents WHERE kyc_id = ?",
+                [$kyc['id']]
+            );
         }
 
-        $stats = [
-            'pending_count' => Database::fetch("SELECT COUNT(*) as count FROM kyc_verifications WHERE status = 'pending'")['count'],
-            'approved_count' => Database::fetch("SELECT COUNT(*) as count FROM kyc_verifications WHERE status = 'approved'")['count'],
-            'rejected_count' => Database::fetch("SELECT COUNT(*) as count FROM kyc_verifications WHERE status = 'rejected'")['count'],
-        ];
-
-        echo Router::render('admin/kyc-approvals', [
-            'kyc_verifications' => $kycVerifications,
-            'pending_count' => $stats['pending_count'],
-            'approved_count' => $stats['approved_count'],
-            'rejected_count' => $stats['rejected_count'],
+        echo Router::render('admin/kyc', [
+            'kycList' => $kycList,
             'csrf_token' => Session::generateCsrfToken(),
+            'success' => Session::getFlash('success'),
+            'error' => Session::getFlash('error'),
         ]);
+    }
+
+    public function approveKyc(): void
+    {
+        if (!Session::validateCsrfToken($_POST['_csrf_token'] ?? '')) {
+            Session::flash('error', 'Invalid request.');
+            Router::redirect('/admin/kyc');
+            return;
+        }
+
+        $kycId = filter_input(INPUT_POST, 'kyc_id', FILTER_VALIDATE_INT);
+        $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        $kyc = Database::fetch("SELECT * FROM kyc_verifications WHERE id = ?", [$kycId]);
+        if (!$kyc) {
+            Session::flash('error', 'KYC record not found.');
+            Router::redirect('/admin/kyc');
+            return;
+        }
+
+        if ($action === 'approve') {
+            Database::update('kyc_verifications', [
+                'status' => 'approved',
+                'approved_at' => date('Y-m-d H:i:s')
+            ], 'id = ?', [$kycId]);
+
+            Database::update('users', [
+                'kyc_verified' => true,
+                'kyc_verified_at' => date('Y-m-d H:i:s')
+            ], 'id = ?', [$kyc['user_id']]);
+
+            AuditLog::log('approve_kyc', 'kyc', $kycId, ['user_id' => $kyc['user_id']]);
+            Session::flash('success', 'KYC approved successfully.');
+        } else {
+            $reason = filter_input(INPUT_POST, 'rejection_reason', FILTER_SANITIZE_SPECIAL_CHARS);
+            Database::update('kyc_verifications', [
+                'status' => 'rejected',
+                'rejection_reason' => $reason
+            ], 'id = ?', [$kycId]);
+
+            AuditLog::log('reject_kyc', 'kyc', $kycId, ['reason' => $reason]);
+            Session::flash('success', 'KYC rejected.');
+        }
+
+        Router::redirect('/admin/kyc');
     }
 }
