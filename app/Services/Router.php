@@ -37,10 +37,13 @@ class Router
         $uri = parse_url($rawUri, PHP_URL_PATH);
         $uri = rtrim($uri, '/') ?: '/';
         
-        // Remove domain-based prefixes if they exist
-        if (strpos($uri, '/public_html') === 0) {
-            $uri = substr($uri, strlen('/public_html'));
-            $uri = rtrim($uri, '/') ?: '/';
+        // Remove known deployment prefixes
+        $prefixes = ['/public_html', '/public'];
+        foreach ($prefixes as $prefix) {
+            if (strpos($uri, $prefix) === 0) {
+                $uri = substr($uri, strlen($prefix));
+                $uri = rtrim($uri, '/') ?: '/';
+            }
         }
         
         // Log dispatch attempt

@@ -124,7 +124,7 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
                 </div>
                 <div class="form-group">
                     <label class="form-label">QR Code (Optional)</label>
-                    <input type="file" name="qr_code" class="form-control" accept="image/*">
+                    <input type="file" name="qr_code" id="networkQRCode" class="form-control" accept="image/*">
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">Save Network</button>
