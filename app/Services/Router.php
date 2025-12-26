@@ -43,10 +43,17 @@ class Router
             $prefix = rtrim($prefix, '/');
             if (!empty($prefix) && strpos($uri, $prefix) === 0) {
                 $uri = substr($uri, strlen($prefix));
-                $uri = '/' . ltrim($uri, '/');
-                $uri = rtrim($uri, '/') ?: '/';
             }
         }
+        
+        // Normalize URI: ensure starts with / and remove trailing slash
+        $uri = '/' . ltrim($uri, '/');
+        if ($uri !== '/') {
+            $uri = rtrim($uri, '/');
+        }
+        
+        // Final fallback
+        if (empty($uri)) $uri = '/';
         
         // Log dispatch attempt
         self::logDispatch($method, $rawUri, $uri);
