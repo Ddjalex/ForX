@@ -536,7 +536,7 @@ class AdminController
             $qrCodePath = null;
             if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = 'uploads/qr_codes/';
-                $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
+                $fullUploadDir = \PUBLIC_PATH . '/' . $uploadDir;
                 
                 if (!is_dir($fullUploadDir)) {
                     mkdir($fullUploadDir, 0755, true);
