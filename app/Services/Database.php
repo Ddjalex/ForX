@@ -15,26 +15,34 @@ class Database
             $config = require __DIR__ . '/../../config/database.php';
             
             try {
-                $dsn = sprintf(
-                    '%s:host=%s;port=%s;dbname=%s',
-                    $config['driver'],
-                    $config['host'],
-                    $config['port'],
-                    $config['database']
-                );
+                // Determine driver and DSN
+                $driver = $config['driver'] ?? 'mysql';
+                if ($driver === 'mysql') {
+                    $dsn = "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']};charset=utf8mb4";
+                } else {
+                    $dsn = sprintf(
+                        '%s:host=%s;port=%s;dbname=%s',
+                        $driver,
+                        $config['host'],
+                        $config['port'],
+                        $config['database']
+                    );
+                }
                 
                 self::$instance = new PDO(
                     $dsn,
                     $config['username'],
                     $config['password'],
-                    [
+                    $config['options'] ?? [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                         PDO::ATTR_EMULATE_PREPARES => false,
                     ]
                 );
             } catch (PDOException $e) {
-                die('Database connection failed: ' . $e->getMessage());
+                error_log("Database connection failed: " . $e->getMessage());
+                // In cPanel, we must not die() if we want the error_log to be visible or handled
+                throw new \Exception("Database connection failed. Please check your configuration.");
             }
         }
         
@@ -62,24 +70,30 @@ class Database
     public static function tableExists(string $tableName): bool
     {
         try {
-            // Fix: MySQL information_schema check using DATABASE() function
+            // Check MariaDB/MySQL information_schema using current database name
+            $dbName = 'alphacfp_ForX'; // Hardcoded for cPanel as per user screenshot
             $result = self::fetch(
-                "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?",
-                [$tableName]
+                "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = ? AND table_name = ?",
+                [$dbName, $tableName]
             );
             return ($result['count'] ?? 0) > 0;
         } catch (\PDOException $e) {
-            return false;
+            error_log("Table check error: " . $e->getMessage());
+            return true;
         }
     }
 
     public static function insert(string $table, array $data): int
     {
         $data = self::convertBooleans($data);
-        $columns = implode('`, `', array_keys($data));
+        $columnsEscaped = [];
+        foreach (array_keys($data) as $key) {
+            $columnsEscaped[] = "`$key`";
+        }
+        $columns = implode(', ', $columnsEscaped);
         $placeholders = implode(', ', array_fill(0, count($data), '?'));
         
-        $sql = "INSERT INTO `{$table}` (`{$columns}`) VALUES ({$placeholders})";
+        $sql = "INSERT INTO `{$table}` ({$columns}) VALUES ({$placeholders})";
         self::query($sql, array_values($data));
         
         return (int) self::getInstance()->lastInsertId();
