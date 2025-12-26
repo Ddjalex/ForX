@@ -515,6 +515,12 @@ class AdminController
             return;
         }
 
+        // Determine if this is a general settings update or a network update
+        if (isset($_POST['update_general_settings'])) {
+            $this->updateSettings();
+            return;
+        }
+
         $action = $_POST['action'] ?? '';
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);

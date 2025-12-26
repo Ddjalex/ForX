@@ -91,8 +91,9 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
             </div>
         </div>
 
-        <form method="POST" action="/admin/settings" id="settingsForm">
+        <form method="POST" action="/admin/settings" id="settingsForm" enctype="multipart/form-data">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="update_general_settings" value="1">
 
             <!-- Section: General Settings -->
             <div id="section-general-settings" class="settings-section">
