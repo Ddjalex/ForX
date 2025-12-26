@@ -523,8 +523,16 @@ class AdminController
             $uploadDir = 'uploads/qr_codes/';
             // Detect if running on cPanel (alphacoremarkets.com) or local (Replit)
             $isCpanel = strpos($_SERVER['HTTP_HOST'] ?? '', 'alphacoremarkets.com') !== false;
-            $basePath = $isCpanel ? dirname(ROOT_PATH) . '/public_html/' : ROOT_PATH . '/public/';
-            $fullUploadDir = $basePath . $uploadDir;
+            
+            // ROOT_PATH is likely /app/ on Replit and /home/user/public_html/ on cPanel
+            // We need to find the actual web root path for file operations
+            if ($isCpanel) {
+                // On cPanel, if ROOT_PATH is the app folder inside public_html
+                // We want public_html/uploads/qr_codes/
+                $fullUploadDir = dirname(ROOT_PATH) . '/public_html/' . $uploadDir;
+            } else {
+                $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
+            }
             
             if (!is_dir($fullUploadDir)) {
                 mkdir($fullUploadDir, 0755, true);

@@ -66,71 +66,71 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
                                 <button type="button" class="action-btn-icon" onclick="showEditNetworkModal(<?= htmlspecialchars(json_encode($network)) ?>)">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                 </button>
-                                <form method="POST" action="/admin/settings/networks" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
-                                    <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="<?= $network['id'] ?>">
-                                    <button type="submit" class="action-btn-icon delete">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Wallet Address</label>
-                            <input type="text" class="form-control" value="<?= htmlspecialchars($network['wallet_address']) ?>" readonly>
-                        </div>
-                        <?php if (!empty($network['qr_code'])): ?>
-                        <div style="text-align: center; margin: 10px 0;">
-                            <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR" style="max-width: 100px; border-radius: 4px;">
-                        </div>
-                        <?php endif; ?>
-                        <div class="form-group">
-                            <label class="form-label">Network Type</label>
-                            <input type="text" class="form-control" value="<?= htmlspecialchars($network['network_type']) ?>" readonly>
-                        </div>
+                        <form method="POST" action="/admin/settings/networks" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
+                            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="<?= $network['id'] ?>">
+                            <button type="submit" class="action-btn-icon delete">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </form>
                     </div>
-                    <?php endforeach; ?>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Wallet Address</label>
+                    <input type="text" class="form-control" value="<?= htmlspecialchars($network['wallet_address']) ?>" readonly>
+                </div>
+                <?php if (!empty($network['qr_code'])): ?>
+                <div style="text-align: center; margin: 10px 0;">
+                    <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR" style="max-width: 100px; border-radius: 4px; background: white; padding: 5px;">
+                </div>
+                <?php endif; ?>
+                <div class="form-group">
+                    <label class="form-label">Network Type</label>
+                    <input type="text" class="form-control" value="<?= htmlspecialchars($network['network_type']) ?>" readonly>
                 </div>
             </div>
-
-<!-- Modal for Adding/Editing Network -->
-<div class="modal-overlay" id="networkModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
-            <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
+            <?php endforeach; ?>
         </div>
-        <form method="POST" action="/admin/settings/networks" enctype="multipart/form-data">
-            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-            <input type="hidden" name="action" id="networkAction" value="add">
-            <input type="hidden" name="id" id="networkId">
-            
-            <div class="form-group">
-                <label class="form-label">Network Name</label>
-                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Symbol</label>
-                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Wallet Address</label>
-                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Network Type</label>
-                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">QR Code (Optional)</label>
-                <input type="file" name="qr_code" class="form-control" accept="image/*">
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-block">Save Network</button>
-        </form>
     </div>
-</div>
+
+    <!-- Modal for Adding/Editing Network -->
+    <div class="modal-overlay" id="networkModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
+                <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
+            </div>
+            <form method="POST" action="/admin/settings/networks" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="action" id="networkAction" value="add">
+                <input type="hidden" name="id" id="networkId">
+                
+                <div class="form-group">
+                    <label class="form-label">Network Name</label>
+                    <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Symbol</label>
+                    <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Wallet Address</label>
+                    <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Network Type</label>
+                    <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">QR Code (Optional)</label>
+                    <input type="file" name="qr_code" class="form-control" accept="image/*">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Save Network</button>
+            </form>
+        </div>
+    </div>
 
             <!-- Section: General Settings -->
             <div id="section-general-settings" class="settings-section">
