@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'driver' => 'pgsql',
-    'host' => getenv('PGHOST'),
-    'port' => getenv('PGPORT'),
-    'database' => getenv('PGDATABASE'),
-    'username' => getenv('PGUSER'),
-    'password' => getenv('PGPASSWORD'),
+    'driver' => 'mysql',
+    'host' => 'localhost',
+    'port' => '3306',
+    'database' => 'alphacfp_ForX',
+    'username' => 'alphacfp_ForX',
+    'password' => 'ale2y3t4h5',
 ];
