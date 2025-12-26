@@ -42,95 +42,57 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
     </div>
 
     <div class="settings-content">
+        <!-- Section: Deposit Networks -->
+        <div id="section-deposit-networks" class="settings-section active">
+            <div class="section-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 class="section-title">Deposit Network Settings</h3>
+                        <p class="section-desc">Manage your crypto wallet addresses and network types for deposits.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="showAddNetworkModal()">Add Network</button>
+                </div>
+            </div>
+
+            <div class="settings-grid">
+                <?php foreach ($depositNetworks as $network): ?>
+                <div class="settings-card">
+                    <div class="card-title-sm" style="display: flex; justify-content: space-between; align-items: center;">
+                        <?= htmlspecialchars($network['name']) ?> (<?= htmlspecialchars($network['symbol']) ?>)
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="action-btn-icon" onclick="showEditNetworkModal(<?= htmlspecialchars(json_encode($network)) ?>)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <form method="POST" action="/admin/settings/networks" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
+                                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="<?= $network['id'] ?>">
+                                <button type="submit" class="action-btn-icon delete">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Wallet Address</label>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($network['wallet_address']) ?>" readonly>
+                    </div>
+                    <?php if (!empty($network['qr_code'])): ?>
+                    <div style="text-align: center; margin: 10px 0;">
+                        <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR" style="max-width: 100px; border-radius: 4px; background: white; padding: 5px;">
+                    </div>
+                    <?php endif; ?>
+                    <div class="form-group">
+                        <label class="form-label">Network Type</label>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($network['network_type']) ?>" readonly>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
         <form method="POST" action="/admin/settings" id="settingsForm">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-
-            <!-- Section: Deposit Networks -->
-            <div id="section-deposit-networks" class="settings-section active">
-                <div class="section-header">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 class="section-title">Deposit Network Settings</h3>
-                            <p class="section-desc">Manage your crypto wallet addresses and network types for deposits.</p>
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="showAddNetworkModal()">Add Network</button>
-                    </div>
-                </div>
-
-                <div class="settings-grid">
-                    <?php foreach ($depositNetworks as $network): ?>
-                    <div class="settings-card">
-                        <div class="card-title-sm" style="display: flex; justify-content: space-between; align-items: center;">
-                            <?= htmlspecialchars($network['name']) ?> (<?= htmlspecialchars($network['symbol']) ?>)
-                            <div style="display: flex; gap: 8px;">
-                                <button type="button" class="action-btn-icon" onclick="showEditNetworkModal(<?= htmlspecialchars(json_encode($network)) ?>)">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </button>
-                        <form method="POST" action="/admin/settings/networks" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this network?')">
-                            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="id" value="<?= $network['id'] ?>">
-                            <button type="submit" class="action-btn-icon delete">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Wallet Address</label>
-                    <input type="text" class="form-control" value="<?= htmlspecialchars($network['wallet_address']) ?>" readonly>
-                </div>
-                <?php if (!empty($network['qr_code'])): ?>
-                <div style="text-align: center; margin: 10px 0;">
-                    <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR" style="max-width: 100px; border-radius: 4px; background: white; padding: 5px;">
-                </div>
-                <?php endif; ?>
-                <div class="form-group">
-                    <label class="form-label">Network Type</label>
-                    <input type="text" class="form-control" value="<?= htmlspecialchars($network['network_type']) ?>" readonly>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-
-    <!-- Modal for Adding/Editing Network -->
-    <div class="modal-overlay" id="networkModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
-                <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
-            </div>
-            <form method="POST" action="/admin/settings/networks" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="action" id="networkAction" value="add">
-                <input type="hidden" name="id" id="networkId">
-                
-                <div class="form-group">
-                    <label class="form-label">Network Name</label>
-                    <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Symbol</label>
-                    <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Wallet Address</label>
-                    <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Network Type</label>
-                    <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">QR Code (Optional)</label>
-                    <input type="file" name="qr_code" id="networkQRCode" class="form-control" accept="image/*">
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-block">Save Network</button>
-            </form>
-        </div>
-    </div>
 
             <!-- Section: General Settings -->
             <div id="section-general-settings" class="settings-section">
@@ -271,6 +233,44 @@ if (!isset($pageTitle)) $pageTitle = 'Settings';
             <div class="settings-footer">
                 <button type="submit" class="btn btn-primary btn-lg">Save All Changes</button>
             </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal for Adding/Editing Network -->
+<div class="modal-overlay" id="networkModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
+            <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
+        </div>
+        <form method="POST" action="/admin/settings/networks" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="action" id="networkAction" value="add">
+            <input type="hidden" name="id" id="networkId">
+            
+            <div class="form-group">
+                <label class="form-label">Network Name</label>
+                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Symbol</label>
+                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Wallet Address</label>
+                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Network Type</label>
+                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">QR Code (Optional)</label>
+                <input type="file" name="qr_code" id="networkQRCode" class="form-control" accept="image/*">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Save Network</button>
         </form>
     </div>
 </div>
@@ -490,84 +490,58 @@ function updateProfitCalculations() {
     const winMultiplier = 1 + (percent / 100);
     const lossMultiplier = 1 + (percent / 100);
     
-    // Update multiplier displays
     document.getElementById('winMultiplier').textContent = '× ' + winMultiplier.toFixed(4);
     document.getElementById('lossMultiplier').textContent = '× ' + lossMultiplier.toFixed(4);
     
-    // Update examples
     const winExample = 100 * winMultiplier;
     const lossExample = 100 * lossMultiplier;
     
     document.getElementById('winExample').textContent = '$' + winExample.toFixed(2);
     document.getElementById('lossExample').textContent = '$' + lossExample.toFixed(2);
-    
-    // Color code the value box
-    const valueBox = document.getElementById('profitControlValue');
-    if (percent > 0) {
-        valueBox.style.background = '#10B981';
-        valueBox.style.color = '#fff';
-    } else if (percent < 0) {
-        valueBox.style.background = '#FF4757';
-        valueBox.style.color = '#fff';
-    } else {
-        valueBox.style.background = 'var(--accent-primary)';
-        valueBox.style.color = '#000';
-    }
 }
 
-async function changePassword() {
+function changePassword() {
     const oldPass = document.getElementById('old_password').value;
     const newPass = document.getElementById('new_password').value;
-    const confPass = document.getElementById('confirm_password').value;
-    const errorEl = document.getElementById('passwordError');
-    const successEl = document.getElementById('passwordSuccess');
-
-    errorEl.style.display = 'none';
-    successEl.style.display = 'none';
-
-    if (!oldPass || !newPass || !confPass) {
-        errorEl.textContent = 'Please fill in all fields';
-        errorEl.style.display = 'block';
+    const confirmPass = document.getElementById('confirm_password').value;
+    
+    if (newPass !== confirmPass) {
+        document.getElementById('passwordError').textContent = 'New passwords do not match';
+        document.getElementById('passwordError').style.display = 'block';
         return;
     }
-
-    if (newPass !== confPass) {
-        errorEl.textContent = 'New passwords do not match';
-        errorEl.style.display = 'block';
-        return;
-    }
-
-    try {
-        const response = await fetch('/admin/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `_csrf_token=<?= $csrf_token ?>&old_password=${encodeURIComponent(oldPass)}&new_password=${encodeURIComponent(newPass)}&confirm_password=${encodeURIComponent(confPass)}`
-        });
-
-        if (response.ok) {
-            successEl.textContent = 'Password updated successfully';
-            successEl.style.display = 'block';
+    
+    fetch('/admin/change-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            old_password: oldPass,
+            new_password: newPass,
+            _csrf_token: '<?= $csrf_token ?>'
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('passwordError').style.display = 'none';
+            document.getElementById('passwordSuccess').textContent = 'Password updated successfully';
+            document.getElementById('passwordSuccess').style.display = 'block';
             document.getElementById('old_password').value = '';
             document.getElementById('new_password').value = '';
             document.getElementById('confirm_password').value = '';
         } else {
-            const text = await response.text();
-            errorEl.textContent = 'Failed to update password. Please check your current password.';
-            errorEl.style.display = 'block';
+            document.getElementById('passwordSuccess').style.display = 'none';
+            document.getElementById('passwordError').textContent = data.error || 'Failed to update password';
+            document.getElementById('passwordError').style.display = 'block';
         }
-    } catch (e) {
-        errorEl.textContent = 'An error occurred. Please try again.';
-        errorEl.style.display = 'block';
-    }
+    });
 }
 
-// Initialize on page load
-window.addEventListener('DOMContentLoaded', updateProfitCalculations);
+// Initialize profit calculations on load
+document.addEventListener('DOMContentLoaded', () => {
+    updateProfitCalculations();
+});
 </script>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'Platform Settings';
-include __DIR__ . '/../layouts/admin.php';
-?>
-

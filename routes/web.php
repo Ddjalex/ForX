@@ -77,9 +77,6 @@ Router::post('/admin/markets/update', [AdminController::class, 'updateMarket'], 
 Router::get('/admin/settings', [AdminController::class, 'settings'], [AdminMiddleware::class]);
 Router::post('/admin/settings', [AdminController::class, 'updateSettings'], [AdminMiddleware::class]);
 Router::post('/admin/settings/networks', [AdminController::class, 'manageDepositNetworks'], [AdminMiddleware::class]);
-Router::post('/admin/settings/networks/add', [AdminController::class, 'manageDepositNetworks'], [AdminMiddleware::class]);
-Router::post('/admin/settings/networks/update', [AdminController::class, 'manageDepositNetworks'], [AdminMiddleware::class]);
-Router::post('/admin/settings/networks/delete', [AdminController::class, 'manageDepositNetworks'], [AdminMiddleware::class]);
 Router::post('/admin/change-password', [AdminController::class, 'changeAdminPassword'], [AdminMiddleware::class]);
 Router::get('/admin/audit-logs', [AdminController::class, 'auditLogs'], [AdminMiddleware::class]);
 Router::get('/admin/positions', [AdminController::class, 'positions'], [AdminMiddleware::class]);
