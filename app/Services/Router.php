@@ -33,27 +33,18 @@ class Router
         $method = $_SERVER['REQUEST_METHOD'];
         $rawUri = $_SERVER['REQUEST_URI'];
         
-        // Clean up URI - remove query string
+        // Clean up URI - remove query string and trailing slash
         $uri = parse_url($rawUri, PHP_URL_PATH);
+        $uri = rtrim($uri, '/') ?: '/';
         
-        // Remove known deployment prefixes
+        // Handle common deployment prefixes specifically for routing
         $prefixes = ['/public_html', '/public'];
         foreach ($prefixes as $prefix) {
-            $prefix = rtrim($prefix, '/');
             if (strpos($uri, $prefix) === 0) {
                 $uri = substr($uri, strlen($prefix));
+                $uri = '/' . ltrim($uri, '/');
+                $uri = rtrim($uri, '/') ?: '/';
             }
-        }
-        
-        // Normalize URI: ensure starts with / and remove trailing slash
-        $uri = '/' . ltrim($uri, '/');
-        if ($uri !== '/') {
-            $uri = rtrim($uri, '/');
-        }
-        
-        // Log final URI for debugging
-        if (self::$debug) {
-            error_log("Final URI after normalization: " . $uri);
         }
         
         // Log dispatch attempt
