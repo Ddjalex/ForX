@@ -602,19 +602,25 @@ class AdminController
         }
 
         unset($_POST['_csrf_token']);
+        unset($_POST['update_general_settings']); // Remove this as well
 
-        foreach ($_POST as $key => $value) {
-            $existing = Database::fetch("SELECT * FROM settings WHERE setting_key = ?", [$key]);
-            if ($existing) {
-                Database::update('settings', ['value' => $value], "setting_key = ?", [$key]);
-            } else {
-                Database::insert('settings', ['setting_key' => $key, 'value' => $value]);
+        try {
+            foreach ($_POST as $key => $value) {
+                $existing = Database::fetch("SELECT id FROM settings WHERE setting_key = ?", [$key]);
+                if ($existing) {
+                    Database::update('settings', ['value' => $value], "setting_key = ?", [$key]);
+                } else {
+                    Database::insert('settings', ['setting_key' => $key, 'value' => $value, 'created_at' => date('Y-m-d H:i:s')]);
+                }
             }
+
+            AuditLog::log('update_settings', 'settings', null, $_POST);
+            Session::flash('success', 'Settings updated successfully.');
+        } catch (\Exception $e) {
+            error_log("Update Settings Error: " . $e->getMessage());
+            Session::flash('error', 'Failed to update settings: ' . $e->getMessage());
         }
 
-        AuditLog::log('update_settings', 'settings', null, $_POST);
-
-        Session::flash('success', 'Settings updated successfully.');
         Router::redirect('/admin/settings');
     }
 
