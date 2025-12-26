@@ -530,8 +530,10 @@ class AdminController
                 // On cPanel, if ROOT_PATH is the app folder inside public_html
                 // We want public_html/uploads/qr_codes/
                 $fullUploadDir = dirname(ROOT_PATH) . '/public_html/' . $uploadDir;
+                $qrCodePath = '/' . $uploadDir; // Base path for DB
             } else {
                 $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
+                $qrCodePath = '/' . $uploadDir; // Base path for DB
             }
             
             if (!is_dir($fullUploadDir)) {
@@ -543,7 +545,7 @@ class AdminController
             $targetPath = $fullUploadDir . $fileName;
             
             if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
-                $qrCodePath = '/' . $uploadDir . $fileName;
+                $qrCodePath = $qrCodePath . $fileName;
             }
         }
 
