@@ -38,13 +38,23 @@ class Router
         $uri = rtrim($uri, '/') ?: '/';
         
         // Remove known deployment prefixes
-        $prefixes = ['/public_html'];
+        $prefixes = ['/public_html', '/public'];
         foreach ($prefixes as $prefix) {
+            $prefix = rtrim($prefix, '/');
             if (strpos($uri, $prefix) === 0) {
                 $uri = substr($uri, strlen($prefix));
-                $uri = rtrim($uri, '/') ?: '/';
+                if (empty($uri)) {
+                    $uri = '/';
+                } elseif ($uri[0] !== '/') {
+                    $uri = '/' . $uri;
+                }
             }
         }
+        
+        $uri = rtrim($uri, '/') ?: '/';
+        
+        // Log final URI for debugging
+        error_log("Final URI after prefix stripping: " . $uri);
         
         // Log dispatch attempt
         self::logDispatch($method, $rawUri, $uri);
