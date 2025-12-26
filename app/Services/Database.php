@@ -98,15 +98,20 @@ class Database
 
     public static function update(string $table, array $data, string $where, array $whereParams = []): int
     {
-        $set = implode(' = ?, ', array_keys($data)) . ' = ?';
-        $sql = "UPDATE {$table} SET {$set} WHERE {$where}";
+        $data = self::convertBooleans($data);
+        $setParts = [];
+        foreach (array_keys($data) as $key) {
+            $setParts[] = "`$key` = ?";
+        }
+        $set = implode(', ', $setParts);
+        $sql = "UPDATE `{$table}` SET {$set} WHERE {$where}";
         
         return self::query($sql, array_merge(array_values($data), $whereParams))->rowCount();
     }
 
     public static function delete(string $table, string $where, array $params = []): int
     {
-        $sql = "DELETE FROM {$table} WHERE {$where}";
+        $sql = "DELETE FROM `{$table}` WHERE {$where}";
         return self::query($sql, $params)->rowCount();
     }
 }
