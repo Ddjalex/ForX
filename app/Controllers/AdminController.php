@@ -474,8 +474,8 @@ class AdminController
             $settings = Database::fetchAll("SELECT * FROM settings") ?: [];
             $settingsArray = [];
             foreach ($settings as $setting) {
-                if (isset($setting['setting_key'])) {
-                    $settingsArray[$setting['setting_key']] = $setting['value'];
+                if (isset($setting['key'])) {
+                    $settingsArray[$setting['key']] = $setting['value'];
                 }
             }
 

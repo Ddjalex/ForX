@@ -211,6 +211,19 @@ CREATE TABLE IF NOT EXISTS settings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Deposit Networks table
+CREATE TABLE IF NOT EXISTS deposit_networks (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    symbol VARCHAR(50) NOT NULL,
+    wallet_address VARCHAR(500) NOT NULL,
+    network_type VARCHAR(100) NOT NULL,
+    qr_code VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_deposits_user ON deposits(user_id);
