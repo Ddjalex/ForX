@@ -28,18 +28,20 @@ $minDeposit = $settings['min_deposit'] ?? '10';
             <div class="deposit-method">
                 <h4><?= htmlspecialchars($network['name'] ?? 'Crypto') ?> (<?= htmlspecialchars($network['symbol'] ?? '') ?>) Deposit</h4>
                 <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-                <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
-                    <p style="margin: 0 0 8px 0; color: var(--text-secondary); text-align: left;">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($network['network_type'] ?? '') ?></strong></p>
+                <div class="wallet-info" style="background: var(--bg-tertiary); padding: 20px; border-radius: 12px; margin-bottom: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.05);">
+                    <p style="margin: 0 0 12px 0; color: var(--text-secondary); text-align: left; font-size: 14px;">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($network['network_type'] ?? '') ?></strong></p>
                     
                     <?php if (!empty($network['qr_code'])): ?>
-                    <div style="margin-bottom: 15px;">
-                        <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR Code" style="max-width: 150px; border-radius: 8px; background: #fff; padding: 5px;">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">Scan QR code to pay</p>
+                    <div style="margin: 15px auto; padding: 15px; background: #fff; border-radius: 12px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR Code" style="width: 180px; height: 180px; display: block;">
+                        <p style="font-size: 11px; color: #64748b; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Scan to pay <?= htmlspecialchars($network['symbol'] ?? '') ?></p>
                     </div>
                     <?php endif; ?>
 
-                    <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary); text-align: left;"><?= htmlspecialchars($network['wallet_address'] ?? '') ?></p>
-                    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($network['wallet_address'] ?? '') ?>'); this.textContent='Copied!';">Copy Address</button>
+                    <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <p style="margin: 0; word-break: break-all; font-family: 'Inter', monospace; color: #fff; font-size: 14px; letter-spacing: 0.5px;"><?= htmlspecialchars($network['wallet_address'] ?? '') ?></p>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 12px; width: 100%;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($network['wallet_address'] ?? '') ?>'); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy Address', 2000);">Copy Address</button>
                 </div>
                 <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
