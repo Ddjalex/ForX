@@ -70,14 +70,10 @@ class Database
     public static function tableExists(string $tableName): bool
     {
         try {
-            // Check MariaDB/MySQL information_schema using current database name
-            $dbName = 'alphacfp_ForX'; // Hardcoded for cPanel as per user screenshot
-            $result = self::fetch(
-                "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = ? AND table_name = ?",
-                [$dbName, $tableName]
-            );
-            return ($result['count'] ?? 0) > 0;
-        } catch (\PDOException $e) {
+            // Simplified check for MySQL/MariaDB
+            $result = self::fetchAll("SHOW TABLES LIKE ?", [$tableName]);
+            return !empty($result);
+        } catch (\Exception $e) {
             error_log("Table check error: " . $e->getMessage());
             return true;
         }

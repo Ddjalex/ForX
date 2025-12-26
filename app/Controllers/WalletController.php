@@ -43,7 +43,7 @@ class WalletController
         
         try {
             // Fetch settings
-            $allSettings = Database::fetchAll("SELECT * FROM `settings` ");
+            $allSettings = Database::fetchAll("SELECT * FROM settings");
             foreach ($allSettings as $setting) {
                 if (isset($setting['setting_key']) && isset($setting['value'])) {
                     $settings[$setting['setting_key']] = $setting['value'];
@@ -51,12 +51,10 @@ class WalletController
             }
 
             // Fetch networks
-            $networks = Database::fetchAll("SELECT * FROM `deposit_networks` ORDER BY name ASC");
+            $networks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY name ASC");
 
         } catch (\Exception $e) {
             error_log("Deposit Page Error: " . $e->getMessage());
-            // Provide feedback to user instead of white page
-            Session::flash('error', 'Database connection issue. Please check your credentials.');
         }
         
         echo Router::render('user/deposit', [
