@@ -626,28 +626,42 @@ class AdminController
             return;
         }
 
-        $settings = $_POST['settings'] ?? [];
+        // List of valid setting keys that can be updated
+        $validSettings = [
+            'min_deposit', 'min_withdrawal', 'withdrawal_fee',
+            'referral_commission', 'referral_min_deposit',
+            'global_max_leverage', 'max_position_size',
+            'profit_control_percent', 'tawkto_property_id', 'tawkto_widget_id'
+        ];
         
         try {
-            foreach ($settings as $key => $value) {
-                // Check if setting exists
-                $existing = Database::fetch("SELECT id FROM settings WHERE setting_key = ?", [$key]);
-                
-                if ($existing) {
-                    Database::update('settings', ['value' => $value], 'setting_key = ?', [$key]);
-                } else {
-                    Database::insert('settings', [
-                        'setting_key' => $key,
-                        'value' => $value
-                    ]);
+            foreach ($validSettings as $key) {
+                if (isset($_POST[$key])) {
+                    $value = is_numeric($_POST[$key]) ? $_POST[$key] : trim($_POST[$key]);
+                    
+                    error_log("Updating setting: $key = $value");
+                    
+                    // Check if setting exists
+                    $existing = Database::fetch("SELECT id FROM settings WHERE key = ?", [$key]);
+                    
+                    if ($existing) {
+                        Database::update('settings', ['value' => $value], 'key = ?', [$key]);
+                    } else {
+                        Database::insert('settings', [
+                            'key' => $key,
+                            'value' => $value
+                        ]);
+                    }
                 }
             }
 
+            error_log("Settings updated successfully");
             AuditLog::log('update_settings', 'settings', 0);
             Session::flash('success', 'Settings updated successfully.');
         } catch (\Exception $e) {
             error_log("Update Settings Error: " . $e->getMessage());
-            Session::flash('error', 'Error updating settings.');
+            error_log("Trace: " . $e->getTraceAsString());
+            Session::flash('error', 'Error updating settings: ' . $e->getMessage());
         }
 
         Router::redirect('/admin/settings');
