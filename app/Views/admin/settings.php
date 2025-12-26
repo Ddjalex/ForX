@@ -517,6 +517,7 @@ function submitNetworkForm(event) {
         return false;
     }
     
+    console.log('Submitting network form with:', { name, symbol, wallet, type });
     document.getElementById('networkForm').submit();
     return false;
 }
@@ -526,14 +527,19 @@ function deleteNetwork(id, name) {
         return false;
     }
     
+    // Get fresh CSRF token from the settings form
+    const settingsForm = document.getElementById('settingsForm');
+    const csrfToken = settingsForm ? settingsForm.querySelector('input[name="_csrf_token"]').value : '<?= $csrf_token ?>';
+    
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/admin/settings';
+    form.style.display = 'none';
     
     const csrf = document.createElement('input');
     csrf.type = 'hidden';
     csrf.name = '_csrf_token';
-    csrf.value = '<?= $csrf_token ?>';
+    csrf.value = csrfToken;
     form.appendChild(csrf);
     
     const actionInput = document.createElement('input');
@@ -549,6 +555,8 @@ function deleteNetwork(id, name) {
     form.appendChild(idInput);
     
     document.body.appendChild(form);
+    console.log('Deleting network ID:', id);
+    console.log('CSRF Token:', csrfToken);
     form.submit();
     return false;
 }
