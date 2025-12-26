@@ -521,7 +521,10 @@ class AdminController
         $qrCodePath = null;
         if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = 'uploads/qr_codes/';
-            $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
+            // Detect if running on cPanel (alphacoremarkets.com) or local (Replit)
+            $isCpanel = strpos($_SERVER['HTTP_HOST'] ?? '', 'alphacoremarkets.com') !== false;
+            $basePath = $isCpanel ? dirname(ROOT_PATH) . '/public_html/' : ROOT_PATH . '/public/';
+            $fullUploadDir = $basePath . $uploadDir;
             
             if (!is_dir($fullUploadDir)) {
                 mkdir($fullUploadDir, 0755, true);
