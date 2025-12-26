@@ -534,28 +534,35 @@ function deleteNetwork(id, name) {
     console.log('Deleting network ID:', id);
     console.log('CSRF Token:', csrfToken);
     
-    // Use fetch API for more reliable form submission
-    const formData = new FormData();
-    formData.append('_csrf_token', csrfToken);
-    formData.append('action', 'delete');
-    formData.append('id', id);
+    // Create and submit a traditional form for reliable POST submission
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/settings';
     
-    fetch('/admin/settings', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        if (response.ok) {
-            location.reload();
-        } else {
-            alert('Error deleting network');
-        }
-    })
-    .catch(error => {
-        console.error('Delete error:', error);
-        alert('Error deleting network: ' + error.message);
-    });
+    // Add CSRF token
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = '_csrf_token';
+    input.value = csrfToken;
+    form.appendChild(input);
+    
+    // Add action
+    input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'action';
+    input.value = 'delete';
+    form.appendChild(input);
+    
+    // Add ID
+    input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'id';
+    input.value = id;
+    form.appendChild(input);
+    
+    document.body.appendChild(form);
+    console.log('Submitting delete form for ID:', id);
+    form.submit();
     
     return false;
 }
