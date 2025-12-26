@@ -527,42 +527,38 @@ function deleteNetwork(id, name) {
         return false;
     }
     
-    // Get fresh CSRF token from the settings form
-    const settingsForm = document.getElementById('settingsForm');
-    const csrfToken = settingsForm ? settingsForm.querySelector('input[name="_csrf_token"]').value : '<?= $csrf_token ?>';
+    console.log('Starting delete for network ID:', id);
     
-    console.log('Deleting network ID:', id);
-    console.log('CSRF Token:', csrfToken);
+    const formData = new FormData();
+    formData.append('_csrf_token', '<?= $csrf_token ?>');
+    formData.append('action', 'delete');
+    formData.append('id', String(id));
     
-    // Create and submit a traditional form for reliable POST submission
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/admin/settings';
+    console.log('Sending DELETE request to /admin/settings');
     
-    // Add CSRF token
-    let input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = '_csrf_token';
-    input.value = csrfToken;
-    form.appendChild(input);
-    
-    // Add action
-    input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'action';
-    input.value = 'delete';
-    form.appendChild(input);
-    
-    // Add ID
-    input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'id';
-    input.value = id;
-    form.appendChild(input);
-    
-    document.body.appendChild(form);
-    console.log('Submitting delete form for ID:', id);
-    form.submit();
+    fetch('/admin/settings', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Response received:', response.status);
+        console.log('Response redirected:', response.redirected);
+        if (response.ok || response.redirected) {
+            console.log('Delete successful, reloading page');
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } else {
+            alert('Error: ' + response.status);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Network error: ' + error.message);
+    });
     
     return false;
 }
