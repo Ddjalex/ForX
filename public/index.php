@@ -7,23 +7,24 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-// app/, routes/, config/ are inside public_html
-define('ROOT_PATH', __DIR__);
+// ROOT_PATH points to the parent directory containing app/, routes/
+define('ROOT_PATH', dirname(__DIR__));
+define('PUBLIC_PATH', __DIR__);
 
 // Create logs directory
-@mkdir(ROOT_PATH . '/storage/logs', 0755, true);
-ini_set('error_log', ROOT_PATH . '/storage/logs/error.log');
+@mkdir(PUBLIC_PATH . '/storage/logs', 0755, true);
+ini_set('error_log', PUBLIC_PATH . '/storage/logs/error.log');
 
 // Custom error handler
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
-    $errorLog = ROOT_PATH . '/storage/logs/php-errors.log';
+    $errorLog = PUBLIC_PATH . '/storage/logs/php-errors.log';
     $message = date('[Y-m-d H:i:s] ') . "[$errno] $errstr in $errfile:$errline\n";
     error_log($message, 3, $errorLog);
     return false;
 });
 
 // Log request information
-$requestLog = ROOT_PATH . '/storage/logs/requests.log';
+$requestLog = PUBLIC_PATH . '/storage/logs/requests.log';
 $requestData = [
     'timestamp' => date('Y-m-d H:i:s'),
     'method' => $_SERVER['REQUEST_METHOD'],
