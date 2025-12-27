@@ -13,21 +13,22 @@ class Database
     {
         if (self::$connection === null) {
             try {
+                // MySQL Database Configuration
                 $host = getenv('DB_HOST') ?: 'localhost';
-                $port = getenv('DB_PORT') ?: '5432';
-                $dbname = getenv('DB_DATABASE') ?: 'alphadb_ForX';
-                $user = getenv('DB_USER') ?: 'postgres';
-                $password = getenv('DB_PASSWORD') ?: '';
-                
-                // Build DSN with SSL support for production databases
+                $port = getenv('DB_PORT') ?: '3306';
+                $dbname = getenv('DB_NAME') ?: 'alphacp_ForX';
+                $user = getenv('DB_USER') ?: 'alphacp_ForX';
+                $password = getenv('DB_PASS') ?: 'ale2y3t4h5';
+
+                // Build MySQL DSN
                 $dsn = sprintf(
-                    'pgsql:host=%s;port=%s;dbname=%s;sslmode=prefer',
+                    'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
                     $host,
                     $port,
                     $dbname
                 );
 
-                error_log("Connecting to: $host:$port/$dbname");
+                error_log("Connecting to MySQL: $host:$port/$dbname");
 
                 self::$connection = new PDO(
                     $dsn,
@@ -37,9 +38,10 @@ class Database
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                         PDO::ATTR_EMULATE_PREPARES => false,
+                        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
                     ]
                 );
-                
+
                 error_log("Database connection successful!");
             } catch (PDOException $e) {
                 error_log("Database Connection Error: " . $e->getMessage());
@@ -55,7 +57,7 @@ class Database
         try {
             $keys = array_keys($data);
             $placeholders = array_map(fn($k) => '?', $keys);
-            
+
             $sql = sprintf(
                 'INSERT INTO %s (%s) VALUES (%s)',
                 $table,
@@ -79,7 +81,7 @@ class Database
     {
         try {
             $sets = array_map(fn($k) => "$k = ?", array_keys($data));
-            
+
             $sql = sprintf(
                 'UPDATE %s SET %s WHERE %s',
                 $table,
