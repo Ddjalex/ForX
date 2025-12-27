@@ -13,22 +13,15 @@ class Database
     {
         if (self::$connection === null) {
             try {
-                // MySQL Database Configuration
-                $host = getenv('DB_HOST') ?: 'localhost';
-                $port = getenv('DB_PORT') ?: '3306';
-                $dbname = getenv('DB_NAME') ?: 'alphacp_ForX';
-                $user = getenv('DB_USER') ?: 'alphacp_ForX';
-                $password = getenv('DB_PASS') ?: 'ale2y3t4h5';
+                $host = 'localhost';
+                $port = '3306';
+                $dbname = 'alphacp_ForX';
+                $user = 'alphacp_ForX';
+                $password = 'ale2y3t4h5';
 
-                // Build MySQL DSN
-                $dsn = sprintf(
-                    'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
-                    $host,
-                    $port,
-                    $dbname
-                );
+                $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
 
-                error_log("Connecting to MySQL: $host:$port/$dbname");
+                error_log("Connecting to MySQL: $host:$port/$dbname with user: $user");
 
                 self::$connection = new PDO(
                     $dsn,
@@ -38,14 +31,13 @@ class Database
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                         PDO::ATTR_EMULATE_PREPARES => false,
-                        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
                     ]
                 );
 
-                error_log("Database connection successful!");
+                error_log("✓ Database connection successful!");
             } catch (PDOException $e) {
-                error_log("Database Connection Error: " . $e->getMessage());
-                throw new \RuntimeException("Database connection failed: " . $e->getMessage());
+                error_log("✗ Database Connection Error: " . $e->getMessage());
+                throw $e;
             }
         }
 
@@ -56,48 +48,53 @@ class Database
     {
         try {
             $keys = array_keys($data);
-            $placeholders = array_map(fn($k) => '?', $keys);
+            $placeholders = array_fill(0, count($keys), '?');
+            $keyList = implode('`, `', $keys);
 
-            $sql = sprintf(
-                'INSERT INTO %s (%s) VALUES (%s)',
-                $table,
-                implode(', ', $keys),
-                implode(', ', $placeholders)
-            );
+            $sql = "INSERT INTO `$table` (`$keyList`) VALUES (" . implode(', ', $placeholders) . ")";
 
-            error_log("INSERT SQL: $sql | Data: " . json_encode($data));
+            error_log("INSERT SQL: $sql");
+            error_log("INSERT DATA: " . json_encode($data));
 
             $stmt = self::getConnection()->prepare($sql);
-            $stmt->execute(array_values($data));
+            
+            $success = $stmt->execute(array_values($data));
+            error_log("Execute result: " . ($success ? "TRUE" : "FALSE"));
 
-            return (int)self::getConnection()->lastInsertId();
+            $lastId = self::getConnection()->lastInsertId();
+            error_log("Last Insert ID: $lastId");
+
+            return (int)$lastId;
         } catch (PDOException $e) {
-            error_log("INSERT Error: " . $e->getMessage());
-            throw new \RuntimeException("Insert failed: " . $e->getMessage());
+            error_log("✗ INSERT Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
     public static function update(string $table, array $data, string $where, array $params = []): int
     {
         try {
-            $sets = array_map(fn($k) => "$k = ?", array_keys($data));
+            $sets = [];
+            foreach (array_keys($data) as $key) {
+                $sets[] = "`$key` = ?";
+            }
+            $setClause = implode(', ', $sets);
 
-            $sql = sprintf(
-                'UPDATE %s SET %s WHERE %s',
-                $table,
-                implode(', ', $sets),
-                $where
-            );
+            $sql = "UPDATE `$table` SET $setClause WHERE $where";
 
             error_log("UPDATE SQL: $sql");
+            error_log("UPDATE DATA: " . json_encode($data) . " PARAMS: " . json_encode($params));
 
             $stmt = self::getConnection()->prepare($sql);
             $stmt->execute(array_merge(array_values($data), $params));
 
-            return $stmt->rowCount();
+            $affected = $stmt->rowCount();
+            error_log("Rows affected: $affected");
+
+            return $affected;
         } catch (PDOException $e) {
-            error_log("UPDATE Error: " . $e->getMessage());
-            throw new \RuntimeException("Update failed: " . $e->getMessage());
+            error_log("✗ UPDATE Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -108,8 +105,8 @@ class Database
             $stmt->execute($params);
             return $stmt->fetch() ?: null;
         } catch (PDOException $e) {
-            error_log("FETCH Error: " . $e->getMessage());
-            throw new \RuntimeException("Fetch failed: " . $e->getMessage());
+            error_log("✗ FETCH Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -120,8 +117,8 @@ class Database
             $stmt->execute($params);
             return $stmt->fetchAll() ?: [];
         } catch (PDOException $e) {
-            error_log("FETCHALL Error: " . $e->getMessage());
-            throw new \RuntimeException("FetchAll failed: " . $e->getMessage());
+            error_log("✗ FETCHALL Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -131,8 +128,8 @@ class Database
             $stmt = self::getConnection()->prepare($sql);
             $stmt->execute($params);
         } catch (PDOException $e) {
-            error_log("QUERY Error: " . $e->getMessage());
-            throw new \RuntimeException("Query failed: " . $e->getMessage());
+            error_log("✗ QUERY Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
