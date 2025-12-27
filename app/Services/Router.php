@@ -130,7 +130,17 @@ class Router
             echo "<!-- View not found: {$view} -->";
         }
         
-        return ob_get_clean();
+        $content = ob_get_clean();
+
+        // Automatically wrap admin views in the admin layout
+        if (strpos($view, 'admin/') === 0) {
+            ob_start();
+            $title = $pageTitle ?? 'Admin';
+            include __DIR__ . '/../Views/layouts/admin.php';
+            return ob_get_clean();
+        }
+
+        return $content;
     }
 
     public static function redirect(string $url): void

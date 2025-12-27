@@ -51,7 +51,7 @@ class KYCController
         }
 
         // Create upload directory
-        $uploadDir = PUBLIC_PATH . '/uploads/kyc/' . $user['id'];
+        $uploadDir = __DIR__ . '/../../public/uploads/kyc/' . $user['id'];
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }

@@ -1,5 +1,5 @@
 <?php
-ob_start();
+// Admin Dashboard
 ?>
 
 <div class="admin-header">
@@ -339,9 +339,3 @@ document.getElementById('rejectModal').addEventListener('click', function(e) {
     if (e.target === this) closeRejectModal();
 });
 </script>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'Admin Dashboard';
-include __DIR__ . '/../layouts/admin.php';
-?>

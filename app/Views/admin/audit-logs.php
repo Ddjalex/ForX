@@ -1,5 +1,5 @@
 <?php
-ob_start();
+// Admin Audit Logs
 ?>
 
 <div class="card">
@@ -47,9 +47,3 @@ ob_start();
         <?php endif; ?>
     </div>
 </div>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'Audit Logs';
-include __DIR__ . '/../layouts/admin.php';
-?>

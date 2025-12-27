@@ -1,5 +1,5 @@
 <?php
-ob_start();
+// Admin Users
 ?>
 
 <?php if (!empty($success)): ?>

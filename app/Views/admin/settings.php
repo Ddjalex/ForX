@@ -276,8 +276,6 @@ $pageTitle = $pageTitle ?? 'Settings';
     </div>
 </div>
 
-<?php include __DIR__ . '/../layouts/admin.php'; ?>
-
 <style>
 .settings-container {
     display: flex;
@@ -647,3 +645,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateProfitCalculations();
 });
 </script>
+
+<?php
+$content = ob_get_clean();
+$pageTitle = 'Platform Settings';
+include __DIR__ . '/../layouts/admin.php';
+?>
+
