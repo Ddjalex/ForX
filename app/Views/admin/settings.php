@@ -245,7 +245,7 @@ $pageTitle = $pageTitle ?? 'Settings';
             <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
             <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
         </div>
-        <form method="POST" action="/admin/settings" enctype="multipart/form-data" id="networkForm" onsubmit="submitNetworkForm(event)">
+        <form method="POST" action="/admin/deposit-networks" enctype="multipart/form-data" id="networkForm" onsubmit="submitNetworkForm(event)">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" name="action" id="networkAction" value="add">
             <input type="hidden" name="id" id="networkId" value="">
