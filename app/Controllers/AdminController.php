@@ -710,7 +710,7 @@ class AdminController
             );
         }
 
-        echo Router::render('admin/kyc', [
+        echo Router::render('admin/kyc-approvals', [
             'kycList' => $kycList,
             'csrf_token' => Session::generateCsrfToken(),
             'success' => Session::getFlash('success'),
