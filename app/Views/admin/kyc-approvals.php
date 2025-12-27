@@ -1,3 +1,10 @@
+<?php
+$pending_count = $pending_count ?? 0;
+$approved_count = $approved_count ?? 0;
+$rejected_count = $rejected_count ?? 0;
+$kyc_verifications = $kyc_verifications ?? [];
+$csrf_token = $csrf_token ?? '';
+?>
 <div class="admin-kyc-wrapper">
     <div class="admin-kyc-container">
         <!-- Enhanced Header -->

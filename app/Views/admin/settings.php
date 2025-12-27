@@ -8,14 +8,6 @@ $error = $error ?? '';
 $pageTitle = $pageTitle ?? 'Settings';
 ?>
 
-<?php if (!empty($success)): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-<?php endif; ?>
-
-<?php if (!empty($error)): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-<?php endif; ?>
-
 <div class="settings-container">
     <div class="settings-sidebar">
         <div class="settings-nav">
@@ -43,6 +35,14 @@ $pageTitle = $pageTitle ?? 'Settings';
     </div>
 
     <div class="settings-content">
+        <?php if (!empty($success)): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
+
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
         <!-- Section: Deposit Networks -->
         <div id="section-deposit-networks" class="settings-section active">
             <div class="section-header">
