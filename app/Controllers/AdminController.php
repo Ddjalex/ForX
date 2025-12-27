@@ -552,9 +552,10 @@ class AdminController
                 if (move_uploaded_file($_FILES['qr_code']['tmp_name'], $targetPath)) {
                     @chmod($targetPath, 0777);
                     $qrCodePath = '/uploads/qr_codes/' . $fileName;
-                    error_log("QR Code uploaded successfully: $qrCodePath");
+                    error_log("QR Code uploaded successfully to: $targetPath");
                 } else {
-                    error_log("Failed to move uploaded QR code file from " . $_FILES['qr_code']['tmp_name'] . " to " . $targetPath);
+                    $error = error_get_last();
+                    error_log("Failed to move uploaded QR code file. Error: " . ($error['message'] ?? 'Unknown error'));
                 }
             }
 
