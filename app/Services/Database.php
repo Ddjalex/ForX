@@ -13,23 +13,34 @@ class Database
     {
         if (self::$connection === null) {
             try {
+                $host = getenv('DB_HOST') ?: 'localhost';
+                $port = getenv('DB_PORT') ?: '5432';
+                $dbname = getenv('DB_DATABASE') ?: 'alphadb_ForX';
+                $user = getenv('DB_USER') ?: 'postgres';
+                $password = getenv('DB_PASSWORD') ?: '';
+                
+                // Build DSN with SSL support for production databases
                 $dsn = sprintf(
-                    'pgsql:host=%s;port=%s;dbname=%s',
-                    getenv('DB_HOST') ?: 'localhost',
-                    getenv('DB_PORT') ?: '5432',
-                    getenv('DB_DATABASE') ?: 'alphadb_ForX'
+                    'pgsql:host=%s;port=%s;dbname=%s;sslmode=prefer',
+                    $host,
+                    $port,
+                    $dbname
                 );
+
+                error_log("Connecting to: $host:$port/$dbname");
 
                 self::$connection = new PDO(
                     $dsn,
-                    getenv('DB_USER') ?: 'postgres',
-                    getenv('DB_PASSWORD') ?: '',
+                    $user,
+                    $password,
                     [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                         PDO::ATTR_EMULATE_PREPARES => false,
                     ]
                 );
+                
+                error_log("Database connection successful!");
             } catch (PDOException $e) {
                 error_log("Database Connection Error: " . $e->getMessage());
                 throw new \RuntimeException("Database connection failed: " . $e->getMessage());
