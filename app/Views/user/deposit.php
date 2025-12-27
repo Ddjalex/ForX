@@ -35,8 +35,12 @@ $minDeposit = $settings['min_deposit'] ?? '10';
                     <div style="margin: 15px auto; padding: 15px; background: #fff; border-radius: 12px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
                         <?php 
                         $displayPath = $network['qr_code'];
+                        // Ensure path starts with /uploads/
                         if (strpos($displayPath, '/public/') === 0) {
                             $displayPath = substr($displayPath, 7);
+                        }
+                        if (strpos($displayPath, 'uploads/') === 0) {
+                            $displayPath = '/' . $displayPath;
                         }
                         ?>
                         <img src="<?= htmlspecialchars($displayPath) ?>?v=<?= time() ?>" alt="QR Code" style="width: 180px; height: 180px; display: block; object-fit: contain;">
