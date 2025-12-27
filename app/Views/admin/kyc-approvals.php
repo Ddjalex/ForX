@@ -169,23 +169,21 @@ $csrf_token = $csrf_token ?? '';
                                         <div class="doc-preview" style="aspect-ratio: auto; height: auto; min-height: 400px;">
                                             <?php
                                             $imagePath = $doc['file_path'];
-                                            if (strpos($imagePath, 'http') !== 0) {
-                                                // Ensure the path starts with /uploads and handle ROOT_PATH issues
-                                                if (strpos($imagePath, '/public/') === 0) {
-                                                    $imagePath = substr($imagePath, 7);
-                                                } elseif (strpos($imagePath, 'public/') === 0) {
-                                                    $imagePath = substr($imagePath, 6);
-                                                }
-                                                
-                                                if (strpos($imagePath, '/') !== 0) {
-                                                    $imagePath = '/' . $imagePath;
-                                                }
+                                            // Normalize the path - remove /public/ prefix if present
+                                            if (strpos($imagePath, '/public/') === 0) {
+                                                $imagePath = substr($imagePath, 7);
+                                            }
+                                            // Ensure path starts with /
+                                            if (strpos($imagePath, '/') !== 0 && !preg_match('/^https?:\/\//', $imagePath)) {
+                                                $imagePath = '/' . $imagePath;
                                             }
                                             ?>
-                                            <img src="<?= htmlspecialchars($imagePath) ?>" alt="<?= $doc['document_type'] ?>" 
+                                            <img src="<?= htmlspecialchars($imagePath) ?>" 
+                                                 alt="<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>"
                                                  style="object-fit: contain; width: 100%; height: 100%;"
                                                  onclick="showDocumentModal('<?= htmlspecialchars($imagePath) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')" 
-                                                 onerror="this.src='https://ui-avatars.com/api/?name=DOC&background=333&color=fff&size=400'">
+                                                 onerror="handleImageError(this)"
+                                                 loading="lazy">
                                             <div class="doc-overlay">
                                                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -435,5 +433,16 @@ function showNotification(msg, type) {
     n.textContent = msg;
     document.body.appendChild(n);
     setTimeout(() => n.remove(), 3000);
+}
+
+function handleImageError(img) {
+    img.style.display = 'none';
+    const parent = img.closest('.doc-preview');
+    if (parent) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #1a2f4a; color: #a0aec0; text-align: center; font-size: 14px; padding: 20px;`;
+        errorDiv.innerHTML = '<div><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><p>Unable to load image</p></div>';
+        parent.appendChild(errorDiv);
+    }
 }
 </script>
