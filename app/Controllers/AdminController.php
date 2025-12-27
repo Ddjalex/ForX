@@ -695,27 +695,45 @@ class AdminController
 
     public function kyc(): void
     {
-        $kycList = Database::fetchAll(
-            "SELECT k.*, u.name as user_name, u.email as user_email 
-             FROM kyc_verifications k 
-             JOIN users u ON k.user_id = u.id 
-             ORDER BY k.created_at DESC"
-        );
-
-        // For each KYC, get documents
-        foreach ($kycList as &$kyc) {
-            $kyc['documents'] = Database::fetchAll(
-                "SELECT * FROM kyc_documents WHERE kyc_id = ?",
-                [$kyc['id']]
+        try {
+            $kyc_verifications = Database::fetchAll(
+                "SELECT k.*, u.name as user_name, u.email as user_email 
+                 FROM kyc_verifications k 
+                 JOIN users u ON k.user_id = u.id 
+                 ORDER BY k.created_at DESC"
             );
-        }
 
-        echo Router::render('admin/kyc-approvals', [
-            'kycList' => $kycList,
-            'csrf_token' => Session::generateCsrfToken(),
-            'success' => Session::getFlash('success'),
-            'error' => Session::getFlash('error'),
-        ]);
+            // Fetch stats
+            $stats = Database::fetch(
+                "SELECT 
+                    COUNT(*) FILTER (WHERE status = 'pending') as pending,
+                    COUNT(*) FILTER (WHERE status = 'approved') as approved,
+                    COUNT(*) FILTER (WHERE status = 'rejected') as rejected
+                 FROM kyc_verifications"
+            );
+
+            // For each KYC, get documents
+            foreach ($kyc_verifications as &$kyc) {
+                $kyc['documents'] = Database::fetchAll(
+                    "SELECT * FROM kyc_documents WHERE kyc_id = ?",
+                    [$kyc['id']]
+                );
+            }
+
+            echo Router::render('admin/kyc-approvals', [
+                'kyc_verifications' => $kyc_verifications,
+                'pending_count' => $stats['pending'] ?? 0,
+                'approved_count' => $stats['approved'] ?? 0,
+                'rejected_count' => $stats['rejected'] ?? 0,
+                'csrf_token' => Session::generateCsrfToken(),
+                'success' => Session::getFlash('success'),
+                'error' => Session::getFlash('error'),
+            ]);
+        } catch (\Throwable $e) {
+            error_log("KYC View Error: " . $e->getMessage());
+            Session::flash('error', 'Error loading KYC verifications.');
+            Router::redirect('/admin');
+        }
     }
 
     public function approveKyc(): void
