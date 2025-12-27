@@ -13,62 +13,39 @@ class Database
     {
         if (self::$connection === null) {
             try {
-                // Check for PostgreSQL DATABASE_URL first (Replit environment)
-                if (getenv('DATABASE_URL')) {
-                    $dbUrl = parse_url(getenv('DATABASE_URL'));
-                    $host = $dbUrl['host'] ?? 'localhost';
-                    $port = $dbUrl['port'] ?? 5432;
-                    $dbname = ltrim($dbUrl['path'] ?? '', '/');
-                    $user = $dbUrl['user'] ?? 'postgres';
-                    $password = $dbUrl['pass'] ?? '';
-                    $sslmode = isset($dbUrl['query']) ? parse_str($dbUrl['query'], $params) && ($params['sslmode'] ?? 'disable') : 'disable';
-                    
-                    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=$sslmode";
-                    error_log("Connecting to PostgreSQL: $host:$port/$dbname");
-                    
-                    self::$connection = new PDO(
-                        $dsn,
-                        $user,
-                        $password,
-                        [
-                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                            PDO::ATTR_EMULATE_PREPARES => false,
-                        ]
-                    );
+                // Read from your existing config file
+                $configFile = dirname(__DIR__) . '/../config/app.php';
+                
+                if (file_exists($configFile)) {
+                    include $configFile;
+                    $host = $DB_HOST ?? 'localhost';
+                    $port = $DB_PORT ?? '3306';
+                    $dbname = $DB_NAME ?? 'alphacp_ForX';
+                    $user = $DB_USER ?? 'alphacp_ForX';
+                    $password = $DB_PASS ?? '';
                 } else {
-                    // Fallback to MySQL for local development
-                    $configFile = dirname(__DIR__) . '/../config/app.php';
-                    
-                    if (file_exists($configFile)) {
-                        include $configFile;
-                        $host = $DB_HOST ?? 'localhost';
-                        $port = $DB_PORT ?? '3306';
-                        $dbname = $DB_NAME ?? 'alphacp_ForX';
-                        $user = $DB_USER ?? 'alphacp_ForX';
-                        $password = $DB_PASS ?? '';
-                    } else {
-                        $host = getenv('DB_HOST') ?: 'localhost';
-                        $port = getenv('DB_PORT') ?: '3306';
-                        $dbname = getenv('DB_NAME') ?: 'alphacp_ForX';
-                        $user = getenv('DB_USER') ?: 'alphacp_ForX';
-                        $password = getenv('DB_PASS') ?: 'ale2y3t4h5';
-                    }
-
-                    $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
-                    error_log("Connecting to MySQL: $host:$port/$dbname with user: $user");
-                    
-                    self::$connection = new PDO(
-                        $dsn,
-                        $user,
-                        $password,
-                        [
-                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                            PDO::ATTR_EMULATE_PREPARES => false,
-                        ]
-                    );
+                    // Fallback to environment variables or defaults
+                    $host = getenv('DB_HOST') ?: 'localhost';
+                    $port = getenv('DB_PORT') ?: '3306';
+                    $dbname = getenv('DB_NAME') ?: 'alphacp_ForX';
+                    $user = getenv('DB_USER') ?: 'alphacp_ForX';
+                    $password = getenv('DB_PASS') ?: 'ale2y3t4h5';
                 }
+
+                $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+
+                error_log("Connecting to MySQL: $host:$port/$dbname with user: $user");
+
+                self::$connection = new PDO(
+                    $dsn,
+                    $user,
+                    $password,
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        PDO::ATTR_EMULATE_PREPARES => false,
+                    ]
+                );
 
                 error_log("✓ Database connection successful!");
             } catch (PDOException $e) {
