@@ -1,172 +1,169 @@
 <?php
-$minDeposit = $settings['min_deposit'] ?? '10';
+$pending_count = 0;
+$approved_count = 0;
+$rejected_count = 0;
+$deposits = $deposits ?? [];
+$csrf_token = $csrf_token ?? '';
+
+foreach ($deposits as $d) {
+    if ($d['status'] === 'pending') $pending_count++;
+    elseif ($d['status'] === 'approved') $approved_count++;
+    elseif ($d['status'] === 'rejected') $rejected_count++;
+}
 ?>
-
-<?php if (!empty($success)): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-<?php endif; ?>
-
-<?php if (!empty($error)): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-<?php endif; ?>
-
-<div class="deposit-grid">
-    <div class="deposit-section">
-        <div class="card-header collapsible">
-            <h3 class="card-title">Deposit Using Cryptocurrency</h3>
-        </div>
-
-        <?php if (!empty($btcAddress)): ?>
-        <div class="deposit-method">
-            <h4>Bitcoin (BTC) Deposit</h4>
-            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-            <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($btcNetwork) ?></strong></p>
-                <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($btcAddress) ?></p>
-                <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($btcAddress) ?>'); this.textContent='Copied!';">Copy Address</button>
+<div class="admin-deposits-wrapper">
+    <div class="admin-deposits-container">
+        <div class="admin-header-section">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>Deposit Approvals</h1>
+                    <p>Review and approve user deposit requests</p>
+                </div>
             </div>
-            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="method" value="bitcoin">
-                <div class="form-group">
-                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="<?= htmlspecialchars($minDeposit) ?>" required>
+            <div class="stats-grid">
+                <div class="stat-card pending">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-content">
+                        <p class="stat-label">Pending</p>
+                        <h3 class="stat-number"><?= $pending_count ?></h3>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)" required>
+                <div class="stat-card approved">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-content">
+                        <p class="stat-label">Approved</p>
+                        <h3 class="stat-number"><?= $approved_count ?></h3>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="file" name="proof" class="form-control" accept="image/*">
+                <div class="stat-card rejected">
+                    <div class="stat-icon">✕</div>
+                    <div class="stat-content">
+                        <p class="stat-label">Rejected</p>
+                        <h3 class="stat-number"><?= $rejected_count ?></h3>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit Deposit</button>
-            </form>
-        </div>
-        <?php endif; ?>
-
-        <?php if (!empty($ethAddress)): ?>
-        <div class="deposit-method">
-            <h4>Ethereum (ETH) Deposit</h4>
-            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-            <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($ethNetwork) ?></strong></p>
-                <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($ethAddress) ?></p>
-                <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($ethAddress) ?>'); this.textContent='Copied!';">Copy Address</button>
             </div>
-            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="method" value="ethereum">
-                <div class="form-group">
-                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="<?= htmlspecialchars($minDeposit) ?>" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)" required>
-                </div>
-                <div class="form-group">
-                    <input type="file" name="proof" class="form-control" accept="image/*">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Deposit</button>
-            </form>
-        </div>
-        <?php endif; ?>
-
-        <?php if (!empty($ltcAddress)): ?>
-        <div class="deposit-method">
-            <h4>Litecoin (LTC) Deposit</h4>
-            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-            <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($ltcNetwork) ?></strong></p>
-                <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($ltcAddress) ?></p>
-                <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($ltcAddress) ?>'); this.textContent='Copied!';">Copy Address</button>
-            </div>
-            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="method" value="litecoin">
-                <div class="form-group">
-                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="<?= htmlspecialchars($minDeposit) ?>" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)" required>
-                </div>
-                <div class="form-group">
-                    <input type="file" name="proof" class="form-control" accept="image/*">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Deposit</button>
-            </form>
-        </div>
-        <?php endif; ?>
-
-        <?php if (!empty($usdtAddress)): ?>
-        <div class="deposit-method">
-            <h4>USDT Deposit</h4>
-            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-            <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($usdtNetwork) ?></strong></p>
-                <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($usdtAddress) ?></p>
-                <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($usdtAddress) ?>'); this.textContent='Copied!';">Copy Address</button>
-            </div>
-            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="method" value="usdt">
-                <div class="form-group">
-                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="<?= htmlspecialchars($minDeposit) ?>" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)" required>
-                </div>
-                <div class="form-group">
-                    <input type="file" name="proof" class="form-control" accept="image/*">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Deposit</button>
-            </form>
-        </div>
-        <?php endif; ?>
-
-        <?php if (!empty($solAddress)): ?>
-        <div class="deposit-method">
-            <h4>Solana (SOL) Deposit</h4>
-            <p class="warning">Please make sure you upload your payment proof for quick payment verification</p>
-            <div class="wallet-info" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                <p style="margin: 0 0 8px 0; color: var(--text-secondary);">Network: <strong style="color: var(--accent-primary);"><?= htmlspecialchars($solNetwork) ?></strong></p>
-                <p style="margin: 0; word-break: break-all; font-family: monospace; color: var(--text-primary);"><?= htmlspecialchars($solAddress) ?></p>
-                <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($solAddress) ?>'); this.textContent='Copied!';">Copy Address</button>
-            </div>
-            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="method" value="solana">
-                <div class="form-group">
-                    <input type="number" name="amount" class="form-control" placeholder="Enter amount in USD" step="0.01" min="<?= htmlspecialchars($minDeposit) ?>" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="txid" class="form-control" placeholder="Transaction ID (TXID)" required>
-                </div>
-                <div class="form-group">
-                    <input type="file" name="proof" class="form-control" accept="image/*">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Deposit</button>
-            </form>
-        </div>
-        <?php endif; ?>
-
-        <?php if (empty($btcAddress) && empty($ethAddress) && empty($ltcAddress) && empty($usdtAddress) && empty($solAddress)): ?>
-        <div class="deposit-method">
-            <p style="text-align: center; color: var(--text-secondary);">No deposit methods have been configured yet. Please contact support.</p>
-        </div>
-        <?php endif; ?>
-    </div>
-
-    <div class="deposit-section">
-        <div class="card-header collapsible">
-            <h3 class="card-title">Other Deposit Options</h3>
         </div>
 
-        <div class="deposit-method">
-            <h4>Request other available Deposit Method</h4>
-            <p>Once payment is made using this method you are to send your payment proof to our support mail <a href="mailto:support@tradeflowglobalex.com">support@tradeflowglobalex.com</a></p>
-            <p>Once requested, you will receive the payment details via our support mail....</p>
-            <form method="POST" action="/wallet/deposit" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
-                <input type="hidden" name="method" value="other">
-                <button type="submit" class="btn btn-secondary">Processed</button>
-            </form>
+        <div class="deposits-list">
+            <?php if (empty($deposits)): ?>
+                <div class="empty-state">
+                    <p>No deposits found</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($deposits as $deposit): ?>
+                    <div class="deposit-card" data-status="<?= $deposit['status'] ?>">
+                        <div class="deposit-header">
+                            <div class="user-info">
+                                <div class="user-avatar"><?= strtoupper(substr($deposit['name'] ?? 'U', 0, 1)) ?></div>
+                                <div class="user-details">
+                                    <h3><?= htmlspecialchars($deposit['name'] ?? 'Unknown') ?></h3>
+                                    <p class="user-email"><?= htmlspecialchars($deposit['email'] ?? '') ?></p>
+                                </div>
+                            </div>
+                            <div class="deposit-meta">
+                                <span class="status-badge" data-status="<?= $deposit['status'] ?>">
+                                    <?= ucfirst($deposit['status']) ?>
+                                </span>
+                                <span class="date"><?= date('M d, Y', strtotime($deposit['created_at'])) ?></span>
+                            </div>
+                        </div>
+
+                        <div class="deposit-details">
+                            <div class="detail-row">
+                                <span class="label">Amount:</span>
+                                <span class="value">$<?= number_format($deposit['amount'], 2) ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Method:</span>
+                                <span class="value"><?= ucfirst(htmlspecialchars($deposit['method'] ?? '')) ?></span>
+                            </div>
+                            <?php if ($deposit['txid']): ?>
+                            <div class="detail-row">
+                                <span class="label">Transaction ID:</span>
+                                <span class="value"><?= htmlspecialchars($deposit['txid']) ?></span>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($deposit['status'] === 'pending'): ?>
+                        <div class="deposit-actions">
+                            <form method="POST" action="/admin/deposits/approve" style="display:inline;">
+                                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                                <input type="hidden" name="deposit_id" value="<?= $deposit['id'] ?>">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-approve">Approve</button>
+                            </form>
+                            <form method="POST" action="/admin/deposits/approve" style="display:inline;">
+                                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+                                <input type="hidden" name="deposit_id" value="<?= $deposit['id'] ?>">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-reject" onclick="return confirm('Reject this deposit?');">Reject</button>
+                            </form>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
+
+<style>
+:root {
+    --bg-primary: #0a1628;
+    --bg-secondary: #112236;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --accent-primary: #00d4aa;
+    --border-color: #2d5a8c;
+    --success: #10b981;
+    --danger: #ef4444;
+}
+
+.admin-deposits-wrapper {
+    background: var(--bg-primary);
+    min-height: 100vh;
+    padding: 30px;
+    font-family: 'Inter', sans-serif;
+}
+
+.admin-header-section { margin-bottom: 40px; }
+.header-title h1 { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.header-title p { color: var(--text-secondary); font-size: 15px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 30px; }
+.stat-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; display: flex; align-items: center; gap: 20px; }
+.stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; background: rgba(0, 212, 170, 0.1); }
+.stat-number { font-size: 32px; font-weight: 700; color: var(--text-primary); margin: 0; }
+.stat-label { font-size: 13px; color: var(--text-secondary); text-transform: uppercase; margin: 0; }
+
+.deposits-list { }
+.deposit-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 20px; padding: 24px; }
+.deposit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.user-info { display: flex; gap: 16px; align-items: center; }
+.user-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-primary); color: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
+.user-details h3 { font-size: 18px; margin: 0 0 4px 0; color: var(--text-primary); }
+.user-email { color: var(--accent-primary); font-size: 14px; margin: 0; }
+
+.deposit-meta { display: flex; gap: 16px; align-items: center; }
+.status-badge { padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.status-badge[data-status="pending"] { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.status-badge[data-status="approved"] { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.status-badge[data-status="rejected"] { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+.date { color: var(--text-secondary); font-size: 13px; }
+
+.deposit-details { background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+.detail-row { display: flex; justify-content: space-between; padding: 8px 0; }
+.detail-row .label { color: var(--text-secondary); font-size: 14px; }
+.detail-row .value { color: var(--text-primary); font-weight: 600; }
+
+.deposit-actions { display: flex; gap: 12px; }
+.btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: 0.3s; }
+.btn-approve { background: var(--success); color: #fff; }
+.btn-reject { background: var(--danger); color: #fff; }
+.btn:hover { opacity: 0.9; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+.empty-state p { font-size: 18px; }
+</style>

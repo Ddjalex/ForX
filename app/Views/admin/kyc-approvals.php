@@ -369,16 +369,16 @@ $csrf_token = $csrf_token ?? '';
 
 <script>
 // Define error handler FIRST so it's available for onerror attributes
-function handleImageError(img) {
+window.handleImageError = function(img) {
     img.style.display = 'none';
     const parent = img.closest('.doc-preview');
     if (parent) {
         const errorDiv = document.createElement('div');
         errorDiv.style.cssText = `display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #1a2f4a; color: #a0aec0; text-align: center; font-size: 14px; padding: 20px; border-radius: 12px;`;
-        errorDiv.innerHTML = '<div style="text-align: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><p style="margin: 10px 0 0 0; font-size: 13px;">Image not found on server</p></div>';
+        errorDiv.innerHTML = '<div style="text-align: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><p style="margin: 10px 0 0 0; font-size: 13px;">Image file not found</p></div>';
         parent.appendChild(errorDiv);
     }
-}
+};
 
 function filterKYC(status) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
