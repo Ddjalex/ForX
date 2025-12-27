@@ -566,16 +566,22 @@ class AdminController
 
             switch ($action) {
                 case 'add':
-                    error_log("Adding new network: $name");
-                    Database::insert('deposit_networks', [
-                        'name' => $name,
-                        'symbol' => $symbol,
-                        'wallet_address' => $wallet_address,
-                        'network_type' => $network_type,
-                        'qr_code' => $qrCodePath,
-                        'status' => 'active'
-                    ]);
-                    error_log("Network added successfully");
+                    error_log("Adding new network: name=$name, symbol=$symbol, wallet=$wallet_address, type=$network_type, qr=$qrCodePath");
+                    try {
+                        $result = Database::insert('deposit_networks', [
+                            'name' => $name,
+                            'symbol' => $symbol,
+                            'wallet_address' => $wallet_address,
+                            'network_type' => $network_type,
+                            'qr_code' => $qrCodePath,
+                            'status' => 'active'
+                        ]);
+                        error_log("Network insert result: " . json_encode($result));
+                        error_log("Network added successfully");
+                    } catch (\Throwable $e) {
+                        error_log("NETWORK INSERT ERROR: " . $e->getMessage());
+                        throw $e;
+                    }
                     break;
                 case 'update':
                     error_log("Updating network ID: $id");

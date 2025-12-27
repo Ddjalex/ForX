@@ -245,26 +245,26 @@ $pageTitle = $pageTitle ?? 'Settings';
             <h3 class="modal-title" id="networkModalTitle">Add Deposit Network</h3>
             <button type="button" class="modal-close" onclick="hideNetworkModal()">&times;</button>
         </div>
-        <form method="POST" action="/admin/settings" enctype="multipart/form-data" id="networkForm" onsubmit="submitNetworkForm(event)">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" id="networkForm">
             <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
             <input type="hidden" name="action" id="networkAction" value="add">
             <input type="hidden" name="id" id="networkId" value="">
             
             <div class="form-group">
                 <label class="form-label">Network Name</label>
-                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin">
+                <input type="text" name="name" id="networkName" class="form-control" placeholder="e.g., Bitcoin" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Symbol</label>
-                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC">
+                <input type="text" name="symbol" id="networkSymbol" class="form-control" placeholder="e.g., BTC" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Wallet Address</label>
-                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address">
+                <input type="text" name="wallet_address" id="networkWallet" class="form-control" placeholder="Enter wallet address" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Network Type</label>
-                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)">
+                <input type="text" name="network_type" id="networkType" class="form-control" placeholder="e.g., BTC (Native)" required>
             </div>
             <div class="form-group">
                 <label class="form-label">QR Code (Optional)</label>
@@ -505,8 +505,6 @@ function hideNetworkModal() {
 }
 
 function submitNetworkForm(event) {
-    event.preventDefault();
-    
     const name = document.getElementById('networkName').value.trim();
     const symbol = document.getElementById('networkSymbol').value.trim();
     const wallet = document.getElementById('networkWallet').value.trim();
@@ -517,9 +515,8 @@ function submitNetworkForm(event) {
         return false;
     }
     
-    console.log('Submitting network form with:', { name, symbol, wallet, type });
-    document.getElementById('networkForm').submit();
-    return false;
+    console.log('Submitting network form with:', { name, symbol, wallet, type, action: document.getElementById('networkAction').value });
+    return true;
 }
 
 function deleteNetwork(id, name) {
