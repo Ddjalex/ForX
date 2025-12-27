@@ -41,7 +41,7 @@ $minDeposit = $settings['min_deposit'] ?? '10';
                             $displayPath = 'public/' . $displayPath;
                         }
                         ?>
-                        <img src="/<?= htmlspecialchars($displayPath) ?>?v=<?= time() ?>" alt="QR Code" style="width: 180px; height: 180px; display: block; object-fit: contain;">
+                        <img src="/<?= htmlspecialchars($displayPath) ?>?v=<?= time() ?>" alt="QR Code" style="width: 180px; height: 180px; display: block; object-fit: contain; background: white; padding: 10px; border-radius: 8px;">
                         <p style="font-size: 11px; color: #64748b; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Scan to pay <?= htmlspecialchars($network['symbol'] ?? '') ?></p>
                     </div>
                     <?php endif; ?>

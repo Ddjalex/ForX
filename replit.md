@@ -159,6 +159,12 @@ ALTER TABLE users ADD INDEX IF NOT EXISTS idx_kyc_verified (kyc_verified);
 4. Verify `index.php` ROOT_PATH points to correct directory
 
 ## Recent Changes (Completed)
+- **December 27, 2024: Migration & QR Code System Refinement** ✅
+  - Successfully migrated TradePro platform to Replit environment.
+  - Refactored admin views with automated layout wrapping in `Router.php`.
+  - Fixed QR code upload and display for deposit networks by implementing unified pathing (`/public/uploads/qr_codes/`).
+  - Added cache-busting and smart path resolution in views to ensure images load reliably.
+  - Implemented automatic physical file cleanup upon record deletion.
 - **December 24, 2024: KYC Verification System - FULLY OPERATIONAL** ✅
   - Complete Know-Your-Customer identity verification with document upload
   - User workflow: `/kyc/verify` page for uploading ID (front/back), passport, and face photo
