@@ -276,6 +276,8 @@ $pageTitle = $pageTitle ?? 'Settings';
     </div>
 </div>
 
+<?php include __DIR__ . '/../layouts/admin.php'; ?>
+
 <style>
 .settings-container {
     display: flex;
