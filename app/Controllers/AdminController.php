@@ -599,15 +599,27 @@ class AdminController
                         // Fetch QR code path before deleting
                         $network = Database::fetch("SELECT qr_code FROM deposit_networks WHERE id = ?", [$id]);
                         if ($network && !empty($network['qr_code'])) {
-                            $fullPath = ROOT_PATH . '/public' . $network['qr_code'];
-                            if (file_exists($fullPath)) {
-                                @unlink($fullPath);
-                                error_log("Deleted QR code file: $fullPath");
+                            // Normalize path for deletion
+                            $qrPath = $network['qr_code'];
+                            $qrPath = ltrim($qrPath, '/');
+                            
+                            // Try both with and without 'public/' prefix
+                            $pathsToTry = [
+                                ROOT_PATH . '/' . $qrPath,
+                                ROOT_PATH . '/public/' . ltrim(str_replace('public/', '', $qrPath), '/')
+                            ];
+                            
+                            foreach ($pathsToTry as $fullPath) {
+                                if (file_exists($fullPath) && is_file($fullPath)) {
+                                    @unlink($fullPath);
+                                    error_log("Deleted QR code file: $fullPath");
+                                    break;
+                                }
                             }
                         }
                         Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
                         AuditLog::log('delete_deposit_network', 'settings', $id);
-                        error_log("Network deleted successfully");
+                        error_log("Network record deleted successfully: ID $id");
                     }
                     break;
                 default:

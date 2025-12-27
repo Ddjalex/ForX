@@ -538,24 +538,16 @@ function deleteNetwork(id, name) {
     formData.append('action', 'delete');
     formData.append('id', String(id));
     
-    fetch('/admin/deposit-networks', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (response.ok || response.redirected) {
-            window.location.reload();
-        } else {
-            alert('Error deleting network');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Network error');
-    });
+    // Send standard POST request
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/admin/deposit-networks', true);
+    xhr.onload = function() {
+        window.location.reload();
+    };
+    xhr.onerror = function() {
+        window.location.reload();
+    };
+    xhr.send(formData);
     
     return false;
 }
