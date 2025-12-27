@@ -13,11 +13,24 @@ class Database
     {
         if (self::$connection === null) {
             try {
-                $host = 'localhost';
-                $port = '3306';
-                $dbname = 'alphacp_ForX';
-                $user = 'alphacp_ForX';
-                $password = 'ale2y3t4h5';
+                // Read from your existing config file
+                $configFile = dirname(__DIR__) . '/../config/app.php';
+                
+                if (file_exists($configFile)) {
+                    include $configFile;
+                    $host = $DB_HOST ?? 'localhost';
+                    $port = $DB_PORT ?? '3306';
+                    $dbname = $DB_NAME ?? 'alphacp_ForX';
+                    $user = $DB_USER ?? 'alphacp_ForX';
+                    $password = $DB_PASS ?? '';
+                } else {
+                    // Fallback to environment variables or defaults
+                    $host = getenv('DB_HOST') ?: 'localhost';
+                    $port = getenv('DB_PORT') ?: '3306';
+                    $dbname = getenv('DB_NAME') ?: 'alphacp_ForX';
+                    $user = getenv('DB_USER') ?: 'alphacp_ForX';
+                    $password = getenv('DB_PASS') ?: 'ale2y3t4h5';
+                }
 
                 $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
 
@@ -57,8 +70,8 @@ class Database
             error_log("INSERT DATA: " . json_encode($data));
 
             $stmt = self::getConnection()->prepare($sql);
-            
             $success = $stmt->execute(array_values($data));
+            
             error_log("Execute result: " . ($success ? "TRUE" : "FALSE"));
 
             $lastId = self::getConnection()->lastInsertId();
@@ -83,7 +96,7 @@ class Database
             $sql = "UPDATE `$table` SET $setClause WHERE $where";
 
             error_log("UPDATE SQL: $sql");
-            error_log("UPDATE DATA: " . json_encode($data) . " PARAMS: " . json_encode($params));
+            error_log("UPDATE DATA: " . json_encode($data));
 
             $stmt = self::getConnection()->prepare($sql);
             $stmt->execute(array_merge(array_values($data), $params));
