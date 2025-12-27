@@ -86,6 +86,21 @@ foreach ($deposits as $d) {
                             <?php endif; ?>
                         </div>
 
+                        <?php if ($deposit['proof_image']): ?>
+                        <div class="proof-image-section">
+                            <h4 class="proof-title">Payment Proof</h4>
+                            <div class="proof-image-container">
+                                <img src="/<?= htmlspecialchars($deposit['proof_image']) ?>" 
+                                     alt="Proof of Payment" 
+                                     class="proof-image"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="proof-error" style="display:none;">
+                                    <p>Image not found</p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
                         <?php if ($deposit['status'] === 'pending'): ?>
                         <div class="deposit-actions">
                             <form method="POST" action="/admin/deposits/approve" style="display:inline;">
@@ -166,4 +181,12 @@ foreach ($deposits as $d) {
 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
 .empty-state p { font-size: 18px; }
+
+.proof-image-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+.proof-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 0 0 12px 0; text-transform: uppercase; }
+.proof-image-container { background: #0a0f1a; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; height: 200px; display: flex; align-items: center; justify-content: center; }
+.proof-image { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
+.proof-image:hover { opacity: 0.9; }
+.proof-error { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a2f4a; color: #a0aec0; text-align: center; }
+.proof-error p { margin: 0; font-size: 14px; }
 </style>
