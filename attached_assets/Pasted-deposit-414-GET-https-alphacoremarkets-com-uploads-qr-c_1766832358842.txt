@@ -1,0 +1,47 @@
+deposit:414  GET https://alphacoremarkets.com/uploads/qr_codes/qr_694fb85d7a15e.jpg?v=1766832227 404 (Not Found)
+deposit:448  GET https://alphacoremarkets.com/uploads/qr_codes/qr_694fb42bd52a1.jpg?v=1766832227 404 (Not Found)
+deposit:482  GET https://alphacoremarkets.com/uploads/qr_codes/qr_694fb6f4771bb.jpg?v=1766832227 404 (Not Found)
+ticker-prices.js:16  GET https://alphacoremarkets.com/api/crypto-prices 404 (Not Found)
+updateTickerPrices @ ticker-prices.js:16
+initTicker @ ticker-prices.js:50
+setTimeout
+(anonymous) @ ticker-prices.js:61
+(anonymous) @ ticker-prices.js:66
+ticker-prices.js:44 Error fetching crypto prices: Error: API error: 404
+    at updateTickerPrices (ticker-prices.js:25:23)
+updateTickerPrices @ ticker-prices.js:44
+await in updateTickerPrices
+initTicker @ ticker-prices.js:50
+setTimeout
+(anonymous) @ ticker-prices.js:61
+(anonymous) @ ticker-prices.js:66
+notifications.js:135  GET https://alphacoremarkets.com/api/notifications/unread 500 (Internal Server Error)
+pollUnread @ notifications.js:135
+(anonymous) @ notifications.js:143
+notifications.js:135  GET https://alphacoremarkets.com/api/notifications/unread 500 (Internal Server Error)
+pollUnread @ notifications.js:135
+setInterval
+(anonymous) @ notifications.js:144
+notifications.js:135  GET https://alphacoremarkets.com/api/notifications/unread 500 (Internal Server Error)
+pollUnread @ notifications.js:135
+setInterval
+(anonymous) @ notifications.js:144
+ticker-prices.js:16  GET https://alphacoremarkets.com/api/crypto-prices 404 (Not Found)
+updateTickerPrices @ ticker-prices.js:16
+setInterval
+initTicker @ ticker-prices.js:53
+setTimeout
+(anonymous) @ ticker-prices.js:61
+(anonymous) @ ticker-prices.js:66
+ticker-prices.js:44 Error fetching crypto prices: Error: API error: 404
+    at updateTickerPrices (ticker-prices.js:25:23)
+updateTickerPrices @ ticker-prices.js:44
+setInterval
+initTicker @ ticker-prices.js:53
+setTimeout
+(anonymous) @ ticker-prices.js:61
+(anonymous) @ ticker-prices.js:66
+notifications.js:135  GET https://alphacoremarkets.com/api/notifications/unread 500 (Internal Server Error)
+pollUnread @ notifications.js:135
+setInterval
+(anonymous) @ notifications.js:144
