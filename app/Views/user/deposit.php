@@ -33,7 +33,13 @@ $minDeposit = $settings['min_deposit'] ?? '10';
                     
                     <?php if (!empty($network['qr_code'])): ?>
                     <div style="margin: 15px auto; padding: 15px; background: #fff; border-radius: 12px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-                        <img src="<?= htmlspecialchars($network['qr_code']) ?>?v=<?= time() ?>" alt="QR Code" style="width: 180px; height: 180px; display: block; object-fit: contain;">
+                        <?php 
+                        $displayPath = $network['qr_code'];
+                        if (strpos($displayPath, '/public/') === 0) {
+                            $displayPath = substr($displayPath, 7);
+                        }
+                        ?>
+                        <img src="<?= htmlspecialchars($displayPath) ?>?v=<?= time() ?>" alt="QR Code" style="width: 180px; height: 180px; display: block; object-fit: contain;">
                         <p style="font-size: 11px; color: #64748b; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Scan to pay <?= htmlspecialchars($network['symbol'] ?? '') ?></p>
                     </div>
                     <?php endif; ?>
