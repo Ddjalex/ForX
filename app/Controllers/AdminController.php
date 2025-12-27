@@ -538,7 +538,7 @@ class AdminController
             if (isset($_FILES['qr_code']) && $_FILES['qr_code']['error'] === UPLOAD_ERR_OK) {
                 error_log("QR Code file detected, uploading...");
                 $uploadDir = 'uploads/qr_codes/';
-                $fullUploadDir = __DIR__ . '/../../public/' . $uploadDir;
+                $fullUploadDir = ROOT_PATH . '/public/' . $uploadDir;
                 
                 if (!is_dir($fullUploadDir)) {
                     @mkdir($fullUploadDir, 0755, true);

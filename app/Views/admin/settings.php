@@ -79,7 +79,7 @@ $pageTitle = $pageTitle ?? 'Settings';
                     </div>
                     <?php if (!empty($network['qr_code'])): ?>
                     <div style="text-align: center; margin: 10px 0;">
-                        <img src="<?= htmlspecialchars($network['qr_code']) ?>" alt="QR" style="max-width: 100px; border-radius: 4px; background: white; padding: 5px;">
+                        <img src="<?= htmlspecialchars($network['qr_code']) ?>?v=<?= time() ?>" alt="QR" style="max-width: 100px; border-radius: 4px; background: white; padding: 5px;">
                     </div>
                     <?php endif; ?>
                     <div class="form-group">
