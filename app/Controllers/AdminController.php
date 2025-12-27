@@ -697,7 +697,7 @@ class AdminController
     {
         try {
             $kyc_verifications = Database::fetchAll(
-                "SELECT k.*, u.name as user_name, u.email as user_email 
+                "SELECT k.*, u.name as full_name, u.email as user_email 
                  FROM kyc_verifications k 
                  JOIN users u ON k.user_id = u.id 
                  ORDER BY k.created_at DESC"
@@ -706,16 +706,16 @@ class AdminController
             // Fetch stats
             $stats = Database::fetch(
                 "SELECT 
-                    COUNT(*) FILTER (WHERE status = 'pending') as pending,
-                    COUNT(*) FILTER (WHERE status = 'approved') as approved,
-                    COUNT(*) FILTER (WHERE status = 'rejected') as rejected
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+                    COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                    COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected
                  FROM kyc_verifications"
             );
 
             // For each KYC, get documents
             foreach ($kyc_verifications as &$kyc) {
                 $kyc['documents'] = Database::fetchAll(
-                    "SELECT * FROM kyc_documents WHERE kyc_id = ?",
+                    "SELECT * FROM kyc_documents WHERE kyc_id = ? ORDER BY created_at DESC",
                     [$kyc['id']]
                 );
             }
@@ -731,6 +731,7 @@ class AdminController
             ]);
         } catch (\Throwable $e) {
             error_log("KYC View Error: " . $e->getMessage());
+            error_log("KYC Error Details: " . $e->getTraceAsString());
             Session::flash('error', 'Error loading KYC verifications.');
             Router::redirect('/admin');
         }
