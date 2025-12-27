@@ -343,7 +343,7 @@ $csrf_token = $csrf_token ?? '';
 
 .kyc-documents-section { padding: 24px; border-top: 1px solid var(--border-color); }
 .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-.doc-preview { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 3/2; background: #000; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; height: auto; }
+.doc-preview { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 3/2; background: #1a2f4a; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; height: auto; min-height: 200px; }
 .doc-image { width: 100%; height: 100%; object-fit: contain; display: block; transition: 0.5s ease; }
 .doc-preview:hover .doc-image { transform: scale(1.05); }
 .doc-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s ease; color: #fff; cursor: pointer; }
@@ -373,12 +373,30 @@ window.handleImageError = function(img) {
     img.style.display = 'none';
     const parent = img.closest('.doc-preview');
     if (parent) {
+        if (parent.querySelector('.error-placeholder')) return; // Already showing error
         const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = `display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #1a2f4a; color: #a0aec0; text-align: center; font-size: 14px; padding: 20px; border-radius: 12px;`;
-        errorDiv.innerHTML = '<div style="text-align: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><p style="margin: 10px 0 0 0; font-size: 13px;">Image file not found</p></div>';
+        errorDiv.className = 'error-placeholder';
+        errorDiv.style.cssText = `position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a2f4a; color: #a0aec0; text-align: center; font-size: 14px; padding: 20px;`;
+        errorDiv.innerHTML = '<div style="text-align: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><p style="margin: 10px 0 0 0; font-size: 13px;">Image not found</p></div>';
         parent.appendChild(errorDiv);
     }
 };
+
+// Check all images on load
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.doc-image').forEach(img => {
+        const parent = img.closest('.doc-preview');
+        if (!parent) return;
+        
+        // Set timeout to check if image loaded
+        setTimeout(() => {
+            // Check if image has natural dimensions (loaded)
+            if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                window.handleImageError(img);
+            }
+        }, 1000);
+    });
+});</script>
 
 function filterKYC(status) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
