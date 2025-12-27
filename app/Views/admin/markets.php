@@ -1,7 +1,3 @@
-<?php
-ob_start();
-?>
-
 <?php if (!empty($success)): ?>
     <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
 <?php endif; ?>
@@ -112,9 +108,3 @@ function hideMarketModal() {
     document.getElementById('marketModal').classList.remove('active');
 }
 </script>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'Market Management';
-include __DIR__ . '/../layouts/admin.php';
-?>

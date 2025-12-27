@@ -1,15 +1,4 @@
 <?php
-ob_start();
-$btcAddress = $settings['deposit_btc_address'] ?? '';
-$btcNetwork = $settings['deposit_btc_network'] ?? 'BTC';
-$ethAddress = $settings['deposit_eth_address'] ?? '';
-$ethNetwork = $settings['deposit_eth_network'] ?? 'ERC20';
-$usdtAddress = $settings['deposit_usdt_address'] ?? '';
-$usdtNetwork = $settings['deposit_usdt_network'] ?? 'TRC20';
-$ltcAddress = $settings['deposit_ltc_address'] ?? '';
-$ltcNetwork = $settings['deposit_ltc_network'] ?? 'LTC';
-$solAddress = $settings['deposit_sol_address'] ?? '';
-$solNetwork = $settings['deposit_sol_network'] ?? 'SOL';
 $minDeposit = $settings['min_deposit'] ?? '10';
 ?>
 
@@ -181,9 +170,3 @@ $minDeposit = $settings['min_deposit'] ?? '10';
         </div>
     </div>
 </div>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'Make Deposit';
-include __DIR__ . '/../layouts/main.php';
-?>

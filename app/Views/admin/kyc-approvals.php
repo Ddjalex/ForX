@@ -1,7 +1,3 @@
-<?php
-ob_start();
-?>
-
 <div class="admin-kyc-wrapper">
     <div class="admin-kyc-container">
         <!-- Enhanced Header -->
@@ -434,8 +430,3 @@ function showNotification(msg, type) {
     setTimeout(() => n.remove(), 3000);
 }
 </script>
-
-<?php
-$content = ob_get_clean();
-include ROOT_PATH . '/app/Views/layouts/dashboard.php';
-?>

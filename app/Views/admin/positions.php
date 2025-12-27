@@ -1,7 +1,3 @@
-<?php
-ob_start();
-?>
-
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">All Positions</h3>
@@ -56,9 +52,3 @@ ob_start();
         <?php endif; ?>
     </div>
 </div>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'All Positions';
-include __DIR__ . '/../layouts/admin.php';
-?>

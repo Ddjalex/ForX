@@ -1,7 +1,3 @@
-<?php
-ob_start();
-?>
-
 <?php if (!empty($success)): ?>
     <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
 <?php endif; ?>
@@ -78,9 +74,3 @@ ob_start();
         <?php endif; ?>
     </div>
 </div>
-
-<?php
-$content = ob_get_clean();
-$pageTitle = 'Withdrawal Management';
-include __DIR__ . '/../layouts/admin.php';
-?>
