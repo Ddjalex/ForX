@@ -22,7 +22,7 @@ class Database
                     $port = $DB_PORT ?? '3306';
                     $dbname = $DB_NAME ?? 'alphacp_ForX';
                     $user = $DB_USER ?? 'alphacp_ForX';
-                    $password = $DB_PASS ?? '';
+                    $password = $DB_PASS ?? 'a1e2y3t4h5';
                 } else {
                     // Fallback to environment variables or defaults
                     $host = getenv('DB_HOST') ?: 'localhost';

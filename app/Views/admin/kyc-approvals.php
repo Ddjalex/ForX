@@ -166,7 +166,7 @@ $csrf_token = $csrf_token ?? '';
                             <div class="doc-grid">
                                 <?php foreach ($kyc['documents'] as $doc): ?>
                                     <div class="doc-item">
-                                        <div class="doc-preview" style="aspect-ratio: auto; height: auto; min-height: 400px;">
+                                        <div class="doc-preview">
                                             <?php
                                             $imagePath = $doc['file_path'];
                                             // Normalize the path - remove /public/ prefix if present
@@ -180,10 +180,10 @@ $csrf_token = $csrf_token ?? '';
                                             ?>
                                             <img src="<?= htmlspecialchars($imagePath) ?>" 
                                                  alt="<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>"
-                                                 style="object-fit: contain; width: 100%; height: 100%;"
                                                  onclick="showDocumentModal('<?= htmlspecialchars($imagePath) ?>', '<?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?>')" 
                                                  onerror="handleImageError(this)"
-                                                 loading="lazy">
+                                                 loading="eager"
+                                                 class="doc-image">
                                             <div class="doc-overlay">
                                                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -343,12 +343,12 @@ $csrf_token = $csrf_token ?? '';
 
 .kyc-documents-section { padding: 24px; border-top: 1px solid var(--border-color); }
 .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-.doc-preview { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 3/2; background: #000; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-.doc-preview img { width: 100%; height: 100%; object-fit: contain; transition: 0.5s; }
-.doc-preview:hover img { transform: scale(1.05); }
-.doc-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; color: #fff; }
+.doc-preview { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 3/2; background: #000; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; height: auto; }
+.doc-image { width: 100%; height: 100%; object-fit: contain; display: block; transition: 0.5s ease; }
+.doc-preview:hover .doc-image { transform: scale(1.05); }
+.doc-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s ease; color: #fff; cursor: pointer; }
 .doc-preview:hover .doc-overlay { opacity: 1; }
-.doc-name { margin-top: 12px; font-weight: 600; color: var(--text-primary); text-align: center; }
+.doc-name { margin-top: 12px; font-weight: 600; color: var(--text-primary); text-align: center; font-size: 14px; }
 
 .kyc-actions-section { padding: 20px 24px; background: rgba(0,0,0,0.1); display: flex; gap: 15px; border-top: 1px solid var(--border-color); }
 .btn { padding: 12px 28px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
