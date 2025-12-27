@@ -81,15 +81,13 @@ $pageTitle = $pageTitle ?? 'Settings';
                     <div style="text-align: center; margin: 10px 0;">
                         <?php 
                         $displayPath = $network['qr_code'];
-                        // Ensure path starts with /uploads/
-                        if (strpos($displayPath, '/public/') === 0) {
+                        // Handle paths that might start with / or public/
+                        $displayPath = ltrim($displayPath, '/');
+                        if (strpos($displayPath, 'public/') === 0) {
                             $displayPath = substr($displayPath, 7);
                         }
-                        if (strpos($displayPath, 'uploads/') === 0) {
-                            $displayPath = '/' . $displayPath;
-                        }
                         ?>
-                        <img src="<?= htmlspecialchars($displayPath) ?>?v=<?= time() ?>" alt="QR" style="max-width: 150px; border-radius: 8px; background: white; padding: 10px; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <img src="/<?= htmlspecialchars(ltrim($displayPath, '/')) ?>?v=<?= time() ?>" alt="QR" style="max-width: 150px; border-radius: 8px; background: white; padding: 10px; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
                         <p style="font-size: 10px; color: var(--text-secondary); margin-top: 5px;">File: <?= htmlspecialchars(basename($network['qr_code'])) ?></p>
                     </div>
                     <?php endif; ?>
