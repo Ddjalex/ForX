@@ -44,12 +44,12 @@ class WalletController
         try {
             $allSettings = Database::fetchAll("SELECT * FROM settings");
             foreach ($allSettings as $setting) {
-                if (isset($setting['setting_key']) && isset($setting['value'])) {
-                    $settings[$setting['setting_key']] = $setting['value'];
+                if (isset($setting['key']) && isset($setting['value'])) {
+                    $settings[$setting['key']] = $setting['value'];
                 }
             }
 
-            $networks = Database::fetchAll("SELECT * FROM deposit_networks ORDER BY name ASC");
+            $networks = Database::fetchAll("SELECT * FROM deposit_networks WHERE status = 'active' ORDER BY name ASC");
         } catch (\Exception $e) {
             error_log("Deposit Page Error: " . $e->getMessage());
         }
