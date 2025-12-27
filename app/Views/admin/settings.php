@@ -533,16 +533,12 @@ function deleteNetwork(id, name) {
         return false;
     }
     
-    console.log('Starting delete for network ID:', id);
-    
     const formData = new FormData();
     formData.append('_csrf_token', '<?= $csrf_token ?>');
     formData.append('action', 'delete');
     formData.append('id', String(id));
     
-    console.log('Sending DELETE request to /admin/settings');
-    
-    fetch('/admin/settings', {
+    fetch('/admin/deposit-networks', {
         method: 'POST',
         body: formData,
         headers: {
@@ -550,20 +546,15 @@ function deleteNetwork(id, name) {
         }
     })
     .then(response => {
-        console.log('Response received:', response.status);
-        console.log('Response redirected:', response.redirected);
         if (response.ok || response.redirected) {
-            console.log('Delete successful, reloading page');
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            window.location.reload();
         } else {
-            alert('Error: ' + response.status);
+            alert('Error deleting network');
         }
     })
     .catch(error => {
-        console.error('Fetch error:', error);
-        alert('Network error: ' + error.message);
+        console.error('Error:', error);
+        alert('Network error');
     });
     
     return false;

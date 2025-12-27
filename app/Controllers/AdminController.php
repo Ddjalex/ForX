@@ -595,17 +595,20 @@ class AdminController
                     break;
                 case 'delete':
                     error_log("Deleting network ID: $id");
-                    // Fetch QR code path before deleting
-                    $network = Database::fetch("SELECT qr_code FROM deposit_networks WHERE id = ?", [$id]);
-                    if ($network && !empty($network['qr_code'])) {
-                        $fullPath = ROOT_PATH . '/public' . $network['qr_code'];
-                        if (file_exists($fullPath)) {
-                            @unlink($fullPath);
-                            error_log("Deleted QR code file: $fullPath");
+                    if ($id) {
+                        // Fetch QR code path before deleting
+                        $network = Database::fetch("SELECT qr_code FROM deposit_networks WHERE id = ?", [$id]);
+                        if ($network && !empty($network['qr_code'])) {
+                            $fullPath = ROOT_PATH . '/public' . $network['qr_code'];
+                            if (file_exists($fullPath)) {
+                                @unlink($fullPath);
+                                error_log("Deleted QR code file: $fullPath");
+                            }
                         }
+                        Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
+                        AuditLog::log('delete_deposit_network', 'settings', $id);
+                        error_log("Network deleted successfully");
                     }
-                    Database::query("DELETE FROM deposit_networks WHERE id = ?", [$id]);
-                    error_log("Network deleted successfully");
                     break;
                 default:
                     error_log("No valid action specified. Action was: '$action'");
